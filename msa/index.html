@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GRR 计划列表</title>
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embedded');</script>
+  <link rel="stylesheet" href="css/demo.css" />
+</head>
+<body data-mod="grr">
+<div class="app">
+  <header class="header">
+    <div class="brand">计量 MSA</div>
+    <div class="header-right">
+      <span>角色</span>
+      <select id="roleSel" onchange="setRole(this.value)">
+        <option value="planner">计划员</option>
+        <option value="appraiser">评价人 · 王工</option>
+      </select>
+      <span>张明</span>
+    </div>
+  </header>
+  <aside class="sidebar">
+    <div id="msaNav"></div>
+  </aside>
+  <main class="list-main">
+    <div class="card">
+      <div class="query">
+        <div class="query-fields">
+          <div class="field"><label>计划编号</label><input placeholder="请输入" /></div>
+          <div class="field"><label>仪器名称</label><input placeholder="请输入" /></div>
+          <div class="field"><label>仪器编号</label><input placeholder="请输入" /></div>
+          <div class="field">
+            <label>状态</label>
+            <select>
+              <option>全部</option>
+              <option>待执行</option>
+              <option>执行中</option>
+              <option>已完成</option>
+              <option>已关闭</option>
+            </select>
+          </div>
+          <div class="field"><label>评价人</label><input placeholder="请输入" /></div>
+          <div class="field"><label>测量日期</label><input type="date" /></div>
+          <div class="field">
+            <label>判定结果</label>
+            <select>
+              <option>全部</option>
+              <option>优秀</option>
+              <option>可接受</option>
+              <option>不可接受</option>
+              <option>—</option>
+            </select>
+          </div>
+        </div>
+        <div class="query-actions">
+          <button class="btn btn-primary" type="button">查询</button>
+          <button class="btn" type="button">重置</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card fill">
+      <div class="toolbar">
+        <div class="toolbar-left"></div>
+        <div class="toolbar-right">
+          <button class="btn btn-primary" type="button" data-planner-only onclick="openPlan()">新增</button>
+          <button class="btn btn-danger" type="button" data-planner-only onclick="toast('请先勾选要删除的计划')">批量删除</button>
+          <button class="btn" type="button" onclick="return notExport()">导出</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="data pin-cols">
+          <thead>
+            <tr>
+              <th><input type="checkbox" /></th>
+              <th>序号</th>
+              <th>状态</th>
+              <th>计划编号</th>
+              <th>仪器名称</th>
+              <th>仪器编号</th>
+              <th>检测项目</th>
+              <th>评价人</th>
+              <th>检验项目数量</th>
+              <th>评价人数量</th>
+              <th>试验次数</th>
+              <th>测量日期</th>
+              <th>判定</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="checkbox" /></td>
+              <td>1</td>
+              <td><span class="badge badge-info">执行中</span></td>
+              <td><a href="data.html">GRR-20260828-001</a></td>
+              <td>数显卡尺</td>
+              <td>EQ-CAL-012</td>
+              <td>轴套 φ20</td>
+              <td>王工 / 李工 / 赵工</td>
+              <td>10</td>
+              <td>3</td>
+              <td>3</td>
+              <td>2026-08-28</td>
+              <td>—</td>
+              <td>
+                <a class="op-link" href="data.html">数据录入</a>
+                <span class="op-link disabled" data-planner-only>编辑</span>
+                <a class="op-link" href="report.html">报告</a>
+                <a class="op-link" href="index.html" onclick="toast('已复制为新草稿 GRR-20260831-006');return false;">复制</a>
+                <a class="op-link danger" href="#" data-planner-only onclick="toast('已关闭');return false;">关闭</a>
+                <span class="op-link danger disabled" data-planner-only>删除</span>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" /></td>
+              <td>2</td>
+              <td><span class="badge badge-ok">已完成</span></td>
+              <td><a href="report.html">GRR-20260827-003</a></td>
+              <td>外径千分尺</td>
+              <td>EQ-MIC-008</td>
+              <td>销轴</td>
+              <td>王工 / 李工 / 赵工</td>
+              <td>10</td>
+              <td>3</td>
+              <td>3</td>
+              <td>2026-08-27</td>
+              <td><span class="badge badge-warn">可接受</span></td>
+              <td>
+                <a class="op-link" href="data.html">数据录入</a>
+                <span class="op-link disabled" data-planner-only>编辑</span>
+                <a class="op-link" href="report.html">报告</a>
+                <a class="op-link" href="#" onclick="toast('已复制为新草稿');return false;">复制</a>
+                <span class="op-link danger disabled" data-planner-only>关闭</span>
+                <a class="op-link danger" href="#" data-planner-only onclick="toast('已删除');return false;">删除</a>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" /></td>
+              <td>3</td>
+              <td><span class="badge badge-muted">待执行</span></td>
+              <td><a href="#" onclick="openPlan('edit-002');return false;">GRR-20260826-002</a></td>
+              <td>高度尺</td>
+              <td>EQ-HGT-003</td>
+              <td>支架</td>
+              <td>王工 / 李工</td>
+              <td>10</td>
+              <td>2</td>
+              <td>2</td>
+              <td>2026-08-26</td>
+              <td>—</td>
+              <td>
+                <a class="op-link" href="data.html">数据录入</a>
+                <a class="op-link" href="#" data-planner-only onclick="openPlan('edit-002');return false;">编辑</a>
+                <a class="op-link" href="report.html">报告</a>
+                <a class="op-link" href="#" onclick="toast('已复制为新草稿');return false;">复制</a>
+                <a class="op-link danger" href="#" data-planner-only onclick="toast('已关闭');return false;">关闭</a>
+                <a class="op-link danger" href="#" data-planner-only onclick="toast('已删除');return false;">删除</a>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" /></td>
+              <td>4</td>
+              <td><span class="badge badge-ok">已完成</span></td>
+              <td><a href="report.html">GRR-20260825-001</a></td>
+              <td>数显卡尺</td>
+              <td>EQ-CAL-012</td>
+              <td>轴套 φ20</td>
+              <td>王工 / 李工 / 赵工</td>
+              <td>10</td>
+              <td>3</td>
+              <td>3</td>
+              <td>2026-08-25</td>
+              <td><span class="badge badge-ok">优秀</span></td>
+              <td>
+                <a class="op-link" href="data.html">数据录入</a>
+                <span class="op-link disabled" data-planner-only>编辑</span>
+                <a class="op-link" href="report.html">报告</a>
+                <a class="op-link" href="#" onclick="toast('已复制为新草稿');return false;">复制</a>
+                <span class="op-link danger disabled" data-planner-only>关闭</span>
+                <a class="op-link danger" href="#" data-planner-only onclick="toast('已删除');return false;">删除</a>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" /></td>
+              <td>5</td>
+              <td><span class="badge badge-danger">已关闭</span></td>
+              <td>GRR-20260820-004</td>
+              <td>深度尺</td>
+              <td>EQ-DEP-001</td>
+              <td>槽宽件</td>
+              <td>王工 / 李工 / 赵工</td>
+              <td>5</td>
+              <td>3</td>
+              <td>3</td>
+              <td>2026-08-20</td>
+              <td>—</td>
+              <td>
+                <span class="op-link disabled">数据录入</span>
+                <span class="op-link disabled" data-planner-only>编辑</span>
+                <span class="op-link disabled">报告</span>
+                <a class="op-link" href="#" onclick="toast('已复制为新草稿');return false;">复制</a>
+                <span class="op-link danger disabled" data-planner-only>关闭</span>
+                <a class="op-link danger" href="#" data-planner-only onclick="toast('已删除');return false;">删除</a>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" /></td>
+              <td>6</td>
+              <td><span class="badge badge-muted">待执行</span></td>
+              <td><a href="data.html">GRR-20260818-002</a></td>
+              <td>外径千分尺</td>
+              <td>EQ-MIC-008</td>
+              <td>销轴</td>
+              <td>王工 / 李工 / 赵工</td>
+              <td>10</td>
+              <td>3</td>
+              <td>3</td>
+              <td>2026-08-18</td>
+              <td>—</td>
+              <td>
+                <a class="op-link" href="data.html">数据录入</a>
+                <a class="op-link" href="#" data-planner-only onclick="openPlan('edit-003');return false;">编辑</a>
+                <a class="op-link" href="report.html">报告</a>
+                <a class="op-link" href="#" onclick="toast('已复制为新草稿');return false;">复制</a>
+                <a class="op-link danger" href="#" data-planner-only onclick="toast('已关闭');return false;">关闭</a>
+                <a class="op-link danger" href="#" data-planner-only onclick="toast('已删除');return false;">删除</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pager">
+        <span>共 6 条</span>
+        <div class="pager-right">
+          <button type="button">‹</button>
+          <button class="cur" type="button">1</button>
+          <button type="button">›</button>
+          <span>每页</span>
+          <select><option>20</option><option>50</option></select>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<div class="modal-mask" id="planMask" onclick="if(event.target===this)closePlan()">
+  <div class="modal modal-lg" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <h3 id="planTitle">新增计划</h3>
+      <button type="button" class="modal-close" onclick="closePlan()" aria-label="关闭">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field">
+          <label>计划编号</label>
+          <div class="ro" id="planNo">提交后生成 GRR-YYYYMMDD-序号</div>
+        </div>
+        <div class="field">
+          <label>仪器 <span style="color:var(--danger)">*</span></label>
+          <select id="eq" onchange="syncEq()">
+            <option value="">请选择</option>
+            <option value="EQ-CAL-012">EQ-CAL-012 数显卡尺</option>
+            <option value="EQ-MIC-008">EQ-MIC-008 外径千分尺</option>
+            <option value="EQ-HGT-003">EQ-HGT-003 高度尺</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>仪器编号</label>
+          <div class="ro" id="eqNum">—</div>
+        </div>
+        <div class="field">
+          <label>仪器规格</label>
+          <div class="ro" id="eqSpec">—</div>
+        </div>
+        <div class="field">
+          <label>仪器量程</label>
+          <div class="ro" id="eqRange">—</div>
+        </div>
+        <div class="field">
+          <label>仪器类型</label>
+          <div class="ro" id="eqType">—</div>
+        </div>
+        <div class="field">
+          <label>检测项目 <span style="color:var(--danger)">*</span></label>
+          <input id="partName" />
+        </div>
+        <div class="field">
+          <label>检验项目数量 n <span style="color:var(--danger)">*</span></label>
+          <select id="nSel">
+            <option>2</option><option>3</option><option>4</option><option>5</option>
+            <option>6</option><option>7</option><option>8</option><option>9</option>
+            <option selected>10</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>试验次数 r <span style="color:var(--danger)">*</span></label>
+          <select id="rSel"><option>2</option><option selected>3</option></select>
+        </div>
+        <div class="field">
+          <label>评价人数量 <span style="color:var(--danger)">*</span></label>
+          <select id="opn" onchange="toggleOp3()">
+            <option>2</option><option selected>3</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>评价人 1 <span style="color:var(--danger)">*</span></label>
+          <select id="op1"><option>王工</option><option>李工</option><option>赵工</option></select>
+        </div>
+        <div class="field">
+          <label>评价人 2 <span style="color:var(--danger)">*</span></label>
+          <select id="op2"><option>王工</option><option selected>李工</option><option>赵工</option></select>
+        </div>
+        <div class="field" id="op3wrap">
+          <label>评价人 3 <span style="color:var(--danger)">*</span></label>
+          <select id="op3"><option>王工</option><option>李工</option><option selected>赵工</option></select>
+        </div>
+        <div class="field">
+          <label>计划测量日期 <span style="color:var(--danger)">*</span></label>
+          <input id="planDate" type="date" />
+        </div>
+        <div class="field span-3">
+          <label>备注</label>
+          <textarea id="remark" placeholder="选填"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot" data-planner-only>
+      <button class="btn" type="button" onclick="saveDraft()">保存草稿</button>
+      <a class="btn btn-primary" href="data.html">提交计划</a>
+    </div>
+  </div>
+</div>
+<script src="js/app.js"></script>
+<script>
+var EQ = {
+  "EQ-CAL-012": { spec: "0–150 mm / 0.01 mm", range: "0–150 mm", type: "卡尺" },
+  "EQ-MIC-008": { spec: "0–25 mm / 0.001 mm", range: "0–25 mm", type: "千分尺" },
+  "EQ-HGT-003": { spec: "0–300 mm / 0.02 mm", range: "0–300 mm", type: "高度尺" }
+};
+function syncEq() {
+  var v = document.getElementById("eq").value;
+  var m = EQ[v];
+  document.getElementById("eqNum").textContent = v || "—";
+  document.getElementById("eqSpec").textContent = m ? m.spec : "—";
+  document.getElementById("eqRange").textContent = m ? m.range : "—";
+  document.getElementById("eqType").textContent = m ? m.type : "—";
+}
+function toggleOp3() {
+  document.getElementById("op3wrap").style.display =
+    document.getElementById("opn").value === "3" ? "" : "none";
+}
+function closePlan() {
+  document.getElementById("planMask").classList.remove("show");
+}
+function fillDefault() {
+  document.getElementById("planNo").textContent = "提交后生成 GRR-YYYYMMDD-序号";
+  document.getElementById("eq").value = "EQ-CAL-012";
+  document.getElementById("partName").value = "轴套 φ20";
+  document.getElementById("nSel").value = "10";
+  document.getElementById("rSel").value = "3";
+  document.getElementById("opn").value = "3";
+  document.getElementById("op1").value = "王工";
+  document.getElementById("op2").value = "李工";
+  document.getElementById("op3").value = "赵工";
+  document.getElementById("planDate").value = "2026-08-28";
+  document.getElementById("remark").value = "";
+  syncEq();
+  toggleOp3();
+}
+function openPlan(id) {
+  document.getElementById("planTitle").textContent = id ? "编辑计划" : "新增计划";
+  fillDefault();
+  if (id === "edit-002") {
+    document.getElementById("planNo").textContent = "GRR-20260826-002";
+    document.getElementById("eq").value = "EQ-HGT-003";
+    document.getElementById("partName").value = "支架";
+    document.getElementById("nSel").value = "10";
+    document.getElementById("rSel").value = "2";
+    document.getElementById("opn").value = "2";
+    document.getElementById("planDate").value = "2026-08-26";
+    syncEq();
+    toggleOp3();
+  }
+  if (id === "edit-001") {
+    document.getElementById("planNo").textContent = "GRR-20260828-001";
+  }
+  if (id === "edit-003") {
+    document.getElementById("planNo").textContent = "GRR-20260818-002";
+    document.getElementById("eq").value = "EQ-MIC-008";
+    document.getElementById("partName").value = "销轴";
+    document.getElementById("planDate").value = "2026-08-18";
+    syncEq();
+  }
+  document.getElementById("planMask").classList.add("show");
+}
+function saveDraft() {
+  closePlan();
+  toast("已保存草稿");
+}
+</script>
+</body>
+</html>

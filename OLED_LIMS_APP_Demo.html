@@ -1,0 +1,1884 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>OLED_LIMS APP Demo</title>
+<style>
+:root{
+  --primary:#1677FF;--primary-hover:#4096FF;--primary-soft:#E8F3FF;
+  --text:#1D2129;--text-2:#4E5969;--text-3:#86909C;--placeholder:#C0C4CC;
+  --border:#F0F1F3;--border-input:#E5E6EB;--bg:#F5F6F8;--danger:#FF4D4F;
+  --ok:#00B42A;--badge:#FF4D4F;--warn:#FF8C1A;--warn-soft:#FFF7E8;
+  --btn-blue:#1989FA;
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html,body{margin:0;height:100%}
+body{font-family:"PingFang SC","Microsoft YaHei",Arial,sans-serif;font-size:14px;color:var(--text-2);background:var(--bg)}
+button,input{font-family:inherit}
+button{cursor:pointer}
+.desk{min-height:100%;display:flex;flex-direction:column}
+.desk-bar{height:52px;padding:0 20px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0}
+.desk-brand{font-size:15px;font-weight:600;color:var(--text)}
+.mode-switch{display:inline-flex;border:1px solid var(--border);border-radius:4px;overflow:hidden}
+.mode-switch a{padding:6px 14px;font-size:13px;line-height:1.2;text-decoration:none;color:var(--text-2);background:#fff}
+.mode-switch a:hover{color:var(--primary)}
+.mode-switch a.on{background:var(--primary);color:#fff}
+.stage{flex:1;display:flex;align-items:center;justify-content:center;padding:16px}
+.phone{width:min(390px,100%);height:min(844px,calc(100vh - 84px));background:#fff;border:1px solid var(--border);border-radius:16px;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.screen{flex:1;min-height:0;display:flex;flex-direction:column;position:relative;background:var(--bg)}
+.view{flex:1;min-height:0;display:none;flex-direction:column}
+.view.on{display:flex}
+/* 各 panel 必须为纵向 flex，否则内层滚动容器(flex:1)无法被高度约束，导致内容撑爆、无法滚动且把 tabbar 挤出可视区 */
+#panel-home,#panel-msg,#panel-approve,#panel-mine,#panel-module{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+/* ---------- 忘记密码页（保留原表单样式） ---------- */
+.sheet{flex:1;min-height:0;background:#fff;padding:12px 20px 20px;overflow:auto}
+.field{margin-bottom:14px}
+.field-label{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-size:13px;color:var(--text-2)}
+.field input{width:100%;height:40px;border:1px solid var(--border-input);border-radius:4px;padding:0 12px;font-size:16px;color:var(--text);background:#fff}
+.field input::placeholder{color:var(--placeholder)}
+.field input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 2px rgba(22,119,255,.16)}
+.pwd{position:relative}
+.pwd input{padding-right:44px}
+.eye{position:absolute;right:0;top:0;width:40px;height:40px;border:0;background:transparent;color:var(--text-3);display:flex;align-items:center;justify-content:center}
+.eye svg{width:18px;height:18px}
+.ghost{height:40px;padding:0 10px;border:1px solid var(--primary);border-radius:4px;background:#fff;color:var(--primary);font-size:13px;white-space:nowrap}
+.ghost:disabled{color:var(--placeholder);border-color:var(--border);background:var(--bg)}
+.sms{display:flex;gap:8px}
+.sms input{flex:1;min-width:0}
+.sms-hint{margin-top:6px;font-size:12px;color:var(--primary);line-height:1.5}
+.err{min-height:18px;margin:-4px 0 8px;font-size:12px;color:var(--danger);line-height:1.4}
+.btn{width:100%;height:40px;border:0;border-radius:4px;background:var(--primary);color:#fff;font-size:15px}
+.btn:hover{background:var(--primary-hover)}
+.steps{display:flex;gap:16px;margin:4px 0 16px;font-size:13px;color:var(--text-3)}
+.steps .on{color:var(--primary);font-weight:600}
+/* ---------- 顶栏 ---------- */
+.subhead{height:48px;display:flex;align-items:center;gap:4px;padding:0 8px 0 4px;background:#fff;flex-shrink:0;border-bottom:1px solid var(--border)}
+.subhead h2{margin:0;font-size:16px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
+.subhead h2.shift-l{padding-right:52px}
+.icon-btn{width:36px;height:36px;border:0;background:transparent;color:var(--text);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.icon-btn svg{width:20px;height:20px}
+.head-link{border:0;background:transparent;color:var(--primary);font-size:14px;padding:8px;flex-shrink:0}
+/* ---------- 页面标题栏（首页/消息/审批/我的） ---------- */
+.page-head{height:48px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.page-head h1{margin:0;font-size:17px;font-weight:600;color:var(--text)}
+.list-body,.home-body,.mine-body{flex:1;min-height:0;overflow:auto;padding:12px;background:var(--bg)}
+/* ---------- 首页分组卡片 ---------- */
+.group-card{background:#fff;border-radius:8px;margin-bottom:12px;overflow:hidden}
+.group-title{display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid var(--border);font-size:15px;font-weight:600;color:var(--text)}
+.group-title svg{width:18px;height:18px;color:var(--primary);flex-shrink:0}
+.icon-grid{display:grid;grid-template-columns:repeat(3,1fr);padding:18px 8px 24px;row-gap:24px}
+.icon-item{position:relative;border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 4px}
+.icon-item .ico{width:44px;height:44px;border-radius:10px;background:var(--primary-soft);color:var(--primary);display:flex;align-items:center;justify-content:center}
+.icon-item .ico svg{width:22px;height:22px}
+.icon-item .lbl{font-size:13px;color:var(--text);line-height:1.3;text-align:center}
+.badge{position:absolute;top:-7px;left:calc(50% + 8px);min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--badge);color:#fff;font-size:11px;line-height:18px;font-weight:500;font-style:normal;text-align:center}
+/* ---------- 搜索栏 ---------- */
+.search-bar{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--bg);flex-shrink:0}
+.search-input{flex:1;height:36px;border-radius:6px;border:0;background:#EDEFF2;display:flex;align-items:center;gap:6px;padding:0 10px}
+.search-input svg{width:15px;height:15px;color:var(--placeholder);flex-shrink:0}
+.search-input input{flex:1;min-width:0;border:0;background:transparent;outline:none;font-size:13px;color:var(--text)}
+.search-input input::placeholder{color:var(--placeholder)}
+.search-bar .q-btn{border:0;background:transparent;color:var(--text-2);font-size:14px;padding:4px 2px}
+/* ---------- 单据卡片 ---------- */
+.doc-list{padding:2px 12px 16px}
+.doc-card{background:#fff;border-radius:8px;margin-bottom:12px;overflow:hidden}
+.doc-head{position:relative;height:42px;background:linear-gradient(90deg,#CFE3FF 0%,#E8F2FF 100%);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;color:var(--text)}
+.status-tag{position:absolute;right:12px;top:50%;transform:translateY(-50%);padding:2px 10px;border-radius:11px;font-size:12px;line-height:18px;white-space:nowrap}
+.status-tag.wait{background:var(--warn-soft);color:var(--warn)}
+.status-tag.run{background:var(--primary-soft);color:var(--primary)}
+.status-tag.done{background:#E8FFEA;color:var(--ok)}
+.doc-body{padding:6px 16px 8px}
+.kv{display:flex;min-height:32px;font-size:13px;line-height:32px;align-items:flex-start}
+.kv .k{width:82px;color:var(--text-3);flex-shrink:0}
+.kv .v{flex:1;color:var(--text);word-break:break-all;line-height:32px}
+.kv-row{display:flex}
+.kv-row .kv{flex:1;min-width:0}
+.kv-row .kv .k{width:76px}
+.doc-foot{display:flex;justify-content:flex-end;padding:4px 16px 14px}
+.pill-btn{padding:5px 16px;border:1px solid var(--primary);border-radius:15px;background:#fff;color:var(--primary);font-size:13px;line-height:1.3}
+.pill-btn:active{background:var(--primary-soft)}
+.empty-tip{padding:40px 0;text-align:center;font-size:13px;color:var(--text-3)}
+/* ---------- 表单（新增/详情编辑区） ---------- */
+.form-wrap{flex:1;min-height:0;overflow:auto;background:#fff;position:relative}
+.group-label{padding:18px 16px 0 36px;font-size:13px;color:var(--text-3)}
+.fi{padding:0 16px}
+.fi .fl{display:flex;align-items:center;margin:14px 0 8px;font-size:14px;color:var(--text);line-height:1.4}
+.fi .fl i{color:var(--danger);font-style:normal;margin-right:3px;font-size:14px}
+.fi input{width:100%;height:40px;border:0;border-radius:4px;background:#F7F8FA;padding:0 12px;font-size:14px;color:var(--text);outline:none}
+.fi input::placeholder{color:var(--placeholder)}
+.fi .auto{height:40px;display:flex;align-items:center;padding:0 12px;border-radius:4px;background:#F7F8FA;font-size:14px;color:var(--placeholder)}
+.fi .sel{height:40px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 12px;border-radius:4px;background:#F7F8FA;font-size:14px}
+.fi .sel .sel-ph{color:var(--placeholder)}
+.fi .sel.has-val .sel-ph{color:var(--text)}
+.fi .sel .chev{width:14px;height:14px;color:var(--placeholder);flex-shrink:0}
+.fi .form-gap{height:6px}
+.stepper{display:inline-flex;align-items:center;height:28px;border:1px solid var(--border);border-radius:4px;overflow:hidden;background:#fff}
+.stepper button{width:28px;height:100%;border:0;background:#F7F8FA;color:var(--text-2);font-size:14px;line-height:1;padding:0}
+.stepper input{width:60px;height:100%;border:0;outline:none;text-align:center;font-size:12px;color:var(--text-2);background:#fff;padding:0}
+/* ---------- 详情页 ---------- */
+.detail-banner{height:56px;background:linear-gradient(180deg,#CBE1FF 0%,#EDF4FF 100%);display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px;font-size:14px;color:var(--text-2);flex-shrink:0}
+.detail-kv{background:#fff;padding:6px 16px 14px}
+.detail-sec h3{margin:18px 16px 4px;font-size:20px;font-weight:600;color:var(--text)}
+.seg-tabs{display:flex;margin:0 16px;border-bottom:1px solid var(--border)}
+.seg-tabs button{flex:1;height:42px;border:0;background:transparent;font-size:14px;color:var(--text-2);position:relative}
+.seg-tabs button.on{color:var(--primary);font-weight:600}
+.seg-tabs button.on::after{content:'';position:absolute;left:50%;transform:translateX(-50%);bottom:0;width:28px;height:2px;background:var(--primary);border-radius:1px}
+.mini-table{margin:12px 16px;border:1px solid var(--border);border-radius:4px;overflow:hidden}
+.mini-table table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+.mini-table th{background:#F7F8FA;color:var(--text-2);font-weight:500;padding:9px 4px;border-bottom:1px solid var(--border);text-align:center}
+.mini-table td{padding:18px 4px;text-align:center;color:var(--text-3);border-bottom:1px solid var(--border)}
+.mini-table tr:last-child td{border-bottom:0}
+.submit-bar{position:sticky;bottom:0;padding:8px 12px calc(10px + env(safe-area-inset-bottom));background:#fff;margin-top:12px}
+.submit-btn{width:100%;height:46px;border:0;border-radius:4px;background:var(--btn-blue);color:#fff;font-size:16px}
+.submit-btn:active{background:var(--primary-hover)}
+/* ---------- 我的 ---------- */
+.profile{background:#fff;border-radius:8px;padding:16px;display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.avatar{width:44px;height:44px;border-radius:22px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;flex-shrink:0}
+.profile b{display:block;font-size:16px;color:var(--text)}
+.profile span{display:block;margin-top:4px;font-size:12px;color:var(--text-3)}
+.nav-row{width:100%;display:flex;align-items:center;justify-content:space-between;padding:15px 16px;margin-bottom:8px;border:0;border-radius:8px;background:#fff;color:var(--text);font-size:14px;text-align:left}
+.nav-row svg{width:16px;height:16px;color:var(--placeholder);flex-shrink:0}
+.btn-logout{width:100%;height:44px;margin-top:12px;border:0;border-radius:8px;background:#fff;color:var(--danger);font-size:14px}
+/* ---------- 消息卡片 ---------- */
+.msg-card{background:#fff;border-radius:8px;padding:14px 16px;margin-bottom:10px}
+.msg-card .t{display:flex;align-items:center;justify-content:space-between;font-size:14px;color:var(--text);font-weight:600}
+.msg-card .t .dot{width:8px;height:8px;border-radius:4px;background:var(--badge);flex-shrink:0}
+.msg-card .t .read .dot{background:transparent}
+.msg-card .b{margin-top:8px;font-size:13px;color:var(--text-2);line-height:1.55}
+.msg-card .time{margin-top:8px;font-size:12px;color:var(--text-3)}
+/* ---------- 底部 tabbar（4 tab + 角标） ---------- */
+.tabbar{height:54px;border-top:1px solid var(--border);background:#fff;display:flex;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom)}
+.tabbar button{position:relative;flex:1;border:0;background:transparent;color:var(--text-3);font-size:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.tabbar button svg{width:22px;height:22px}
+.tabbar button.on{color:var(--primary)}
+.tb-badge{position:absolute;top:5px;left:calc(50% + 5px);min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--badge);color:#fff;font-size:10px;line-height:16px;font-style:normal;font-weight:500;text-align:center;white-space:nowrap}
+.toast{position:absolute;left:50%;bottom:72px;transform:translateX(-50%);max-width:86%;padding:8px 12px;border-radius:4px;background:rgba(29,33,41,.9);color:#fff;font-size:13px;line-height:1.45;text-align:center;opacity:0;pointer-events:none;z-index:5}
+.toast.on{opacity:1}
+/* ---------- 登录页（保留原样式） ---------- */
+.xlogin{flex:1;min-height:0;display:flex;flex-direction:column;background:#fff;overflow:auto}
+.xlogin-hero{display:block;width:100%;height:auto;flex-shrink:0}
+.xlogin-form{margin-top:14%;padding:0 8.7% 8px}
+.xrow{display:flex;align-items:center;width:100%;min-height:54px;padding:0;border:0;border-bottom:1px solid #eee;background:#fff;gap:8px;text-align:left}
+.xrow .lab{width:64px;flex-shrink:0;font-size:15px;color:#6a6c6e}
+.xrow .val,.xrow input{flex:1;min-width:0;height:44px;border:0;outline:none;background:transparent;padding:0;font-size:15px;color:#414244}
+.xrow input::placeholder{color:#c5c8ce}
+.xrow .chev{width:16px;height:16px;color:#c5c8ce;flex-shrink:0}
+.eyes{display:inline-flex;align-items:center;gap:6px;flex-shrink:0}
+.eyes .eye{position:static;width:22px;height:22px;border:0;background:transparent;color:#b7bcc4;padding:0;display:flex;align-items:center;justify-content:center}
+.eyes .eye svg{width:18px;height:18px}
+.xcap{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #eee}
+.xcap input{flex:1;height:36px;border:0;outline:none;font-size:15px}
+.xcap canvas{width:96px;height:36px;border-radius:4px}
+.xerr{min-height:0;margin:8px 0 0;font-size:12px;color:#F53F3F;line-height:1.4}
+.xerr:empty{display:none}
+.xbtn{width:100%;height:46px;margin-top:28px;border:0;border-radius:23px;background:#0079ea;color:#fff;font-size:16px;letter-spacing:1px}
+.xbtn:hover{background:#006ed6}
+.xfoot{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
+.xcheck{position:relative;display:inline-flex;align-items:center;gap:6px;color:#c0c4cc;font-size:13px}
+.xcheck input{position:absolute;opacity:0;width:1px;height:1px}
+.xcheck i{width:14px;height:14px;border:1px solid #dcdfe6;border-radius:2px;background:#fff;box-sizing:border-box}
+.xcheck input:checked+i{background:#0079ea;border-color:#0079ea;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6l3 3 5-5' fill='none' stroke='%23fff' stroke-width='1.6'/%3E%3C/svg%3E");background-size:10px;background-repeat:no-repeat;background-position:center}
+.xfoot #btn-forgot{border:0;background:none;padding:0;color:#c0c4cc;font-size:13px}
+.xlogo{margin-top:auto;display:flex;justify-content:center;padding:24px 0 28px}
+.xlogo img{width:18%;height:auto;display:block}
+.org-mask{position:absolute;inset:0;z-index:6;display:flex;align-items:flex-end}
+.org-mask__bg{position:absolute;inset:0;border:0;background:rgba(0,0,0,.45)}
+.org-panel{position:relative;width:100%;background:#fff;border-radius:12px 12px 0 0;padding:8px 0 18px}
+.org-panel__title{height:44px;display:flex;align-items:center;justify-content:center;font-size:15px;color:#1d2129;font-weight:600}
+.org-item{width:100%;height:48px;border:0;background:#fff;color:#0079ea;font-size:15px}
+/* ---------- 底部选择器（表单下拉） ---------- */
+.picker-mask{position:absolute;inset:0;z-index:8;display:flex;align-items:flex-end}
+.picker-mask__bg{position:absolute;inset:0;border:0;background:rgba(0,0,0,.45)}
+.picker-panel{position:relative;width:100%;max-height:62%;background:#fff;border-radius:12px 12px 0 0;overflow:hidden;display:flex;flex-direction:column}
+.picker-panel__title{height:44px;display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--text);font-weight:600;border-bottom:1px solid var(--border);flex-shrink:0}
+.picker-panel__list{overflow:auto;padding:6px 0}
+.picker-item{width:100%;height:46px;border:0;background:#fff;color:var(--text);font-size:15px;text-align:center;flex-shrink:0}
+.picker-item:active{background:var(--bg)}
+/* ---------- 检验项目编辑弹窗 ---------- */
+.project-mask{position:absolute;inset:0;z-index:9;display:flex;align-items:flex-end}
+.project-mask__bg{position:absolute;inset:0;border:0;background:rgba(0,0,0,.45)}
+.project-panel{position:relative;width:100%;background:#fff;border-radius:12px 12px 0 0;padding-bottom:12px}
+.project-panel__title{height:44px;display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--text);font-weight:600;border-bottom:1px solid var(--border)}
+.project-panel__body{padding:8px 16px 4px}
+.project-panel__foot{display:flex;gap:12px;padding:8px 16px calc(10px + env(safe-area-inset-bottom))}
+.project-panel__foot button{flex:1;height:42px;border-radius:4px;font-size:15px}
+#project-cancel{border:1px solid var(--border-input);background:#fff;color:var(--text-2)}
+#project-save{border:0;background:var(--btn-blue);color:#fff}
+.pseg{display:flex;background:var(--bg);border-radius:4px;padding:2px}
+.pseg button{flex:1;height:32px;border:0;background:transparent;border-radius:3px;font-size:13px;color:var(--text-2)}
+.pseg button.on{background:#fff;color:var(--primary);font-weight:600}
+/* ---------- 检验项目明细列表 ---------- */
+.item-list{padding:0 16px}
+.item-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 0;border-bottom:1px solid var(--border)}
+.item-info{flex:1;min-width:0}
+.item-info b{display:block;font-size:14px;color:var(--text);font-weight:600;word-break:break-all}
+.item-info span{display:block;margin-top:3px;font-size:12px;color:var(--text-3);line-height:1.4;word-break:break-all}
+.item-ops{display:flex;gap:8px;flex-shrink:0}
+.item-ops button{border:1px solid var(--primary);background:#fff;border-radius:14px;padding:5px 14px;font-size:13px;color:var(--primary)}
+.item-ops .item-del{color:var(--danger);border-color:var(--danger)}
+.item-add-btn{display:block;margin:14px auto 4px;padding:9px 24px;border:1px dashed var(--primary);background:var(--primary-soft);border-radius:18px;color:var(--primary);font-size:14px;font-weight:600}
+/* 方案切换区（接收页，明确的"更换方案"入口） */
+.scheme-pick{display:flex;align-items:center;gap:8px;height:42px;background:#F7F8FA;border-radius:4px;padding:0 6px 0 12px}
+.scheme-pick .scheme-name{flex:1;min-width:0;font-size:14px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.scheme-pick .scheme-name.ph{color:var(--placeholder)}
+.scheme-switch{flex-shrink:0;border:1px solid var(--primary);background:#fff;color:var(--primary);border-radius:14px;padding:5px 14px;font-size:13px;font-weight:600}
+@media (max-width:520px){
+  .desk-bar{padding:0 12px}
+  .stage{padding:0}
+  .phone{width:100%;height:calc(100vh - 52px);border:0;border-radius:0}
+}
+</style>
+</head>
+<body>
+<div class="desk">
+  <header class="desk-bar">
+    <div class="desk-brand">奥莱德 LIMS</div>
+    <div class="mode-switch">
+      <a href="./OLED_LIMS_Demo.html">PC</a>
+      <a href="./OLED_LIMS_APP_Demo.html" class="on">APP</a>
+    </div>
+  </header>
+  <div class="stage">
+    <div class="phone">
+      <div class="screen">
+        <section id="view-login" class="view on">
+          <div class="xlogin">
+            <img class="xlogin-hero" src="./img/app-login-hero.png" alt="" />
+            <form id="form-account" class="xlogin-form">
+              <button type="button" class="xrow" id="org-row">
+                <span class="lab">组织</span>
+                <span class="val" id="org-name">万物智汇有限公司</span>
+                <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+              </button>
+              <label class="xrow">
+                <span class="lab">用户名</span>
+                <input id="account" name="username" autocomplete="username" placeholder="请输入用户名" />
+              </label>
+              <label class="xrow">
+                <span class="lab">密码</span>
+                <input id="password" type="password" autocomplete="current-password" placeholder="请输入密码" />
+                <span class="eyes">
+                  <button type="button" class="eye" data-eye="password" aria-label="显示密码">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2.5 12S6 6.5 12 6.5 21.5 12 21.5 12 18 17.5 12 17.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.4"/></svg>
+                  </button>
+                  <button type="button" class="eye" data-eye="password" data-force-hide aria-label="隐藏密码">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 4.5l17 15"/><path d="M9.5 6.6A10 10 0 0 1 12 6.2c6 0 9.5 5.8 9.5 5.8a16 16 0 0 1-3.1 3.6"/><path d="M6.2 7.4C4 9 2.5 12 2.5 12s3.5 5.8 9.5 5.8c1.1 0 2.2-.2 3.1-.6"/><path d="M10 10.2a2.3 2.3 0 0 0 3.2 3.2"/></svg>
+                  </button>
+                </span>
+              </label>
+              <div id="cap-account" class="xcap" hidden>
+                <input id="cap-account-input" autocomplete="off" placeholder="图形验证码" maxlength="4" />
+                <canvas id="cap-account-canvas" width="104" height="40" title="点击刷新"></canvas>
+              </div>
+              <div id="err-account" class="xerr"></div>
+              <button class="xbtn" type="submit">登录</button>
+              <div class="xfoot">
+                <label class="xcheck">
+                  <input id="remember" type="checkbox" />
+                  <i></i>
+                  <span>记住账号</span>
+                </label>
+                <button type="button" id="btn-forgot">忘记密码?</button>
+              </div>
+            </form>
+            <div class="xlogo"><img src="./img/app-login-logo.png" alt="万物智汇 xsmart" /></div>
+          </div>
+          <div id="org-sheet" class="org-mask" hidden>
+            <button type="button" class="org-mask__bg" id="org-close" aria-label="关闭"></button>
+            <div class="org-panel">
+              <div class="org-panel__title">选择组织</div>
+              <button type="button" class="org-item" id="org-pick">万物智汇有限公司</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="view-forgot" class="view">
+          <div class="subhead">
+            <button type="button" class="icon-btn" id="forgot-back" aria-label="返回">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <h2>忘记密码</h2>
+          </div>
+          <div class="sheet">
+            <div class="steps"><span id="step-1" class="on">1 验证手机</span><span id="step-2">2 设置新密码</span></div>
+            <form id="form-forgot-1">
+              <div class="field">
+                <div class="field-label"><span>手机号</span></div>
+                <input id="forgot-phone" type="tel" inputmode="numeric" maxlength="11" placeholder="请输入手机号" />
+              </div>
+              <div class="field">
+                <div class="field-label"><span>手机验证码</span></div>
+                <div class="sms">
+                  <input id="forgot-code" inputmode="numeric" maxlength="6" placeholder="请输入验证码" />
+                  <button type="button" class="ghost" id="btn-sms-forgot" data-sms-btn data-sms-purpose="forgot">获取验证码</button>
+                </div>
+                <div id="sms-hint-forgot" class="sms-hint" hidden></div>
+              </div>
+              <div id="err-forgot-1" class="err"></div>
+              <button class="btn" type="submit">下一步</button>
+            </form>
+            <form id="form-forgot-2" hidden>
+              <div class="field">
+                <div class="field-label"><span>新密码</span></div>
+                <div class="pwd">
+                  <input id="new-password" type="password" autocomplete="new-password" placeholder="不少于 6 位" />
+                  <button type="button" class="eye" data-eye="new-password" aria-label="显示密码">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="field">
+                <div class="field-label"><span>确认密码</span></div>
+                <input id="new-password-2" type="password" autocomplete="new-password" placeholder="再次输入新密码" />
+              </div>
+              <div id="err-forgot-2" class="err"></div>
+              <button class="btn" type="submit">完成</button>
+            </form>
+          </div>
+        </section>
+
+        <section id="view-main" class="view">
+          <div id="panel-home" data-panel="home">
+            <div class="page-head"><h1>首页</h1></div>
+            <div class="home-body" id="home-groups"></div>
+          </div>
+          <div id="panel-msg" data-panel="msg" hidden>
+            <div class="page-head"><h1>消息</h1></div>
+            <div class="list-body" id="msg-list"></div>
+          </div>
+          <div id="panel-approve" data-panel="approve" hidden>
+            <div class="page-head"><h1>审批</h1></div>
+            <div class="list-body" id="approve-list"></div>
+          </div>
+          <div id="panel-mine" data-panel="mine" hidden>
+            <div class="page-head"><h1>我的</h1></div>
+            <div class="mine-body">
+              <div class="profile">
+                <div class="avatar" id="mine-avatar">超</div>
+                <div>
+                  <b id="mine-name">超级管理员</b>
+                  <span id="mine-meta">admin · 13800000001</span>
+                </div>
+              </div>
+              <button type="button" class="nav-row" data-mine="audit">我的审核<span></span></button>
+              <button type="button" class="nav-row" data-mine="start">我的发起<span></span></button>
+              <button type="button" class="nav-row" data-mine="msg">消息<span></span></button>
+              <button type="button" class="btn-logout" id="btn-logout">退出登录</button>
+            </div>
+          </div>
+          <div id="panel-module" data-panel="module" hidden>
+            <div class="subhead">
+              <button type="button" class="icon-btn" id="mod-back" aria-label="返回">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <h2 id="mod-title" class="shift-l">模块</h2>
+              <button type="button" class="head-link" id="mod-add" hidden>新增</button>
+            </div>
+            <div class="mod-body" id="mod-body" style="flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;background:var(--bg)"></div>
+          </div>
+          <nav class="tabbar" id="tabbar">
+            <button type="button" data-tab="home" class="on">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5z"/></svg>
+              <span>首页</span><i class="tb-badge">99+</i>
+            </button>
+            <button type="button" data-tab="msg">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4a5.5 5.5 0 0 1 5.5 5.5v3l1.7 3.2a.6.6 0 0 1-.53.88H5.33a.6.6 0 0 1-.53-.88L6.5 12.5v-3A5.5 5.5 0 0 1 12 4z"/><path d="M10 19.5a2 2 0 0 0 4 0"/></svg>
+              <span>消息</span><i class="tb-badge">1</i>
+            </button>
+            <button type="button" data-tab="approve">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5.5" y="3.5" width="13" height="17" rx="2"/><path d="M9 12.5l2 2 4-4"/></svg>
+              <span>审批</span><i class="tb-badge">31</i>
+            </button>
+            <button type="button" data-tab="mine">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.2"/><path d="M5 19.2c1.4-3 3.8-4.4 7-4.4s5.6 1.4 7 4.4"/></svg>
+              <span>我的</span>
+            </button>
+          </nav>
+        </section>
+        <div id="picker-mask" class="picker-mask" hidden>
+          <button type="button" class="picker-mask__bg" id="picker-close" aria-label="关闭"></button>
+          <div class="picker-panel">
+            <div class="picker-panel__title" id="picker-title">请选择</div>
+            <div class="picker-panel__list" id="picker-list"></div>
+          </div>
+        </div>
+        <div id="project-mask" class="project-mask" hidden>
+          <button type="button" class="project-mask__bg" id="project-close" aria-label="关闭"></button>
+          <div class="project-panel">
+            <div class="project-panel__title" id="project-title">检验项目</div>
+            <div class="project-panel__body">
+              <div class="fi"><div class="fl"><i>*</i>项目名称</div><input type="text" id="project-name" placeholder="请输入检验项目名称" /></div>
+              <div class="fi"><div class="fl">类型</div><div class="pseg" id="project-type-seg"><button type="button" class="on" data-pt="定量">定量</button><button type="button" data-pt="定性">定性</button></div></div>
+              <div class="fi"><div class="fl">单位</div><input type="text" id="project-unit" placeholder="如 %、ppm、无" /></div>
+              <div class="fi"><div class="fl">规格/标准</div><input type="text" id="project-spec" placeholder="如 ≥99.9%（定性可用逗号分隔选项）" /></div>
+            </div>
+            <div class="project-panel__foot">
+              <button type="button" id="project-cancel">取消</button>
+              <button type="button" id="project-save">保存</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="toast" class="toast" role="status"></div>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  var USERS_KEY = 'OLED_LIMS_APP_USERS';
+  var SESSION_KEY = 'OLED_LIMS_APP_SESSION';
+  var REMEMBER_KEY = 'OLED_LIMS_APP_REMEMBER';
+  var SEED = [
+    { account: 'admin', name: '超级管理员', password: '123456', phone: '13800000001' },
+    { account: 'zhang', name: '张检验', password: '123456', phone: '13911112222' }
+  ];
+  /* 首页模块分组：组图标 + 组内页面（角标为演示数据） */
+  var MODULES = [
+    { id: 'sample', name: '报检及取样', icon: '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M14.5 9.5l-4 4V16h2.5l4-4z"/>',
+      items: ['采购来料检', '中间过程检', '成品检', '客户回收料', '客户退货检', '留样检', '耐热报检', '研发报检', '库内复检', '通用检', '外检', '取样', '样品接收'],
+      counts: [29, 14, 8, 5, 4, 3, 2, 1, 6, 7, 4, 12, 10] },
+    { id: 'result', name: '检验结果查询', icon: '<circle cx="11" cy="11" r="6"/><path d="M16 16l4 4"/>',
+      items: ['采购来料检验结果', '生产过程检验结果', '生产物料检验结果', '库内复检检验结果', '钢瓶检验结果'], counts: ['99+', 32, 18, 7, 12] }
+  ];
+  var MINE_NOTES = {
+    audit: '我的审核',
+    start: '我的发起',
+    msg: '消息'
+  };
+  var MSGS = [
+    { title: '报检单超期提醒', body: 'BJD00000562 已执行 48 小时未完成取样，请及时处理。', time: '2026-09-21 18:07', unread: true },
+    { title: '审核通过通知', body: '您发起的《生产入库申请单》已审核通过。', time: '2026-09-20 10:32', unread: false },
+    { title: '维修工单进度', body: 'WX00000123 已完成维修，等待验收确认。', time: '2026-09-19 09:15', unread: false }
+  ];
+  var captcha = { account: '', phone: '' };
+  var captchaOn = false;
+  var sms = null;
+  var smsTimer = null;
+  var forgotPhoneOk = '';
+  var stack = [];
+  var stackFrom = 'home';
+  var session = null;
+
+  function $(id) { return document.getElementById(id); }
+  function el(tag, cls) { var n = document.createElement(tag); if (cls) n.className = cls; return n; }
+  function users() {
+    try {
+      var raw = sessionStorage.getItem(USERS_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return SEED.map(function (u) { return Object.assign({}, u); });
+  }
+  function saveUsers(list) { sessionStorage.setItem(USERS_KEY, JSON.stringify(list)); }
+  function findPhone(phone) {
+    var key = String(phone || '').trim();
+    return users().filter(function (u) { return u.phone === key; })[0] || null;
+  }
+  function loadRemember() {
+    try {
+      var list = JSON.parse(localStorage.getItem(REMEMBER_KEY) || '[]');
+      return Array.isArray(list) ? list : [];
+    } catch (e) { return []; }
+  }
+  function saveRemember(list) { localStorage.setItem(REMEMBER_KEY, JSON.stringify(list.slice(0, 5))); }
+  function readSession() {
+    try { return JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null'); } catch (e) { return null; }
+  }
+  function toast(msg) {
+    var elx = $('toast');
+    elx.textContent = msg;
+    elx.classList.add('on');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function () { elx.classList.remove('on'); }, 2200);
+  }
+  function setErr(id, msg) { $(id).textContent = msg || ''; }
+  function show(name) {
+    document.querySelectorAll('.view').forEach(function (v) {
+      v.classList.toggle('on', v.id === 'view-' + name);
+    });
+  }
+  function drawCaptcha(canvas) {
+    var alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    var code = '';
+    for (var i = 0; i < 4; i++) code += alphabet[Math.floor(Math.random() * alphabet.length)];
+    var ctx = canvas.getContext('2d');
+    var w = canvas.width, h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = '#F7F8FA';
+    ctx.fillRect(0, 0, w, h);
+    for (var n = 0; n < 3; n++) {
+      ctx.strokeStyle = n % 2 ? '#B3C6E0' : '#C9CDD4';
+      ctx.beginPath();
+      ctx.moveTo(Math.random() * w, Math.random() * h);
+      ctx.lineTo(Math.random() * w, Math.random() * h);
+      ctx.stroke();
+    }
+    ctx.font = 'bold 22px "PingFang SC","Microsoft YaHei",sans-serif';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#1677FF';
+    for (var c = 0; c < 4; c++) {
+      ctx.save();
+      ctx.translate(14 + c * 22, h / 2);
+      ctx.rotate((Math.random() - 0.5) * 0.35);
+      ctx.fillText(code[c], 0, 0);
+      ctx.restore();
+    }
+    return code;
+  }
+  function refreshCaptcha() {
+    captcha.account = drawCaptcha($('cap-account-canvas'));
+  }
+  function validPhone(phone) { return /^1\d{10}$/.test(String(phone || '').trim()); }
+  function smsAlive() { return sms && Date.now() <= sms.expire; }
+  function paintSmsButtons() {
+    document.querySelectorAll('[data-sms-btn]').forEach(function (b) {
+      var same = sms && sms.left > 0 && b.getAttribute('data-sms-purpose') === sms.purpose;
+      b.disabled = !!same;
+      b.textContent = same ? sms.left + 's' : '获取验证码';
+    });
+  }
+  function startCountdown() {
+    clearInterval(smsTimer);
+    sms.left = 60;
+    paintSmsButtons();
+    smsTimer = setInterval(function () {
+      if (!sms) { clearInterval(smsTimer); return; }
+      sms.left -= 1;
+      if (sms.left <= 0) {
+        sms.left = 0;
+        clearInterval(smsTimer);
+      }
+      paintSmsButtons();
+    }, 1000);
+  }
+  function sendSms(phone, purpose, hintId, errId) {
+    setErr(errId, '');
+    if (!String(phone || '').trim()) { setErr(errId, '请输入手机号'); return false; }
+    if (!validPhone(phone)) { setErr(errId, '请输入 11 位手机号'); return false; }
+    if (!findPhone(phone)) { setErr(errId, '手机号与账号用户手机号不一致'); return false; }
+    var code = String(Math.floor(100000 + Math.random() * 900000));
+    sms = { phone: String(phone).trim(), code: code, purpose: purpose, expire: Date.now() + 60000, left: 60 };
+    var hint = $(hintId);
+    hint.hidden = false;
+    hint.textContent = '演示验证码 ' + code + '，60 秒内有效';
+    startCountdown();
+    toast('验证码已发送');
+    return true;
+  }
+  function checkSms(phone, code, purpose, errId) {
+    if (!sms || sms.purpose !== purpose || sms.phone !== String(phone || '').trim()) {
+      setErr(errId, '请先获取验证码');
+      return false;
+    }
+    if (!smsAlive()) {
+      setErr(errId, '验证码已失效，请重新获取');
+      return false;
+    }
+    if (String(code || '').trim() !== sms.code) {
+      setErr(errId, '验证码不正确');
+      return false;
+    }
+    return true;
+  }
+  function enter(user) {
+    session = { account: user.account, name: user.name, phone: user.phone };
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    captchaOn = false;
+    $('cap-account').hidden = true;
+    $('password').value = '';
+    setErr('err-account', '');
+    renderMine();
+    showMain('home');
+  }
+  function showMain(panel) {
+    show('main');
+    ['home', 'msg', 'approve', 'mine', 'module'].forEach(function (p) {
+      $('panel-' + p).hidden = p !== panel;
+    });
+    $('tabbar').hidden = panel === 'module';
+    document.querySelectorAll('[data-tab]').forEach(function (btn) {
+      btn.classList.toggle('on', btn.getAttribute('data-tab') === panel);
+    });
+    if (panel === 'mine') renderMine();
+  }
+  function renderMine() {
+    if (!session) return;
+    $('mine-avatar').textContent = session.name.slice(0, 1);
+    $('mine-name').textContent = session.name;
+    $('mine-meta').textContent = session.account + ' · ' + session.phone;
+  }
+  function icon(path) {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + path + '</svg>';
+  }
+  var DOC_ICONS = [
+    '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/>',
+    '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M14.5 9.5l-4 4V16h2.5l4-4z"/>',
+    '<circle cx="12" cy="12" r="7"/><path d="M12 8.5V12l2.5 2"/>',
+    '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 9h6M9 13h6"/><path d="M9 17.5l1.5 1.5 3-3"/>',
+    '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M12 8v6M9 11h6"/>'
+  ];
+  function renderHome() {
+    var wrap = $('home-groups');
+    wrap.textContent = '';
+    MODULES.forEach(function (mod) {
+      var card = el('div', 'group-card');
+      var t = el('div', 'group-title');
+      t.innerHTML = icon(mod.icon);
+      var nameSpan = el('span');
+      nameSpan.textContent = mod.name;
+      t.appendChild(nameSpan);
+      var grid = el('div', 'icon-grid');
+      mod.items.forEach(function (item, idx) {
+        var btn = el('button', 'icon-item');
+        btn.type = 'button';
+        var count = mod.counts && mod.counts[idx];
+        btn.innerHTML = '<span class="ico">' + icon(DOC_ICONS[idx % DOC_ICONS.length]) + '</span>'
+          + '<span class="lbl"></span>'
+          + (count ? '<i class="badge"></i>' : '');
+        btn.querySelector('.lbl').textContent = item;
+        if (count) btn.querySelector('.badge').textContent = String(count);
+        btn.addEventListener('click', function () {
+          if (mod.id === 'sample' && item === '取样') {
+            openStack([{ title: '取样', type: 'sample' }], 'home');
+          } else if (mod.id === 'sample' && item === '样品接收') {
+            openStack([{ title: '样品接收', type: 'sample-receive' }], 'home');
+          } else if (mod.id === 'sample') {
+            openStack([{ title: item, type: 'list', inspType: item }], 'home');
+          } else {
+            openStack([{ title: item, type: 'list', docs: makeDocs() }], 'home');
+          }
+        });
+        grid.appendChild(btn);
+      });
+      card.appendChild(t);
+      card.appendChild(grid);
+      wrap.appendChild(card);
+    });
+  }
+  /* ==================== 报检单及取样（数据驱动，对齐 PC 端） ==================== */
+  var ORDERS_KEY = 'OLED_LIMS_APP_ORDERS';
+
+  // 11 种报检单类型配置：命名与 PC 端 typeMap 完全一致（采购来料检/中间过程检/成品检/客户回收料/客户退货检/留样检/耐热报检/研发报检/库内复检/通用检/外检）
+  var INSP_TYPES = {
+    '采购来料检': { pc: 'purchase-incoming', calc: 'ladder',
+      relLabel: '到货通知单号', relPh: '如 TZ20260918001',
+      hasSupplier: true, hasCustomer: false, customerReq: false, hasWorkshop: false, hasDocType: false, hasMedium: false,
+      hasCount: true, hasQuantity: true, hasScheme: true, countReq: true, hasPoint: true,
+      materialType: '原材料', remark: '采购来料检验，请按到货通知单核对物料与供应商信息后取样送检。',
+      team: '来料检验班组', point: '原料库粉体取样台' },
+    '中间过程检': { pc: 'made-product', calc: 'manual',
+      relLabel: '生产订单号', relPh: '如 MO-NF3-20260901',
+      hasSupplier: false, hasCustomer: true, customerReq: false, hasWorkshop: true, hasDocType: false, hasMedium: false,
+      hasCount: false, hasQuantity: false, hasScheme: false, hasPoint: true,
+      materialType: '中间过程物料', remark: '中间过程检验，请按生产订单与当前工序取样送检。',
+      team: '卡盘过程检验班', workshop: '卡盘成型车间', line: '卡盘制浆分散线', point: '卡盘制浆取样口' },
+    '成品检': { pc: 'finished-product', calc: 'ladder',
+      relLabel: '生产订单号', relPh: '如 MO-FG-20260901',
+      hasSupplier: false, hasCustomer: true, customerReq: false, hasWorkshop: true, hasDocType: false, hasMedium: false,
+      hasCount: true, hasQuantity: true, hasScheme: true, countReq: true, hasPoint: true,
+      materialType: '成品', remark: '成品出厂检验，请按成品批次与抽样方案取样送检。',
+      team: '成品检验班组', workshop: '卡盘装配车间', line: '卡盘成品检测线', point: 'ESC成品出厂取样' },
+    '客户回收料': { pc: 'customer-recycle', calc: 'ladder',
+      relLabel: '到货通知单号', relPh: '如 TZ-HS-20260901',
+      hasSupplier: false, hasCustomer: true, customerReq: true, hasWorkshop: false, hasDocType: false, hasMedium: false,
+      hasCount: true, hasQuantity: true, hasScheme: true, hasPoint: true,
+      materialType: '原材料', remark: '客户回收料检验，请按回收批次与抽样方案取样送检。',
+      team: '来料检验班组', point: '原料库粉体取样台' },
+    '客户退货检': { pc: 'customer-return', calc: 'ladder',
+      relLabel: '退货单号', relPh: '如 TH-202609-01',
+      hasSupplier: false, hasCustomer: true, customerReq: true, hasWorkshop: false, hasDocType: false, hasMedium: false,
+      hasCount: true, hasQuantity: true, hasScheme: true, hasPoint: false,
+      materialType: '原材料', remark: '客户退货检验，请按退货批次与抽样方案取样送检。',
+      team: '来料检验班组', point: '' },
+    '留样检': { pc: 'retain-sample', calc: 'manual',
+      relLabel: '', relPh: '',
+      hasSupplier: false, hasCustomer: false, customerReq: false, hasWorkshop: false, hasDocType: false, hasMedium: false,
+      hasCount: false, hasQuantity: false, hasScheme: false, hasPoint: true,
+      materialType: '原材料', remark: '留样复检，请按留样批次取样送检。',
+      team: '来料检验班组', point: '原料库粉体取样台' },
+    '耐热报检': { pc: 'heat-resistance', calc: 'manual',
+      relLabel: '', relPh: '',
+      hasSupplier: false, hasCustomer: false, customerReq: false, hasWorkshop: false, hasDocType: false, hasMedium: false,
+      hasCount: true, hasQuantity: false, hasScheme: false, hasPoint: true,
+      materialType: '原材料', remark: '耐热报检，请按耐热周期取样送检。',
+      team: '来料检验班组', point: '原料库粉体取样台' },
+    '研发报检': { pc: 'rd-test', calc: 'manual',
+      relLabel: '', relPh: '',
+      hasSupplier: false, hasCustomer: false, customerReq: false, hasWorkshop: false, hasDocType: false, hasMedium: false,
+      hasCount: false, hasQuantity: false, hasScheme: false, hasPoint: true,
+      hasSourceExperiment: true, hasProjectName: true,
+      materialType: '原材料', remark: '研发报检，请按研发实验批次取样送检。',
+      team: '来料检验班组', point: '原料库粉体取样台' },
+    '库内复检': { pc: 'in-wh-recheck', calc: 'manual',
+      relLabel: '', relPh: '',
+      hasSupplier: false, hasCustomer: false, customerReq: false, hasWorkshop: false, hasDocType: false, hasMedium: false,
+      hasCount: false, hasQuantity: false, hasScheme: false, hasPoint: true,
+      materialType: '原材料', remark: '库内复检，请按库存批次取样送检。',
+      team: '来料检验班组', point: '原料库粉体取样台' },
+    '通用检': { pc: 'general', calc: 'manual',
+      relLabel: '', relPh: '',
+      hasSupplier: false, hasCustomer: false, customerReq: false, hasWorkshop: false, hasDocType: false, hasMedium: false,
+      hasCount: false, hasQuantity: false, hasScheme: false, hasPoint: true,
+      materialType: '原材料', remark: '通用检验，请按实际检验需求取样送检。',
+      team: '来料检验班组', point: '原料库粉体取样台' },
+    '外检': { pc: 'external', calc: 'full',
+      relLabel: '处理工单号', relPh: '如 WO-CYL-202609-01',
+      hasSupplier: false, hasCustomer: false, customerReq: false, hasWorkshop: true, hasDocType: true, hasMedium: true,
+      hasCount: true, hasQuantity: false, hasScheme: false, countReq: true, hasPoint: true,
+      countLabel: '扫码/报检件数', materialType: '', remark: '钢瓶外检（1:1 全检），请按充装介质与单据类型执行检漏、镜检与气密性检测。',
+      team: '成品检验班组', workshop: '卡盘装配车间', line: '卡盘成品检测线', point: 'ESC成品出厂取样' }
+  };
+  var INSP_TYPE_NAMES = Object.keys(INSP_TYPES);
+
+  // 检验方案库：方案编码 + 名称 + 检验项目明细（定量/定性），对齐 PC 端 insp-scheme
+  var INSP_SCHEMES = {
+    'SCH-IQC-ALN4N-TKY': {
+      name: '德山蓝色主体材料 mCP4N来料检',
+      items: [
+        { code: 'JY-01', name: '含量(纯度)', type: '定量', unit: '%', lsl: 99.9, usl: 100, spec: '≥99.9%' },
+        { code: 'JY-02', name: '水分', type: '定量', unit: 'ppm', usl: 100, spec: '≤100 ppm' },
+        { code: 'JY-03', name: '金属离子', type: '定量', unit: 'ppb', usl: 50, spec: '≤50 ppb' },
+        { code: 'JY-QL-01', name: '外观色泽', type: '定性', unit: '', spec: '无色透明，无可见杂质', options: ['无色透明，无可见杂质', '轻微浑浊', '可见杂质'] },
+        { code: 'JY-QL-02', name: '包装与标识', type: '定性', unit: '', spec: '密封完好，标识清晰', options: ['密封完好，标识清晰', '标识模糊', '包装破损'] }
+      ]
+    },
+    'SCH-IPQC-ESC-SLURRY': {
+      name: '卡盘制浆分散过程检',
+      items: [
+        { code: 'JY-04', name: '固含量', type: '定量', unit: '%', lsl: 15, usl: 25, spec: '15%~25%' },
+        { code: 'JY-05', name: '粘度', type: '定量', unit: 'mPa·s', lsl: 100, usl: 500, spec: '100~500 mPa·s' },
+        { code: 'JY-QL-03', name: '颗粒形貌', type: '定性', unit: '', spec: '形貌均匀一致', options: ['形貌均匀一致', '可见团聚粗粒'] }
+      ]
+    },
+    'SCH-FQC-ESC144-INT': {
+      name: '12英寸ESC-144区厂内成品检',
+      items: [
+        { code: 'JY-06', name: '外形尺寸', type: '定量', unit: 'mm', lsl: 299, usl: 301, spec: '300±1 mm' },
+        { code: 'JY-07', name: '平面度', type: '定量', unit: 'μm', usl: 5, spec: '≤5 μm' },
+        { code: 'JY-QL-04', name: '外观', type: '定性', unit: '', spec: '无划伤', options: ['无划伤', '有划伤'] }
+      ]
+    }
+  };
+  var SCHEME_CODES = Object.keys(INSP_SCHEMES);
+
+  // 方案匹配：按报检单类型 → 方案编码（对齐 PC defaultSchemeCode）；无固定方案的类型返回 null
+  function matchScheme(typeName) {
+    var t = INSP_TYPES[typeName];
+    if (!t) return null;
+    if (t.pc === 'made-product') return 'SCH-IPQC-ESC-SLURRY';
+    if (t.pc === 'finished-product') return 'SCH-FQC-ESC144-INT';
+    if (t.pc === 'external') return 'SCH-FQC-ESC144-INT';
+    if (t.pc === 'general') return null; // 通用检无固定方案 → 触发"无匹配方案"提示
+    return 'SCH-IQC-ALN4N-TKY';
+  }
+
+  var OPT_SUPPLIERS = ['株式会社トクヤマ', '林德气体(中国)有限公司', '湖北华特电子材料有限公司'];
+  var OPT_CUSTOMERS = ['北方华创科技集团股份有限公司', '中微半导体设备(上海)股份有限公司', '东京电子(TEL)', '长江存储科技有限责任公司'];
+  var OPT_WORKSHOPS = ['卡盘成型车间', '卡盘装配车间'];
+  var OPT_LINES = { '卡盘成型车间': ['卡盘制浆分散线'], '卡盘装配车间': ['卡盘成品检测线'] };
+  var OPT_POINTS = ['原料库粉体取样台', '特气钢瓶取样点', '卡盘制浆取样口', '烧结基板取样口', 'ESC成品出厂取样', '导热胶成品放行取样'];
+  var OPT_TEAMS = ['来料检验班组', '卡盘过程检验班', '热界面过程检验班', '成品检验班组', '理化分析班组'];
+  var OPT_DOC_TYPES = ['真空抽空检漏', '内壁镜检洁净度', '瓶阀气密性检测'];
+  var OPT_MEDIUMS = ['NF3 (三氟化氮)', 'C2F6 (六氟乙烷)', 'SiH4 (高纯硅烷)', 'CF4 (四氟化碳)'];
+  var OPT_MATERIALS = [
+    { num: 'OLED-HOST-BL-01', name: '蓝色主体材料 mCP', spec: '纯度≥99.9% 升华级', type: '原材料', unit: 'kg', scheme: 'GB/T 2828.1 正常抽样', sampling: '正常抽样' },
+    { num: 'OLED-ETL-01', name: '电子传输层材料', spec: '纯度≥99.5%', type: '中间过程物料', unit: 'kg', scheme: 'GB/T 2828.1 正常抽样', sampling: '正常抽样' },
+    { num: 'OLED-MAT-01', name: '生产物料 A', spec: '标准规格', type: '生产物料', unit: 'kg', scheme: 'GB/T 2828.1 正常抽样', sampling: '正常抽样' },
+    { num: 'OLED-MAT-02', name: '生产物料 B', spec: '标准规格', type: '生产物料', unit: 'kg', scheme: 'GB/T 2828.1 正常抽样', sampling: '加严抽样' },
+    { num: 'OLED-ELE-01', name: 'ESC 静电吸盘成品', spec: '12英寸 ESC', type: '成品', unit: '件', scheme: 'GB/T 2828.1 正常抽样', sampling: '正常抽样' }
+  ];
+
+  function pad2(n) { return String(n).padStart(2, '0'); }
+  function nowStr() {
+    var d = new Date();
+    return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()) + ' '
+      + pad2(d.getHours()) + ':' + pad2(d.getMinutes()) + ':' + pad2(d.getSeconds());
+  }
+  function genInspNo(orders) {
+    var d = new Date();
+    var prefix = 'BJ' + d.getFullYear() + pad2(d.getMonth() + 1) + pad2(d.getDate());
+    var maxSeq = 0;
+    INSP_TYPE_NAMES.forEach(function (t) {
+      (orders[t] || []).forEach(function (r) {
+        var no = String(r.no || '');
+        if (no.indexOf(prefix) === 0) {
+          var seq = parseInt(no.slice(prefix.length), 10);
+          if (!isNaN(seq) && seq > maxSeq) maxSeq = seq;
+        }
+      });
+    });
+    return prefix + String(maxSeq + 1).padStart(4, '0');
+  }
+  function loadOrders() {
+    try {
+      var raw = sessionStorage.getItem(ORDERS_KEY);
+      if (raw) {
+        var o = JSON.parse(raw);
+        INSP_TYPE_NAMES.forEach(function (t) { o[t] = o[t] || []; });
+        return o;
+      }
+    } catch (e) {}
+    return null;
+  }
+  function saveOrders(o) { sessionStorage.setItem(ORDERS_KEY, JSON.stringify(o)); }
+
+  // 应取样件数测算（对齐 PC onInspOrderCountChange：钢瓶全检 / 加严 / 正常阶梯 / 手输）
+  function calcSampleCount(typeName, count, samplingType) {
+    var t = INSP_TYPES[typeName];
+    var c = Math.max(1, parseInt(count, 10) || 1);
+    if (t.calc === 'full') return c;
+    if (t.calc === 'manual') return 0;
+    if (samplingType === '加严抽样') return Math.max(3, Math.min(20, Math.ceil(c * 0.1)));
+    if (c <= 10) return 2;
+    if (c <= 50) return 3;
+    if (c <= 150) return 5;
+    return 8;
+  }
+  function defaultMaterial(typeName) {
+    var t = INSP_TYPES[typeName];
+    var list = OPT_MATERIALS.filter(function (m) { return m.type === t.materialType; });
+    return list[0] || OPT_MATERIALS[0];
+  }
+  function buildSamples(order) {
+    var list = [];
+    var numPart = String(order.no).replace(/\D/g, '').slice(-6) || '091801';
+    for (var i = 1; i <= order.willSample; i++) {
+      list.push({
+        num: 'YP' + numPart + String(i).padStart(3, '0'),
+        status: i <= order.doneSample ? '已取样' : '待取样',
+        point: order.point, scheme: order.scheme || 'SPC采购来料检验方案',
+        sampler: i <= order.doneSample ? '超级管理员' : '—', time: i <= order.doneSample ? order.time : '—',
+        received: false, receivedScheme: '', receivedItems: []
+      });
+    }
+    return list;
+  }
+  function orderRows(o) {
+    var t = INSP_TYPES[o.type];
+    var rows = [];
+    if (t.relLabel) rows.push([t.relLabel, o.relNo || '—']);
+    if (t.hasSupplier) rows.push(['供应商信息', o.supplier || '—']);
+    if (t.hasCustomer && o.customer) rows.push(['客户信息', o.customer]);
+    if (t.hasWorkshop) rows.push(['所属车间', o.workshop || '—']);
+    if (t.hasWorkshop) rows.push(['产线名称', o.line || '—']);
+    if (t.hasDocType) rows.push(['单据类型', o.docType || '—']);
+    if (t.hasSourceExperiment) rows.push(['来源实验', o.sourceExperiment || '—']);
+    if (t.hasProjectName) rows.push(['所属项目', o.projectName || '—']);
+    rows.push(['物料信息', o.materialText || '—']);
+    if (t.hasMedium) rows.push(['充装介质', o.medium || '—']);
+    if (t.hasPoint !== false) rows.push(['采样点', o.point || '—']);
+    if (!t.hasMedium) rows.push(['报检批号', o.batch || '—']);
+    if (t.hasCount) rows.push([t.countLabel || '报检件数', o.count != null ? String(o.count) : '—']);
+    if (t.hasQuantity) rows.push(['报检数量', o.qty != null ? String(o.qty) : '—']);
+    if (t.hasQuantity) rows.push(['基本单位', o.unit || '—']);
+    if (t.hasScheme) rows.push(['抽样方案', o.scheme || '—']);
+    if (t.hasScheme) rows.push(['抽样类型', o.sampling || '—']);
+    rows.push(['检验班组', o.team || '—']);
+    rows.push(['报检人', o.creator || '超级管理员']);
+    rows.push(['报检时间', o.time || '—']);
+    rows.push(['应取样件数', String(o.willSample != null ? o.willSample : '—')]);
+    rows.push(['已取样件数', String(o.doneSample != null ? o.doneSample : '—')]);
+    rows.push(['待取样件数', String(o.todoSample != null ? o.todoSample : '—')]);
+    if (o.remark) rows.push(['报检备注', o.remark]);
+    return rows;
+  }
+  function statusClass(status) {
+    if (status === '执行中') return 'run';
+    if (status === '已完成') return 'done';
+    return 'wait';
+  }
+  function orderCard(o) {
+    var card = el('div', 'doc-card');
+    var head = el('div', 'doc-head');
+    var t = el('span');
+    t.textContent = '报检单号：' + o.no;
+    head.appendChild(t);
+    var tag = el('span', 'status-tag ' + statusClass(o.status));
+    tag.textContent = o.status;
+    head.appendChild(tag);
+    var bd = el('div', 'doc-body');
+    renderRows(bd, orderRows(o));
+    var foot = el('div', 'doc-foot');
+    var btn = el('button', 'pill-btn');
+    btn.type = 'button';
+    btn.textContent = '查看详情';
+    btn.addEventListener('click', function () {
+      stack.push({ title: o.no, type: 'detail', order: o });
+      renderModule();
+    });
+    foot.appendChild(btn);
+    card.appendChild(head);
+    card.appendChild(bd);
+    card.appendChild(foot);
+    return card;
+  }
+  function seedOrders() {
+    var orders = {};
+    var base = {
+      '采购来料检': [
+        { relNo: 'TZ20260918001', supplier: '株式会社トクヤマ', matIdx: 0, batch: 'LOT-20260918-01', count: 50, qty: 1250, status: '待执行', doneSample: 0 },
+        { relNo: 'TZ20260915002', supplier: '林德气体(中国)有限公司', matIdx: 0, batch: 'LOT-20260915-02', count: 11, qty: 120, status: '执行中', doneSample: 4 }
+      ],
+      '中间过程检': [
+        { relNo: 'MO-NF3-20260901', matIdx: 1, batch: 'LOT-20260920-01', status: '待执行' },
+        { relNo: 'MO-NF3-20260828', matIdx: 1, batch: 'LOT-20260828-03', status: '执行中' }
+      ],
+      '成品检': [
+        { relNo: 'MO-FG-20260901', matIdx: 4, batch: 'LOT-20260919-01', count: 50, qty: 500, status: '待执行' }
+      ],
+      '客户回收料': [
+        { relNo: 'TZ-HS-20260901', customer: '芯陶科技', matIdx: 0, batch: 'LOT-20260912-01', count: 20, qty: 200, status: '待执行' }
+      ],
+      '客户退货检': [
+        { relNo: 'TH-202609-01', customer: '芯陶科技', matIdx: 0, batch: 'LOT-20260908-02', count: 5, qty: 50, status: '待执行' }
+      ],
+      '留样检': [
+        { batch: 'LOT-20260905-01', matIdx: 0, status: '待执行' }
+      ],
+      '耐热报检': [
+        { matIdx: 0, batch: 'LOT-20260901-03', count: 30, status: '待执行' }
+      ],
+      '研发报检': [
+        { matIdx: 0, batch: 'LOT-20260902-01', sourceExperiment: '研发实验 A', projectName: '新材料验证', status: '待执行' }
+      ],
+      '库内复检': [
+        { batch: 'LOT-20260910-07', matIdx: 0, status: '待执行' }
+      ],
+      '通用检': [
+        { matIdx: 0, batch: 'LOT-20260901-01', status: '待执行' }
+      ],
+      '外检': [
+        { relNo: 'WO-CYL-202609-01', docType: '真空抽空检漏', medium: 'NF3 (三氟化氮)', count: 6, status: '待执行' }
+      ]
+    };
+    INSP_TYPE_NAMES.forEach(function (typeName) {
+      var t = INSP_TYPES[typeName];
+      orders[typeName] = [];
+      (base[typeName] || []).forEach(function (b, i) {
+        var mat = OPT_MATERIALS[b.matIdx != null ? b.matIdx : 0];
+        var count = b.count != null ? b.count : (t.hasCount ? 50 : 3);
+        var sampling = mat.sampling;
+        var will = (t.calc === 'full') ? count : (t.calc === 'manual' ? 3 : calcSampleCount(typeName, count, sampling));
+        var done = b.doneSample || 0;
+        var order = {
+          id: 'seed_' + typeName + '_' + i,
+          type: typeName, no: 'BJ20260918' + pad2(10 + i) + pad2(i + 1),
+          status: b.status || '待执行',
+          relNo: b.relNo || '', supplier: b.supplier || '', customer: b.customer || '',
+          sourceExperiment: b.sourceExperiment || '', projectName: b.projectName || '',
+          workshop: b.workshop || t.workshop || '', line: b.line || t.line || '',
+          docType: b.docType || '', medium: b.medium || '',
+          materialNum: mat.num, materialName: mat.name, materialSpec: mat.spec, materialType: mat.type,
+          materialText: mat.num + ' / ' + mat.name + ' / ' + mat.spec + ' / ' + mat.type,
+          point: (t.hasPoint === false) ? '' : (b.point || t.point || '原料库粉体取样台'), batch: b.batch || '',
+          count: t.hasCount ? count : null, qty: t.hasQuantity ? (b.qty || 1250) : null,
+          unit: mat.unit, scheme: mat.scheme, sampling: sampling,
+          willSample: will, doneSample: done, todoSample: will - done,
+          team: t.team, remark: t.remark, creator: '超级管理员', time: '2026-09-21 18:07:55',
+          samples: []
+        };
+        order.samples = buildSamples(order);
+        orders[typeName].push(order);
+      });
+    });
+    saveOrders(orders);
+    return orders;
+  }
+  function getOrders() {
+    var o = loadOrders();
+    if (!o) o = seedOrders();
+    return o;
+  }
+  function makeDocs(prefix) {
+    var p = prefix || 'BJ';
+    return [
+      { no: p + '00000565', status: 'wait', statusText: '待执行', rows: [
+        ['到货通知单号', '--'], ['物料信息', 'KY-WL-03/可用物料3/GG-01/原料'], ['供应商信息', 'GYS-0701/国内供应商'], ['采样点', '测试采样点1'],
+        ['报检批号', '1', '报检件数', '--'], ['报检数量', '--', '基本单位', '1'], ['检验班组', '--', '备注', '--'],
+        ['报检人', '超级管理员'], ['报检时间', '2026-09-21 18:07:55'], ['应取样件数', '1', '已取样件数', '--'], ['待取样件数', '1']
+      ] },
+      { no: p + '00000562', status: 'run', statusText: '执行中', rows: [
+        ['到货通知单号', '--'], ['物料信息', '123456/光刻胶/30ArF光刻胶'], ['供应商信息', 'GYS-0701/国内供应商'], ['采样点', '测试采样点1'],
+        ['报检批号', 'YL20260920001', '报检件数', '11'], ['报检数量', '--', '基本单位', 'm²'], ['检验班组', '111', '备注', '--'],
+        ['报检人', '超级管理员'], ['报检时间', '2026-09-20 13:56:19'], ['应取样件数', '8', '已取样件数', '4'], ['待取样件数', '4']
+      ] }
+    ];
+  }
+  function kvNode(row) {
+    var kv = el('div', 'kv');
+    kv.innerHTML = '<span class="k"></span><span class="v"></span>';
+    kv.children[0].textContent = row[0];
+    kv.children[1].textContent = row[1];
+    return kv;
+  }
+  function renderRows(bd, rows) {
+    rows.forEach(function (r) {
+      if (r.length === 2) { bd.appendChild(kvNode(r)); return; }
+      var rowEl = el('div', 'kv-row');
+      for (var i = 0; i < 2; i++) {
+        var kv = el('div', 'kv');
+        kv.innerHTML = '<span class="k"></span><span class="v"></span>';
+        kv.children[0].textContent = r[i * 2];
+        kv.children[1].textContent = r[i * 2 + 1];
+        rowEl.appendChild(kv);
+      }
+      bd.appendChild(rowEl);
+    });
+  }
+  function docCard(doc) {
+    var card = el('div', 'doc-card');
+    var head = el('div', 'doc-head');
+    var t = el('span');
+    t.textContent = '报检单号：' + doc.no;
+    head.appendChild(t);
+    var tag = el('span', 'status-tag ' + doc.status);
+    tag.textContent = doc.statusText;
+    head.appendChild(tag);
+    var bd = el('div', 'doc-body');
+    renderRows(bd, doc.rows);
+    var foot = el('div', 'doc-foot');
+    var btn = el('button', 'pill-btn');
+    btn.type = 'button';
+    btn.textContent = '查看详情';
+    btn.addEventListener('click', function () {
+      stack.push({ title: doc.no, type: 'detail', doc: doc });
+      renderModule();
+    });
+    foot.appendChild(btn);
+    card.appendChild(head);
+    card.appendChild(bd);
+    card.appendChild(foot);
+    return card;
+  }
+  /* ---------- 表单片段 ---------- */
+  function chevSvg() {
+    return '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>';
+  }
+  function fiSelect(label, req, field, val) {
+    return '<div class="fi"><div class="fl">' + (req ? '<i>*</i>' : '') + label + '</div>'
+      + '<div class="sel' + (val ? ' has-val' : '') + '" data-field="' + field + '" data-label="' + label + '"><span class="sel-ph">' + (val || '请选择') + '</span>' + chevSvg() + '</div></div>';
+  }
+  function fiInput(label, req, ph, val, field) {
+    return '<div class="fi"><div class="fl">' + (req ? '<i>*</i>' : '') + label + '</div>'
+      + '<input type="text"' + (field ? ' data-field="' + field + '"' : '') + ' placeholder="' + (ph || '请输入') + '"' + (val ? ' value="' + val + '"' : '') + ' /></div>';
+  }
+  function fiAuto(label, text, field) {
+    return '<div class="fi"><div class="fl">' + label + '</div><div class="auto"' + (field ? ' data-field="' + field + '"' : '') + '>' + text + '</div></div>';
+  }
+  function fiStepper(label, req, val, ph, field) {
+    return '<div class="fi"><div class="fl">' + (req ? '<i>*</i>' : '') + label + '</div>'
+      + '<div class="stepper"' + (field ? ' data-field="' + field + '"' : '') + '><button type="button" class="st-minus">−</button><input type="text" value="' + (val || '') + '" placeholder="' + (ph || '') + '" /><button type="button" class="st-plus">＋</button></div></div>';
+  }
+  function groupLabel(text) { return '<div class="group-label">' + text + '</div>'; }
+  function bindSteppers(root, onAfter) {
+    root.querySelectorAll('.stepper').forEach(function (st) {
+      var input = st.querySelector('input');
+      var step = function (delta) {
+        var v = parseInt(input.value, 10);
+        input.value = (isNaN(v) ? 0 : Math.max(0, v + delta));
+        if (onAfter) onAfter(st, input);
+      };
+      st.querySelector('.st-minus').onclick = function () { step(-1); };
+      st.querySelector('.st-plus').onclick = function () { step(1); };
+      input.addEventListener('input', function () { if (onAfter) onAfter(st, input); });
+    });
+  }
+  function miniTable(cols, emptyText) {
+    var wrap = el('div', 'mini-table');
+    var html = '<table><thead><tr>';
+    cols.forEach(function (c) { html += '<th>' + c + '</th>'; });
+    html += '</tr></thead><tbody><tr><td colspan="' + cols.length + '">' + (emptyText || '暂无数据') + '</td></tr></tbody></table>';
+    wrap.innerHTML = html;
+    return wrap;
+  }
+  function makeSubmitBar(text, onTap) {
+    var bar = el('div', 'submit-bar');
+    bar.innerHTML = '<button type="button" class="submit-btn"></button>';
+    var b = bar.querySelector('.submit-btn');
+    b.textContent = text || '提交';
+    b.onclick = onTap || function () { toast('已提交（演示）'); };
+    return bar;
+  }
+  /* ---------- 底部选择器 ---------- */
+  function openPicker(title, options, onPick) {
+    $('picker-title').textContent = title || '请选择';
+    var list = $('picker-list');
+    list.textContent = '';
+    options.forEach(function (opt) {
+      var b = el('button', 'picker-item');
+      b.type = 'button';
+      b.textContent = opt;
+      b.onclick = function () {
+        closePicker();
+        if (onPick) onPick(opt);
+      };
+      list.appendChild(b);
+    });
+    $('picker-mask').hidden = false;
+  }
+  function closePicker() { $('picker-mask').hidden = true; }
+  function materialByText(text) {
+    return OPT_MATERIALS.filter(function (m) { return (m.num + ' / ' + m.name + ' / ' + m.spec + ' / ' + m.type) === text; })[0] || null;
+  }
+  function materialOptions(typeName) {
+    var t = INSP_TYPES[typeName];
+    var list = OPT_MATERIALS.filter(function (m) { return !t.materialType || m.type === t.materialType; });
+    if (!list.length) list = OPT_MATERIALS;
+    return list.map(function (m) { return m.num + ' / ' + m.name + ' / ' + m.spec + ' / ' + m.type; });
+  }
+  function fieldOptions(field, state) {
+    if (field === 'supplier') return OPT_SUPPLIERS;
+    if (field === 'customer') return OPT_CUSTOMERS;
+    if (field === 'workshop') return OPT_WORKSHOPS;
+    if (field === 'line') return OPT_LINES[state.workshop] || [];
+    if (field === 'docType') return OPT_DOC_TYPES;
+    if (field === 'medium') return OPT_MEDIUMS;
+    if (field === 'point') return OPT_POINTS;
+    if (field === 'team') return OPT_TEAMS;
+    return [];
+  }
+  function bindSelectors(root, state, typeName, onChanged) {
+    root.querySelectorAll('.sel[data-field]').forEach(function (s) {
+      s.onclick = function () {
+        var field = s.getAttribute('data-field');
+        var opts;
+        if (field === 'material') opts = materialOptions(typeName);
+        else opts = fieldOptions(field, state);
+        openPicker(s.getAttribute('data-label'), opts, function (v) {
+          s.querySelector('.sel-ph').textContent = v;
+          s.classList.add('has-val');
+          if (onChanged) onChanged(field, v, s);
+        });
+      };
+    });
+  }
+  /* ---------- 渲染：列表 / 详情 / 新增 / 取样 ---------- */
+  function renderList(top, body) {
+    var bar = el('div', 'search-bar');
+    bar.innerHTML = '<div class="search-input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="M16 16l4 4"/></svg><input id="doc-search" placeholder="请输入关键字" /></div><button type="button" class="q-btn" id="btn-search">查询</button>';
+    var listWrap = el('div', 'doc-list');
+    listWrap.style.flex = '1';
+    body.appendChild(bar);
+    body.appendChild(listWrap);
+    var paint = function () {
+      var kw = (bar.querySelector('#doc-search').value || '').trim();
+      listWrap.textContent = '';
+      if (top.inspType) {
+        var orders = getOrders();
+        (orders[top.inspType] || []).filter(function (o) {
+          return !kw || o.no.indexOf(kw) >= 0 || (o.relNo || '').indexOf(kw) >= 0;
+        }).forEach(function (o) { listWrap.appendChild(orderCard(o)); });
+      } else {
+        top.docs.filter(function (d) { return !kw || d.no.indexOf(kw) >= 0; }).forEach(function (doc) {
+          listWrap.appendChild(docCard(doc));
+        });
+      }
+      if (!listWrap.children.length) {
+        var tip = el('div', 'empty-tip');
+        tip.textContent = '暂无数据';
+        listWrap.appendChild(tip);
+      }
+    };
+    bar.querySelector('#btn-search').onclick = paint;
+    bar.querySelector('#doc-search').onkeydown = function (e) { if (e.key === 'Enter') paint(); };
+    paint();
+  }
+  function sampleTable(o) {
+    var wrap = el('div', 'mini-table');
+    var html = '<table><thead><tr><th>样品编号</th><th>状态</th><th>取样人</th><th>取样时间</th></tr></thead><tbody>';
+    if (o.samples && o.samples.length) {
+      o.samples.forEach(function (s) {
+        html += '<tr><td>' + s.num + '</td><td style="color:' + (s.status === '已取样' ? 'var(--ok)' : 'var(--warn)') + '">' + s.status + '</td><td>' + s.sampler + '</td><td>' + s.time + '</td></tr>';
+      });
+    } else {
+      html += '<tr><td colspan="4">暂无数据</td></tr>';
+    }
+    html += '</tbody></table>';
+    wrap.innerHTML = html;
+    return wrap;
+  }
+  function renderOrderDetail(top, body) {
+    var o = top.order;
+    var wrap = el('div', 'form-wrap');
+    var banner = el('div', 'detail-banner');
+    banner.textContent = '基本信息';
+    wrap.appendChild(banner);
+    var bd = el('div', 'detail-kv');
+    renderRows(bd, orderRows(o));
+    wrap.appendChild(bd);
+    var sec = el('div', 'detail-sec');
+    sec.innerHTML = '<h3>样品明细</h3>'
+      + '<div class="seg-tabs"><button type="button" class="on" data-dt="s">样品信息</button><button type="button" data-dt="i">检验项目</button></div>'
+      + '<div data-pane="s"></div>'
+      + '<div data-pane="i" hidden></div>';
+    wrap.appendChild(sec);
+    var paneS = sec.querySelector('[data-pane="s"]');
+    paneS.appendChild(sampleTable(o));
+    var paneI = sec.querySelector('[data-pane="i"]');
+    paneI.appendChild(miniTable(['检验项目名称', '标准值', '检验结果', '单项判定']));
+    sec.querySelectorAll('.seg-tabs button').forEach(function (b) {
+      b.onclick = function () {
+        sec.querySelectorAll('.seg-tabs button').forEach(function (x) { x.classList.remove('on'); });
+        b.classList.add('on');
+        paneS.hidden = b.getAttribute('data-dt') !== 's';
+        paneI.hidden = b.getAttribute('data-dt') !== 'i';
+      };
+    });
+    if (o.todoSample > 0) {
+      wrap.appendChild(makeSubmitBar('去取样（' + o.todoSample + ' 件）', function () {
+        stack.push({ title: '取样 · ' + o.no, type: 'sample-do', order: o });
+        renderModule();
+      }));
+    } else {
+      var fin = el('div', 'submit-bar');
+      fin.innerHTML = '<button type="button" class="submit-btn" style="background:var(--text-3)">已全部取样</button>';
+      wrap.appendChild(fin);
+    }
+    body.appendChild(wrap);
+  }
+  function renderAdd(top, body) {
+    var typeName = top.inspType;
+    var t = INSP_TYPES[typeName];
+    var mat = defaultMaterial(typeName);
+    var state = {
+      relNo: '', supplier: '', customer: '', workshop: t.workshop || '', line: t.line || '',
+      docType: '', medium: '', materialText: mat.num + ' / ' + mat.name + ' / ' + mat.spec + ' / ' + mat.type,
+      point: t.point || '', batch: '', count: t.hasCount ? 50 : null, qty: t.hasQuantity ? 1250 : null,
+      team: t.team, remark: t.remark, willSample: 0
+    };
+    state.willSample = (t.calc === 'manual') ? 3 : calcSampleCount(typeName, state.count, mat.sampling);
+
+    var wrap = el('div', 'form-wrap');
+    var html = '';
+    html += fiAuto('报检单号', '自动生成', 'no');
+    html += groupLabel('基本信息');
+    if (t.relLabel) html += fiInput(t.relLabel, false, t.relPh, '', 'relNo');
+    if (t.hasSupplier) html += fiSelect('供应商信息', true, 'supplier', '');
+    if (t.hasCustomer) html += fiSelect('客户信息', false, 'customer', '');
+    if (t.hasWorkshop) html += fiSelect('所属车间', false, 'workshop', state.workshop);
+    if (t.hasWorkshop) html += fiSelect('产线名称', false, 'line', state.line);
+    if (t.hasDocType) html += fiSelect('单据类型', false, 'docType', '');
+    if (t.hasSourceExperiment) html += fiInput('来源实验', false, '请输入来源实验', '', 'sourceExperiment');
+    if (t.hasProjectName) html += fiInput('所属项目', false, '请输入所属项目', '', 'projectName');
+    html += fiSelect('检验班组', false, 'team', state.team);
+    html += fiInput('报检备注', false, '请输入报检申请说明、特殊加急需求或取样要求', t.remark, 'remark');
+    html += groupLabel('物料信息');
+    if (t.hasMedium) {
+      html += fiSelect('充装介质', true, 'medium', '');
+    } else {
+      html += fiSelect('物料信息', true, 'material', state.materialText);
+    }
+    if (t.hasPoint !== false) html += fiSelect('采样点', true, 'point', state.point);
+    if (!t.hasMedium) html += fiInput('报检批号', true, '如 LOT-20260918-01', '', 'batch');
+    if (t.hasCount) html += fiStepper(t.countLabel || '报检件数', !!t.countReq, String(state.count), '', 'count');
+    if (t.hasQuantity) html += fiStepper('报检数量', false, String(state.qty), '输入', 'qty');
+    if (t.hasQuantity) html += fiAuto('基本单位', '自动代入 · ' + mat.unit, 'unit');
+    html += groupLabel('抽样信息');
+    if (t.hasScheme) html += fiAuto('抽样方案名称', '根据物料自动代入 · ' + mat.scheme, 'scheme');
+    if (t.hasScheme) html += fiAuto('抽样类型', '根据抽样方案自动代入 · ' + mat.sampling, 'sampling');
+    html += fiStepper('应取样件数', true, String(state.willSample), '', 'willSample');
+
+    wrap.innerHTML = html;
+
+    var elUnit = wrap.querySelector('[data-field="unit"]');
+    var elScheme = wrap.querySelector('[data-field="scheme"]');
+    var elSampling = wrap.querySelector('[data-field="sampling"]');
+    var willInput = wrap.querySelector('.stepper[data-field="willSample"] input');
+
+    var recalcWill = function () {
+      var mm = materialByText(state.materialText) || mat;
+      var c = parseInt(state.count, 10) || 1;
+      if (t.calc === 'manual') return;
+      state.willSample = calcSampleCount(typeName, c, mm.sampling);
+      if (willInput) willInput.value = state.willSample;
+    };
+
+    bindSelectors(wrap, state, typeName, function (field, v) {
+      state[field] = v;
+      if (field === 'material') {
+        state.materialText = v;
+        var mm = materialByText(v);
+        if (mm) {
+          if (elUnit) elUnit.textContent = '自动代入 · ' + mm.unit;
+          if (elScheme) elScheme.textContent = '根据物料自动代入 · ' + mm.scheme;
+          if (elSampling) elSampling.textContent = '根据抽样方案自动代入 · ' + mm.sampling;
+        }
+        recalcWill();
+      }
+      if (field === 'workshop') {
+        state.line = (OPT_LINES[v] || [''])[0] || '';
+        var lineSel = wrap.querySelector('.sel[data-field="line"]');
+        if (lineSel) {
+          lineSel.querySelector('.sel-ph').textContent = state.line || '请选择';
+          if (state.line) lineSel.classList.add('has-val');
+        }
+      }
+    });
+
+    bindSteppers(wrap, function (st, input) {
+      var field = st.getAttribute('data-field');
+      if (field === 'count') { state.count = parseInt(input.value, 10) || 0; recalcWill(); }
+      if (field === 'qty') { state.qty = parseInt(input.value, 10) || 0; }
+      if (field === 'willSample') { state.willSample = parseInt(input.value, 10) || 0; }
+    });
+
+    wrap.appendChild(makeSubmitBar('提交', function () {
+      // 读取字段值
+      wrap.querySelectorAll('[data-field]').forEach(function (n) {
+        var f = n.getAttribute('data-field');
+        if (f === 'no') return;
+        if (n.classList.contains('sel')) {
+          var txt = n.querySelector('.sel-ph').textContent;
+          state[f] = (txt === '请选择') ? '' : txt;
+        } else if (n.tagName === 'INPUT') {
+          state[f] = n.value;
+        }
+      });
+      // 校验（对齐 PC submitInspOrderForm）
+      if (t.hasSupplier && !state.supplier) { toast('请选择供应商信息'); return; }
+      if (t.hasMedium && !state.medium) { toast('请选择充装介质'); return; }
+      if (t.customerReq && !state.customer) { toast('请选择客户信息'); return; }
+      if (!t.hasMedium && !String(state.batch).trim()) { toast('请输入报检批号'); return; }
+      if (t.hasPoint !== false && !state.point) { toast('请选择工序采样点'); return; }
+      var mm2 = materialByText(state.materialText) || mat;
+      if (mm2 && mm2.sampling === '免检') { toast('该物料免检，不用报检，可直接入库'); return; }
+      var will = parseInt(state.willSample, 10) || 0;
+      if (will <= 0) { toast('应取样件数必须为大于 0 的正整数'); return; }
+
+      // 生成报检单 + 下发取样任务（对齐 PC submitInspOrderForm）
+      var orders = getOrders();
+      var no = genInspNo(orders);
+      var mm = materialByText(state.materialText) || mat;
+      var order = {
+        id: 'o_' + Date.now(),
+        type: typeName, no: no, status: '待执行',
+        relNo: state.relNo, supplier: state.supplier, customer: state.customer,
+        sourceExperiment: state.sourceExperiment || '', projectName: state.projectName || '',
+        workshop: state.workshop, line: state.line,
+        docType: state.docType, medium: state.medium,
+        materialNum: mm.num, materialName: mm.name, materialSpec: mm.spec, materialType: mm.type,
+        materialText: state.materialText,
+        point: state.point, batch: state.batch,
+        count: t.hasCount ? (parseInt(state.count, 10) || 0) : null,
+        qty: t.hasQuantity ? (parseInt(state.qty, 10) || 0) : null,
+        unit: mm.unit, scheme: mm.scheme, sampling: mm.sampling,
+        willSample: will, doneSample: 0, todoSample: will,
+        team: state.team, remark: state.remark, creator: session ? session.name : '超级管理员', time: nowStr(),
+        samples: []
+      };
+      order.samples = buildSamples(order);
+      orders[typeName].unshift(order);
+      saveOrders(orders);
+      toast('报检单 [' + no + '] 保存成功，已自动下发生成 ' + will + ' 个待取样任务');
+      stack.pop();
+      renderModule();
+    }));
+
+    body.appendChild(wrap);
+  }
+  function sampleCard(o) {
+    var card = el('div', 'doc-card');
+    var head = el('div', 'doc-head');
+    var t = el('span');
+    t.textContent = '报检单号：' + o.no;
+    head.appendChild(t);
+    var tag = el('span', 'status-tag ' + statusClass(o.status));
+    tag.textContent = o.status;
+    head.appendChild(tag);
+    var bd = el('div', 'doc-body');
+    renderRows(bd, [
+      ['报检单类型', o.type],
+      ['物料信息', o.materialText || '—'],
+      ['采样点', o.point || '—'],
+      ['待取样件数', String(o.todoSample)],
+      ['已取样件数', String(o.doneSample)],
+      ['检验班组', o.team || '—']
+    ]);
+    var foot = el('div', 'doc-foot');
+    var btn = el('button', 'pill-btn');
+    btn.type = 'button';
+    btn.textContent = '去取样';
+    btn.addEventListener('click', function () {
+      stack.push({ title: '取样 · ' + o.no, type: 'sample-do', order: o });
+      renderModule();
+    });
+    foot.appendChild(btn);
+    card.appendChild(head);
+    card.appendChild(bd);
+    card.appendChild(foot);
+    return card;
+  }
+  function renderSample(top, body) {
+    var bar = el('div', 'search-bar');
+    bar.innerHTML = '<div class="search-input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="M16 16l4 4"/></svg><input id="sample-search" placeholder="请输入单号或类型关键字" /></div><button type="button" class="q-btn" id="sample-search-btn">查询</button>';
+    var listWrap = el('div', 'doc-list');
+    listWrap.style.flex = '1';
+    body.appendChild(bar);
+    body.appendChild(listWrap);
+    var paint = function () {
+      var kw = (bar.querySelector('#sample-search').value || '').trim();
+      listWrap.textContent = '';
+      var orders = getOrders();
+      var pending = [];
+      INSP_TYPE_NAMES.forEach(function (t) {
+        (orders[t] || []).forEach(function (o) {
+          if ((o.status === '待执行' || o.status === '执行中') && o.todoSample > 0) {
+            if (!kw || o.no.indexOf(kw) >= 0 || o.type.indexOf(kw) >= 0) pending.push(o);
+          }
+        });
+      });
+      pending.forEach(function (o) { listWrap.appendChild(sampleCard(o)); });
+      if (!pending.length) {
+        var tip = el('div', 'empty-tip');
+        tip.textContent = '暂无待取样报检单';
+        listWrap.appendChild(tip);
+      }
+    };
+    bar.querySelector('#sample-search-btn').onclick = paint;
+    bar.querySelector('#sample-search').onkeydown = function (e) { if (e.key === 'Enter') paint(); };
+    paint();
+  }
+  function renderSampleDo(top, body) {
+    var o = top.order;
+    var wrap = el('div', 'form-wrap');
+    var banner = el('div', 'detail-banner');
+    banner.textContent = '待取样报检单';
+    wrap.appendChild(banner);
+    var bd = el('div', 'detail-kv');
+    renderRows(bd, [
+      ['报检单号', o.no], ['报检单类型', o.type], ['采样点', o.point || '—'],
+      ['检验班组', o.team || '—'], ['待取样件数', String(o.todoSample)], ['已取样件数', String(o.doneSample)]
+    ]);
+    wrap.appendChild(bd);
+    var sec = el('div', 'detail-sec');
+    sec.innerHTML = '<h3>样品清单</h3>';
+    sec.appendChild(sampleTable(o));
+    sec.innerHTML += fiInput('取样人', true, '', session ? session.name : '超级管理员', 'sampler');
+    wrap.appendChild(sec);
+    wrap.appendChild(makeSubmitBar('完成取样（' + o.todoSample + ' 件）', function () {
+      var sampler = (wrap.querySelector('[data-field="sampler"]') || {}).value || (session ? session.name : '超级管理员');
+      var orders = getOrders();
+      var list = orders[o.type] || [];
+      var target = null;
+      list.forEach(function (r) { if (r.id === o.id) target = r; });
+      if (target) {
+        target.samples.forEach(function (s) { if (s.status === '待取样') { s.status = '已取样'; s.sampler = sampler; s.time = nowStr(); } });
+        target.doneSample = target.willSample;
+        target.todoSample = 0;
+        target.status = '执行中';
+        saveOrders(orders);
+      }
+      toast('已完成取样，' + o.willSample + ' 件样品进入检验');
+      stack.pop();
+      renderModule();
+    }));
+    body.appendChild(wrap);
+  }
+  /* ---------- 样品接收：项目编辑弹窗 ---------- */
+  var projectType = '定量';
+  var projectEditorCb = null;
+  var projectEditingCode = '';
+  function setProjectType(type) {
+    projectType = type;
+    document.querySelectorAll('#project-type-seg button').forEach(function (b) {
+      b.classList.toggle('on', b.getAttribute('data-pt') === type);
+    });
+  }
+  function openProjectEditor(item, onSave) {
+    projectEditorCb = onSave;
+    projectEditingCode = item ? (item.code || '') : '';
+    $('project-title').textContent = item ? '编辑检验项目' : '新增检验项目';
+    $('project-name').value = item ? (item.name || '') : '';
+    $('project-unit').value = item ? (item.unit || '') : '';
+    $('project-spec').value = item ? (item.spec || '') : '';
+    setProjectType(item ? (item.type || '定量') : '定量');
+    $('project-mask').hidden = false;
+  }
+  function closeProjectEditor() { $('project-mask').hidden = true; }
+  function saveProject() {
+    var name = $('project-name').value.trim();
+    if (!name) { toast('项目名称不能为空'); return; }
+    var spec = $('project-spec').value.trim();
+    var item = {
+      code: projectEditingCode || ('JY-' + String(Date.now()).slice(-6)),
+      name: name,
+      type: projectType,
+      unit: $('project-unit').value.trim(),
+      spec: spec
+    };
+    if (projectType === '定性' && spec) item.options = spec.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+    if (projectEditorCb) projectEditorCb(item);
+    closeProjectEditor();
+  }
+  /* ---------- 样品接收：接收列表 ---------- */
+  function receiveSampleCard(sample, order) {
+    var card = el('div', 'doc-card');
+    var head = el('div', 'doc-head');
+    var t = el('span');
+    t.textContent = '样品编号：' + sample.num;
+    head.appendChild(t);
+    var tag = el('span', 'status-tag wait');
+    tag.textContent = '待接收';
+    head.appendChild(tag);
+    var bd = el('div', 'doc-body');
+    renderRows(bd, [
+      ['来源报检单', order.no],
+      ['报检单类型', order.type],
+      ['物料信息', order.materialText || '—'],
+      ['采样点', sample.point || '—'],
+      ['取样人', sample.sampler || '—']
+    ]);
+    var foot = el('div', 'doc-foot');
+    var btn = el('button', 'pill-btn');
+    btn.type = 'button';
+    btn.textContent = '接收';
+    btn.addEventListener('click', function () {
+      stack.push({ title: '接收 · ' + sample.num, type: 'sample-receive-do', sample: sample, order: order });
+      renderModule();
+    });
+    foot.appendChild(btn);
+    card.appendChild(head);
+    card.appendChild(bd);
+    card.appendChild(foot);
+    return card;
+  }
+  function renderSampleReceive(top, body) {
+    var bar = el('div', 'search-bar');
+    bar.innerHTML = '<div class="search-input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="M16 16l4 4"/></svg><input id="receive-search" placeholder="请输入样品编号或单号" /></div><button type="button" class="q-btn" id="receive-search-btn">查询</button>';
+    var listWrap = el('div', 'doc-list');
+    listWrap.style.flex = '1';
+    body.appendChild(bar);
+    body.appendChild(listWrap);
+    var paint = function () {
+      var kw = (bar.querySelector('#receive-search').value || '').trim();
+      listWrap.textContent = '';
+      var orders = getOrders();
+      var pending = [];
+      INSP_TYPE_NAMES.forEach(function (t) {
+        (orders[t] || []).forEach(function (o) {
+          (o.samples || []).forEach(function (s) {
+            if (s.status === '已取样' && !s.received) {
+              if (!kw || s.num.indexOf(kw) >= 0 || o.no.indexOf(kw) >= 0) pending.push({ sample: s, order: o });
+            }
+          });
+        });
+      });
+      pending.forEach(function (p) { listWrap.appendChild(receiveSampleCard(p.sample, p.order)); });
+      if (!pending.length) {
+        var tip = el('div', 'empty-tip');
+        tip.textContent = '暂无待接收样品';
+        listWrap.appendChild(tip);
+      }
+    };
+    bar.querySelector('#receive-search-btn').onclick = paint;
+    bar.querySelector('#receive-search').onkeydown = function (e) { if (e.key === 'Enter') paint(); };
+    paint();
+  }
+  function renderSampleReceiveDo(top, body) {
+    var sample = top.sample;
+    var order = top.order;
+    // 防重：已接收样品直接拒绝
+    if (sample.received) {
+      toast('该样品已接收，请勿重复提交');
+      stack.pop();
+      renderModule();
+      return;
+    }
+    var matched = matchScheme(order.type);
+    var state = {
+      schemeCode: matched || '',
+      items: matched ? JSON.parse(JSON.stringify(INSP_SCHEMES[matched].items)) : []
+    };
+    if (!matched) toast('未找到匹配的检验方案，请手动选择方案');
+
+    var wrap = el('div', 'form-wrap');
+    var banner = el('div', 'detail-banner');
+    banner.textContent = '样品信息';
+    wrap.appendChild(banner);
+    var bd = el('div', 'detail-kv');
+    renderRows(bd, [
+      ['样品编号', sample.num], ['来源报检单', order.no], ['报检单类型', order.type],
+      ['物料信息', order.materialText || '—'], ['采样点', sample.point || '—']
+    ]);
+    wrap.appendChild(bd);
+
+    var sec = el('div', 'detail-sec');
+    sec.innerHTML = '<h3>检验方案</h3>'
+      + '<div class="fi"><div class="scheme-pick"><span class="scheme-name' + (matched ? '' : ' ph') + '" id="scheme-name">' + (matched ? INSP_SCHEMES[matched].name : '请选择方案') + '</span><button type="button" class="scheme-switch" id="scheme-switch">更换方案</button></div></div>'
+      + '<h3>检验项目明细</h3>';
+    var itemList = el('div', 'item-list');
+    sec.appendChild(itemList);
+    var addBtn = el('button', 'item-add-btn');
+    addBtn.type = 'button';
+    addBtn.textContent = '+ 新增检验项目';
+    sec.appendChild(addBtn);
+    wrap.appendChild(sec);
+
+    var paintItems = function () {
+      itemList.textContent = '';
+      if (!state.items.length) {
+        var tip = el('div', 'empty-tip');
+        tip.textContent = '暂无检验项目，请新增';
+        itemList.appendChild(tip);
+        return;
+      }
+      state.items.forEach(function (it, idx) {
+        var row = el('div', 'item-row');
+        row.innerHTML = '<div class="item-info"><b></b><span></span></div><div class="item-ops"><button type="button" class="item-edit">编辑</button><button type="button" class="item-del">删除</button></div>';
+        row.querySelector('.item-info b').textContent = it.name;
+        row.querySelector('.item-info span').textContent = '[' + it.type + '] ' + (it.unit ? it.unit + ' · ' : '') + (it.spec || '');
+        row.querySelector('.item-edit').onclick = function () { openProjectEditor(it, function (updated) { state.items[idx] = updated; paintItems(); }); };
+        row.querySelector('.item-del').onclick = function () { state.items.splice(idx, 1); paintItems(); };
+        itemList.appendChild(row);
+      });
+    };
+    paintItems();
+
+    var schemeNameEl = wrap.querySelector('#scheme-name');
+    var schemeSwitch = wrap.querySelector('#scheme-switch');
+    schemeSwitch.onclick = function () {
+      var opts = SCHEME_CODES.map(function (c) { return INSP_SCHEMES[c].name; });
+      openPicker('选择检验方案', opts, function (name) {
+        var code = SCHEME_CODES.filter(function (c) { return INSP_SCHEMES[c].name === name; })[0];
+        if (code) {
+          state.schemeCode = code;
+          state.items = JSON.parse(JSON.stringify(INSP_SCHEMES[code].items));
+          schemeNameEl.textContent = name;
+          schemeNameEl.classList.remove('ph');
+          paintItems();
+        }
+      });
+    };
+    addBtn.onclick = function () { openProjectEditor(null, function (newItem) { state.items.push(newItem); paintItems(); }); };
+
+    wrap.appendChild(makeSubmitBar('接收', function () {
+      var orders = getOrders();
+      var targetSample = null;
+      (orders[order.type] || []).forEach(function (o) {
+        if (o.id === order.id) {
+          (o.samples || []).forEach(function (s) { if (s.num === sample.num) targetSample = s; });
+        }
+      });
+      if (!targetSample) { toast('未找到该样品，接收失败'); return; }
+      // 防重
+      if (targetSample.received) { toast('该样品已接收，请勿重复提交'); stack.pop(); renderModule(); return; }
+      // 前端校验
+      if (!state.schemeCode) { toast('请选择检验方案'); return; }
+      if (!state.items.length) { toast('检验项目明细不能为空'); return; }
+      for (var i = 0; i < state.items.length; i++) {
+        if (!String(state.items[i].name || '').trim()) { toast('检验项目名称不能为空'); return; }
+      }
+      // 事务一致性：一次性同步更新样品的方案与项目明细
+      targetSample.received = true;
+      targetSample.receivedScheme = state.schemeCode;
+      targetSample.receivedItems = JSON.parse(JSON.stringify(state.items));
+      saveOrders(orders);
+      toast('样品 ' + sample.num + ' 接收成功，检验方案与项目明细已同步');
+      stack.pop();
+      renderModule();
+    }));
+
+    body.appendChild(wrap);
+  }
+  function renderModule() {
+    var top = stack[stack.length - 1];
+    $('mod-title').textContent = top.title;
+    var body = $('mod-body');
+    body.textContent = '';
+    $('mod-add').hidden = !(top.type === 'list' && top.inspType);
+    if (top.type === 'list') { renderList(top, body); return; }
+    if (top.type === 'detail') {
+      if (top.order) { renderOrderDetail(top, body); return; }
+      var doc = top.doc;
+      var wrap = el('div', 'form-wrap');
+      var banner = el('div', 'detail-banner');
+      banner.textContent = '基本信息';
+      wrap.appendChild(banner);
+      var bd = el('div', 'detail-kv');
+      renderRows(bd, doc.rows);
+      wrap.appendChild(bd);
+      body.appendChild(wrap);
+      return;
+    }
+    if (top.type === 'add') { renderAdd(top, body); return; }
+    if (top.type === 'sample') { renderSample(top, body); return; }
+    if (top.type === 'sample-do') { renderSampleDo(top, body); return; }
+    if (top.type === 'sample-receive') { renderSampleReceive(top, body); return; }
+    if (top.type === 'sample-receive-do') { renderSampleReceiveDo(top, body); return; }
+    var note = el('div', 'note');
+    note.style.cssText = 'background:#fff;border-radius:8px;padding:14px;font-size:13px;color:var(--text-2);line-height:1.65';
+    note.textContent = top.note || '以后续确认为准。';
+    body.appendChild(note);
+  }
+  function openStack(next, from) {
+    stackFrom = from || stackFrom;
+    stack = next;
+    showMain('module');
+    renderModule();
+  }
+  function setForgotStep(step) {
+    $('form-forgot-1').hidden = step !== 1;
+    $('form-forgot-2').hidden = step !== 2;
+    $('step-1').classList.toggle('on', step === 1);
+    $('step-2').classList.toggle('on', step === 2);
+  }
+  function logout() {
+    session = null;
+    sessionStorage.removeItem(SESSION_KEY);
+    show('login');
+  }
+  function renderMsgPanel() {
+    var wrap = $('msg-list');
+    wrap.textContent = '';
+    MSGS.forEach(function (m) {
+      var card = el('div', 'msg-card' + (m.unread ? '' : ' read'));
+      card.innerHTML = '<div class="t"><span class="tt"></span><span class="dot"></span></div><div class="b"></div><div class="time"></div>';
+      card.querySelector('.tt').textContent = m.title;
+      card.querySelector('.b').textContent = m.body;
+      card.querySelector('.time').textContent = m.time;
+      wrap.appendChild(card);
+    });
+  }
+  function renderApprovePanel() {
+    var wrap = $('approve-list');
+    wrap.textContent = '';
+    makeDocs('SP').forEach(function (doc) {
+      wrap.appendChild(docCard(doc));
+    });
+  }
+
+  $('org-row').onclick = function () { $('org-sheet').hidden = false; };
+  $('org-close').onclick = function () { $('org-sheet').hidden = true; };
+  $('org-pick').onclick = function () { $('org-sheet').hidden = true; };
+  $('picker-close').onclick = function () { closePicker(); };
+  $('project-close').onclick = function () { closeProjectEditor(); };
+  $('project-cancel').onclick = function () { closeProjectEditor(); };
+  $('project-save').onclick = function () { saveProject(); };
+  document.querySelectorAll('#project-type-seg button').forEach(function (b) {
+    b.onclick = function () { setProjectType(b.getAttribute('data-pt')); };
+  });
+  $('btn-forgot').onclick = function () {
+    setErr('err-forgot-1', '');
+    setErr('err-forgot-2', '');
+    setForgotStep(1);
+    forgotPhoneOk = '';
+    show('forgot');
+  };
+  $('forgot-back').onclick = function () {
+    if (!$('form-forgot-2').hidden) { setForgotStep(1); return; }
+    show('login');
+  };
+  document.querySelectorAll('.eye').forEach(function (btn) {
+    btn.onclick = function (ev) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      var input = $(btn.getAttribute('data-eye'));
+      if (!input) return;
+      if (btn.hasAttribute('data-force-hide')) input.type = 'password';
+      else input.type = input.type === 'password' ? 'text' : 'password';
+    };
+  });
+  $('cap-account-canvas').onclick = function () { refreshCaptcha(); };
+  $('btn-sms-forgot').onclick = function () {
+    forgotPhoneOk = '';
+    sendSms($('forgot-phone').value, 'forgot', 'sms-hint-forgot', 'err-forgot-1');
+  };
+  $('forgot-phone').addEventListener('input', function () { forgotPhoneOk = ''; });
+
+  $('form-account').onsubmit = function (e) {
+    e.preventDefault();
+    // 免登录：点击「登录」直接进入主模块，不做账号密码与验证码校验
+    setErr('err-account', '');
+    enter(SEED[0]);
+  };
+  $('form-forgot-1').onsubmit = function (e) {
+    e.preventDefault();
+    var phone = $('forgot-phone').value.trim();
+    if (!checkSms(phone, $('forgot-code').value, 'forgot', 'err-forgot-1')) return;
+    forgotPhoneOk = phone;
+    setErr('err-forgot-2', '');
+    $('new-password').value = '';
+    $('new-password-2').value = '';
+    setForgotStep(2);
+  };
+  $('form-forgot-2').onsubmit = function (e) {
+    e.preventDefault();
+    setErr('err-forgot-2', '');
+    if (!forgotPhoneOk || !sms || sms.purpose !== 'forgot' || sms.phone !== forgotPhoneOk) {
+      setForgotStep(1);
+      setErr('err-forgot-1', '请先获取验证码');
+      return;
+    }
+    if (!smsAlive()) {
+      setForgotStep(1);
+      setErr('err-forgot-1', '验证码已失效，请重新获取');
+      return;
+    }
+    var a = $('new-password').value;
+    var b = $('new-password-2').value;
+    if (a.length < 6) { setErr('err-forgot-2', '新密码不少于 6 位'); return; }
+    if (a !== b) { setErr('err-forgot-2', '两次输入的密码不一致'); return; }
+    var list = users();
+    var user = null;
+    list.forEach(function (item) { if (item.phone === forgotPhoneOk) user = item; });
+    if (!user) { setErr('err-forgot-2', '手机号与账号用户手机号不一致'); return; }
+    user.password = a;
+    saveUsers(list);
+    sms = null;
+    forgotPhoneOk = '';
+    paintSmsButtons();
+    $('sms-hint-forgot').hidden = true;
+    $('account').value = user.account;
+    $('password').value = '';
+    $('remember').checked = true;
+    setForgotStep(1);
+    show('login');
+    toast('密码已重置，请使用新密码登录');
+  };
+
+  $('mod-back').onclick = function () {
+    stack.pop();
+    if (!stack.length) showMain(stackFrom);
+    else renderModule();
+  };
+  $('mod-add').onclick = function () {
+    var top = stack[stack.length - 1];
+    stack.push({ title: '新增报检单', type: 'add', inspType: top.inspType });
+    renderModule();
+  };
+  document.querySelectorAll('[data-tab]').forEach(function (btn) {
+    btn.onclick = function () {
+      stack = [];
+      showMain(btn.getAttribute('data-tab'));
+    };
+  });
+  document.querySelectorAll('[data-mine]').forEach(function (btn) {
+    btn.onclick = function () {
+      var key = btn.getAttribute('data-mine');
+      var title = btn.textContent.trim();
+      if (key === 'msg') { stack = []; showMain('msg'); return; }
+      openStack([{ title: title, type: 'list', docs: makeDocs(key === 'audit' ? 'SH' : 'FS') }], 'mine');
+    };
+  });
+  $('btn-logout').onclick = logout;
+
+  var remembered = loadRemember();
+  if (remembered.length) {
+    $('account').value = remembered[0].account;
+    $('remember').checked = true;
+  } else {
+    $('remember').checked = false;
+  }
+  renderHome();
+  renderMsgPanel();
+  renderApprovePanel();
+  session = readSession();
+  if (session) {
+    renderMine();
+    showMain('home');
+  }
+})();
+</script>
+</body>
+</html>

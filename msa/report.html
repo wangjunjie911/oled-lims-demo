@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GRR 分析报告</title>
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embedded');</script>
+  <link rel="stylesheet" href="css/demo.css" />
+</head>
+<body data-mod="grr">
+<div class="app">
+  <header class="header">
+    <div class="brand">计量 MSA</div>
+    <div class="header-right">
+      <span>角色</span>
+      <select id="roleSel" onchange="setRole(this.value)">
+        <option value="planner">计划员</option>
+        <option value="appraiser">评价人 · 王工</option>
+      </select>
+      <span>张明</span>
+    </div>
+  </header>
+  <aside class="sidebar">
+    <div id="msaNav"></div>
+  </aside>
+  <main>
+    <div class="page-head">
+      <div>
+        <h1>分析报告</h1>
+      </div>
+      <div class="head-actions">
+        <button class="btn" type="button" onclick="return notExport()">导出</button>
+        <a class="btn" href="index.html">返回列表</a>
+        <a class="btn btn-primary" href="#" onclick="toast('已复制为新草稿');return false;">复制为新计划</a>
+      </div>
+    </div>
+
+    <div class="verdict warn">
+      <div class="big">10%≤%R&amp;R&lt;30%，测量系统可接受</div>
+      <div>%R&amp;R = 18.42%（对 TV）· ndc = 7 · 极差图无点出限</div>
+    </div>
+
+    <div class="card">
+      <div class="form-grid">
+        <div class="field"><label>计划编号</label><div class="ro">GRR-20260827-003</div></div>
+        <div class="field"><label>仪器</label><div class="ro">外径千分尺 / EQ-MIC-008</div></div>
+        <div class="field"><label>规格 / 量程</label><div class="ro">0–25 mm / 0.001 mm</div></div>
+        <div class="field"><label>检测项目</label><div class="ro">销轴</div></div>
+        <div class="field"><label>评价人</label><div class="ro">王工 / 李工 / 赵工</div></div>
+        <div class="field"><label>检验项目数量</label><div class="ro">10</div></div>
+        <div class="field"><label>评价人数量</label><div class="ro">3</div></div>
+        <div class="field"><label>试验次数</label><div class="ro">3</div></div>
+        <div class="field"><label>分析日期</label><div class="ro">2026-08-27</div></div>
+        <div class="field"><label>制定</label><div class="ro">张明 2026-08-27 16:02</div></div>
+        <div class="field"><label>审核（署名，非审批）</label><div class="ro">—</div></div>
+      </div>
+    </div>
+
+    <div class="kpi-row">
+      <div class="stat-card"><div class="num">18.42%</div><div class="lbl">%R&amp;R（TV）</div></div>
+      <div class="stat-card"><div class="num">7</div><div class="lbl">ndc = ⌊1.41×PV/GRR⌋</div></div>
+      <div class="stat-card"><div class="num">0.0048</div><div class="lbl">GRR（6σ）</div></div>
+      <div class="stat-card"><div class="num">0.0261</div><div class="lbl">TV</div></div>
+    </div>
+
+    <h2 class="sec">变差分解（对 TV）</h2>
+    <div class="card" style="padding:0">
+      <table class="data">
+        <thead>
+          <tr><th>分量</th><th>测量值</th><th>%TV</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>重复性 EV</td><td>0.0031</td><td>11.88%</td></tr>
+          <tr><td>再现性 AV</td><td>0.0037</td><td>14.18%</td></tr>
+          <tr><td>GRR</td><td>0.0048</td><td>18.42%</td></tr>
+          <tr><td>零件变差 PV</td><td>0.0256</td><td>98.08%</td></tr>
+          <tr><td>总变差 TV</td><td>0.0261</td><td>100%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caption">K1=0.5908（r=3）· K2=0.5231（3 人）· K3=0.3146（n=10）· 纠正 Excel K3 查表错误。不计算 %Tolerance。</p>
+
+    <h2 class="sec">均值图</h2>
+    <div class="card">
+      <div class="chart-box">
+        <svg viewBox="0 0 640 200" preserveAspectRatio="none">
+          <line x1="40" y1="40" x2="620" y2="40" stroke="#d40000" stroke-dasharray="4 3" />
+          <line x1="40" y1="100" x2="620" y2="100" stroke="#969799" />
+          <line x1="40" y1="160" x2="620" y2="160" stroke="#d40000" stroke-dasharray="4 3" />
+          <polyline fill="none" stroke="#006be6" stroke-width="1.5"
+            points="50,96 108,88 166,92 224,84 282,90 340,78 398,86 456,80 514,74 572,82" />
+          <polyline fill="none" stroke="#2da641" stroke-width="1.5"
+            points="50,102 108,94 166,98 224,90 282,96 340,84 398,92 456,86 514,80 572,88" />
+          <polyline fill="none" stroke="#ed6a0c" stroke-width="1.5"
+            points="50,108 108,100 166,104 224,96 282,102 340,90 398,98 456,92 514,86 572,94" />
+        </svg>
+      </div>
+      <p class="caption">横轴：零件 P01–P10 · 纵轴：各评价人零件均值 · 虚线 UCLx / LCLx（A2×R̄）· 蓝王工 / 绿李工 / 橙赵工</p>
+    </div>
+
+    <h2 class="sec">极差图</h2>
+    <div class="card">
+      <div class="chart-box">
+        <svg viewBox="0 0 640 200" preserveAspectRatio="none">
+          <line x1="40" y1="36" x2="620" y2="36" stroke="#d40000" stroke-dasharray="4 3" />
+          <line x1="40" y1="170" x2="620" y2="170" stroke="#c8c9cc" />
+          <polyline fill="none" stroke="#006be6" stroke-width="1.5"
+            points="50,140 108,132 166,148 224,128 282,136 340,124 398,142 456,130 514,138 572,134" />
+          <polyline fill="none" stroke="#2da641" stroke-width="1.5"
+            points="50,146 108,138 166,152 224,134 282,142 340,130 398,148 456,136 514,144 572,140" />
+          <polyline fill="none" stroke="#ed6a0c" stroke-width="1.5"
+            points="50,150 108,144 166,156 224,140 282,148 340,136 398,152 456,142 514,148 572,146" />
+        </svg>
+      </div>
+      <p class="caption">横轴：零件 P01–P10 · 纵轴：极差 · 上虚线 UCLR=D4×R̄，下线 LCLR=D3×R̄=0（r=3）· 禁止使用均值图控制限</p>
+    </div>
+
+    <div class="sec-row">
+      <h2 class="sec">原始数据</h2>
+      <div class="sec-actions" data-planner-only>
+        <button class="btn" type="button" id="rawEditBtn" onclick="startRawEdit()">编辑</button>
+        <button class="btn" type="button" id="rawCancelBtn" style="display:none" onclick="cancelRawEdit()">取消</button>
+        <button class="btn btn-primary" type="button" id="rawSaveBtn" style="display:none" onclick="saveRawEdit()">保存</button>
+      </div>
+    </div>
+    <div class="card" style="padding:0">
+      <div class="table-wrap">
+        <table class="data matrix" id="rawTbl">
+          <thead>
+            <tr><th>评价人</th><th>试验</th><th>P01</th><th>P02</th><th>P03</th><th>P04</th><th>P05</th><th>P06</th><th>P07</th><th>P08</th><th>P09</th><th>P10</th></tr>
+          </thead>
+          <tbody>
+            <tr><td rowspan="3">王工</td><td>1</td><td class="val">12.001</td><td class="val">12.021</td><td class="val">12.040</td><td class="val">12.062</td><td class="val">12.081</td><td class="val">12.102</td><td class="val">12.120</td><td class="val">12.141</td><td class="val">12.162</td><td class="val">12.180</td></tr>
+            <tr><td>2</td><td class="val">12.003</td><td class="val">12.020</td><td class="val">12.042</td><td class="val">12.060</td><td class="val">12.083</td><td class="val">12.100</td><td class="val">12.122</td><td class="val">12.140</td><td class="val">12.161</td><td class="val">12.182</td></tr>
+            <tr><td>3</td><td class="val">12.002</td><td class="val">12.023</td><td class="val">12.041</td><td class="val">12.061</td><td class="val">12.080</td><td class="val">12.103</td><td class="val">12.121</td><td class="val">12.142</td><td class="val">12.160</td><td class="val">12.181</td></tr>
+            <tr><td rowspan="3">李工</td><td>1</td><td class="val">12.005</td><td class="val">12.024</td><td class="val">12.044</td><td class="val">12.064</td><td class="val">12.084</td><td class="val">12.105</td><td class="val">12.124</td><td class="val">12.144</td><td class="val">12.164</td><td class="val">12.184</td></tr>
+            <tr><td>2</td><td class="val">12.004</td><td class="val">12.026</td><td class="val">12.043</td><td class="val">12.065</td><td class="val">12.082</td><td class="val">12.104</td><td class="val">12.125</td><td class="val">12.143</td><td class="val">12.165</td><td class="val">12.183</td></tr>
+            <tr><td>3</td><td class="val">12.006</td><td class="val">12.025</td><td class="val">12.045</td><td class="val">12.063</td><td class="val">12.085</td><td class="val">12.106</td><td class="val">12.123</td><td class="val">12.145</td><td class="val">12.163</td><td class="val">12.185</td></tr>
+            <tr><td rowspan="3">赵工</td><td>1</td><td class="val">12.008</td><td class="val">12.028</td><td class="val">12.047</td><td class="val">12.067</td><td class="val">12.087</td><td class="val">12.107</td><td class="val">12.127</td><td class="val">12.147</td><td class="val">12.167</td><td class="val">12.187</td></tr>
+            <tr><td>2</td><td class="val">12.007</td><td class="val">12.027</td><td class="val">12.048</td><td class="val">12.066</td><td class="val">12.086</td><td class="val">12.108</td><td class="val">12.126</td><td class="val">12.146</td><td class="val">12.168</td><td class="val">12.186</td></tr>
+            <tr><td>3</td><td class="val">12.009</td><td class="val">12.029</td><td class="val">12.046</td><td class="val">12.068</td><td class="val">12.088</td><td class="val">12.109</td><td class="val">12.128</td><td class="val">12.148</td><td class="val">12.166</td><td class="val">12.188</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="js/app.js"></script>
+<script>
+var rawSnap = [];
+function rawCells() {
+  return document.querySelectorAll("#rawTbl td.val");
+}
+function setRawMode(editing) {
+  document.getElementById("rawEditBtn").style.display = editing ? "none" : "";
+  document.getElementById("rawCancelBtn").style.display = editing ? "" : "none";
+  document.getElementById("rawSaveBtn").style.display = editing ? "" : "none";
+}
+function startRawEdit() {
+  rawSnap = [];
+  rawCells().forEach(function (td) {
+    var v = td.textContent.trim();
+    rawSnap.push(v);
+    td.innerHTML = '<input value="' + v + '" />';
+  });
+  setRawMode(true);
+}
+function cancelRawEdit() {
+  rawCells().forEach(function (td, i) {
+    td.textContent = rawSnap[i];
+  });
+  setRawMode(false);
+}
+function saveRawEdit() {
+  var cells = rawCells();
+  var vals = [];
+  var empty = false;
+  cells.forEach(function (td) {
+    var inp = td.querySelector("input");
+    var v = inp ? inp.value.trim() : td.textContent.trim();
+    if (v === "" || isNaN(Number(v))) empty = true;
+    vals.push(v);
+  });
+  if (empty) {
+    toast("存在空值或非数字，请改后再保存");
+    return;
+  }
+  cells.forEach(function (td, i) { td.textContent = vals[i]; });
+  setRawMode(false);
+  toast("已保存，报告已按新数据重算");
+}
+</script>
+</body>
+</html>

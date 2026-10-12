@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>稳定性分析报告</title>
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embedded');</script>
+  <link rel="stylesheet" href="css/demo.css" />
+</head>
+<body data-mod="stab">
+<div class="app">
+  <header class="header">
+    <div class="brand">计量 MSA</div>
+    <div class="header-right">
+      <span>角色</span>
+      <select id="roleSel" onchange="setRole(this.value)">
+        <option value="planner">计划员</option>
+        <option value="appraiser">测量人 · 王工</option>
+      </select>
+      <span>张明</span>
+    </div>
+  </header>
+  <aside class="sidebar">
+    <div id="msaNav"></div>
+  </aside>
+  <main>
+    <div class="page-head">
+      <div>
+        <h1>分析报告</h1>
+      </div>
+      <div class="head-actions">
+        <button class="btn" type="button" onclick="return notExport()">导出</button>
+        <a class="btn" href="stab.html">返回列表</a>
+        <a class="btn btn-primary" href="#" onclick="toast('已复制为新草稿');return false;">复制为新计划</a>
+      </div>
+    </div>
+
+    <div id="verdictBox"></div>
+
+    <div class="card">
+      <div class="form-grid" id="summary"></div>
+    </div>
+
+    <div class="kpi-row kpi-5" id="kpis"></div>
+
+    <h2 class="sec">X̄ 图</h2>
+    <div class="card">
+      <div class="chart-box" id="xChart"></div>
+      <p class="caption">横轴：样本 1…k · 纵轴：子组均值 · 虚线 UCL / LCL · 中线 X̄̄ · 出限点标红 · A2=1.023（n=3）</p>
+    </div>
+
+    <h2 class="sec">R 图</h2>
+    <div class="card">
+      <div class="chart-box" id="rChart"></div>
+      <p class="caption">横轴：样本 1…k · 纵轴：极差 · 上虚线 UCL(R)=D4×R̄ · LCL 不考虑（D3=0）· 禁止沿用 Excel Z36</p>
+    </div>
+
+    <div class="sec-row">
+      <h2 class="sec">原始数据</h2>
+      <div class="sec-actions" data-planner-only>
+        <button class="btn" type="button" id="rawEditBtn" onclick="startRawEdit()">编辑</button>
+        <button class="btn" type="button" id="rawCancelBtn" style="display:none" onclick="cancelRawEdit()">取消</button>
+        <button class="btn btn-primary" type="button" id="rawSaveBtn" style="display:none" onclick="saveRawEdit()">保存</button>
+      </div>
+    </div>
+    <div class="card" style="padding:0">
+      <div class="table-wrap">
+        <table class="data matrix" id="rawTbl"></table>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="js/app.js"></script>
+<script>
+var N = 3, K = 25, A2 = 1.023, D4 = 2.574;
+var mode = (new URLSearchParams(location.search).get("id")) || "done";
+var META = {
+  running: { no: "STAB-20260901-001", eq: "数显卡尺 / EQ-CAL-012", spec: "0–150 mm / 0.01 mm", part: "轴套 φ20", date: "2026-09-01", filled: 18, status: "执行中" },
+  done: { no: "STAB-20260827-003", eq: "外径千分尺 / EQ-MIC-008", spec: "0–25 mm / 0.001 mm", part: "销轴", date: "2026-08-27", filled: 25, status: "已完成" },
+  reject: { no: "STAB-20260825-001", eq: "数显卡尺 / EQ-CAL-012", spec: "0–150 mm / 0.01 mm", part: "轴套 φ20", date: "2026-08-25", filled: 25, status: "已完成" },
+  pending: { no: "STAB-20260826-002", eq: "高度尺 / EQ-HGT-003", spec: "0–300 mm / 0.02 mm", part: "支架", date: "2026-08-26", filled: 0, status: "待执行" }
+};
+var meta = META[mode] || META.done;
+var cells = [];
+var STABLE = [
+  ["20.012", "20.015", "20.010"],
+  ["20.013", "20.011", "20.014"],
+  ["20.010", "20.012", "20.013"],
+  ["20.014", "20.016", "20.012"],
+  ["20.011", "20.013", "20.012"],
+  ["20.015", "20.012", "20.014"],
+  ["20.012", "20.010", "20.013"],
+  ["20.013", "20.014", "20.011"],
+  ["20.010", "20.013", "20.012"],
+  ["20.014", "20.012", "20.015"],
+  ["20.011", "20.014", "20.012"],
+  ["20.013", "20.010", "20.011"],
+  ["20.012", "20.015", "20.013"],
+  ["20.014", "20.011", "20.012"],
+  ["20.010", "20.012", "20.014"],
+  ["20.013", "20.015", "20.012"],
+  ["20.011", "20.013", "20.010"],
+  ["20.012", "20.014", "20.013"],
+  ["20.015", "20.011", "20.012"],
+  ["20.013", "20.012", "20.014"],
+  ["20.010", "20.014", "20.011"],
+  ["20.012", "20.013", "20.015"],
+  ["20.014", "20.010", "20.013"],
+  ["20.011", "20.012", "20.014"],
+  ["20.013", "20.015", "20.011"]
+];
+
+function seedVal(t, i) {
+  if (mode === "reject" && t === 6 && i === 2) return "20.086";
+  return STABLE[t][i];
+}
+function initCells() {
+  var lim = meta.filled;
+  cells = [];
+  for (var i = 0; i < N; i++) {
+    cells[i] = [];
+    for (var t = 0; t < K; t++) cells[i][t] = t < lim ? seedVal(t, i) : "";
+  }
+}
+function colComplete(t) {
+  for (var i = 0; i < N; i++) {
+    if (cells[i][t] === "" || isNaN(Number(cells[i][t]))) return false;
+  }
+  return true;
+}
+function xbar(t) {
+  if (!colComplete(t)) return null;
+  var s = 0;
+  for (var i = 0; i < N; i++) s += Number(cells[i][t]);
+  return s / N;
+}
+function range(t) {
+  if (!colComplete(t)) return null;
+  var nums = [];
+  for (var i = 0; i < N; i++) nums.push(Number(cells[i][t]));
+  return Math.max.apply(null, nums) - Math.min.apply(null, nums);
+}
+function calc() {
+  var xs = [], rs = [], idx = [];
+  for (var t = 0; t < K; t++) {
+    if (!colComplete(t)) continue;
+    xs.push(xbar(t));
+    rs.push(range(t));
+    idx.push(t);
+  }
+  if (!xs.length) return { k1: 0 };
+  var xbb = xs.reduce(function (a, b) { return a + b; }, 0) / xs.length;
+  var rbar = rs.reduce(function (a, b) { return a + b; }, 0) / xs.length;
+  var uclx = xbb + A2 * rbar, lclx = xbb - A2 * rbar, uclr = D4 * rbar;
+  var xOos = xs.some(function (v) { return v > uclx || v < lclx; });
+  var rOos = rs.some(function (v) { return v > uclr; });
+  return { k1: xs.length, xs: xs, rs: rs, idx: idx, xbb: xbb, rbar: rbar, uclx: uclx, lclx: lclx, uclr: uclr, xOos: xOos, rOos: rOos, reject: xOos || rOos };
+}
+function fmt(v, d) { return v.toFixed(d == null ? 4 : d); }
+function paint() {
+  var st = calc();
+  var box = document.getElementById("verdictBox");
+  if (st.k1 < 1) {
+    box.innerHTML = '<div class="verdict"><div class="big">尚无完整子组，不出正式判定</div><div>至少填齐 1 个样本的 X1～X3。</div></div>';
+  } else {
+    var ok = !st.reject;
+    box.innerHTML =
+      '<div class="verdict ' + (ok ? "ok" : "danger") + '">' +
+      '<div class="big">' + (ok ? "测量系统可接受" : "测量系统不可接受") + "</div>" +
+      "<div>" + (ok
+        ? "控制图分析显示，测量过程是稳定的，因为没有出现明显可见的特殊原因影响。测量系统可接受。"
+        : "控制图分析显示，测量过程是不稳定的，出现明显可见的特殊原因影响。测量系统不可接受。") +
+      " · 均值图" + (st.xOos ? "超限" : "未超限") + " · 极差图" + (st.rOos ? "超限" : "未超限") +
+      (meta.filled < K ? " · 执行中，判定为正式判定" : "") + "</div></div>";
+  }
+  document.getElementById("summary").innerHTML =
+    field("计划编号", meta.no) +
+    field("仪器", meta.eq) +
+    field("规格 / 量程", meta.spec) +
+    field("检测项目", meta.part) +
+    field("测量参数", "—") +
+    field("测量人", "王工") +
+    field("试验次数", String(N)) +
+    field("样本数", String(K)) +
+    field("测量日期", meta.date) +
+    field("制定", "张明 " + meta.date + " 16:02") +
+    field("审核（署名，非审批）", "—");
+  if (st.k1 < 1) {
+    document.getElementById("kpis").innerHTML = "";
+  } else {
+    document.getElementById("kpis").innerHTML =
+      stat(st.k1 + " / " + K, "完整子组 / 样本数") +
+      stat(fmt(st.xbb), "X̄̄") +
+      stat(fmt(st.rbar), "R̄") +
+      stat(fmt(st.uclx) + " / " + fmt(st.lclx), "UCL(X̄) / LCL(X̄)") +
+      stat(fmt(st.uclr), "UCL(R) · LCL 不考虑");
+  }
+  drawChart("xChart", st, "x");
+  drawChart("rChart", st, "r");
+  drawRaw();
+}
+function field(l, v) {
+  return '<div class="field"><label>' + l + '</label><div class="ro">' + v + "</div></div>";
+}
+function stat(n, l) {
+  return '<div class="stat-card"><div class="num" style="font-size:18px">' + n + '</div><div class="lbl">' + l + "</div></div>";
+}
+function drawChart(id, st, kind) {
+  var el = document.getElementById(id);
+  if (st.k1 < 1) { el.innerHTML = ""; return; }
+  var vals = kind === "x" ? st.xs : st.rs;
+  var ucl = kind === "x" ? st.uclx : st.uclr;
+  var lcl = kind === "x" ? st.lclx : 0;
+  var cl = kind === "x" ? st.xbb : st.rbar;
+  var ymin = Math.min(lcl, Math.min.apply(null, vals)) - 0.002;
+  var ymax = Math.max(ucl, Math.max.apply(null, vals)) + 0.002;
+  function y(v) { return 180 - (v - ymin) / (ymax - ymin) * 150; }
+  var W = 620, left = 40;
+  var pts = [];
+  var dots = "";
+  vals.forEach(function (v, i) {
+    var x = left + (i / Math.max(vals.length - 1, 1)) * (W - 20);
+    var yy = y(v);
+    pts.push(x + "," + yy);
+    var oos = kind === "x" ? (v > ucl || v < lcl) : (v > ucl);
+    dots += '<circle cx="' + x + '" cy="' + yy + '" r="3" fill="' + (oos ? "#d40000" : "#006be6") + '" />';
+  });
+  el.innerHTML =
+    '<svg viewBox="0 0 640 200" preserveAspectRatio="none">' +
+    '<line x1="40" y1="' + y(ucl) + '" x2="620" y2="' + y(ucl) + '" stroke="#d40000" stroke-dasharray="4 3" />' +
+    '<line x1="40" y1="' + y(cl) + '" x2="620" y2="' + y(cl) + '" stroke="#969799" />' +
+    (kind === "x" ? '<line x1="40" y1="' + y(lcl) + '" x2="620" y2="' + y(lcl) + '" stroke="#d40000" stroke-dasharray="4 3" />' : "") +
+    '<polyline fill="none" stroke="#006be6" stroke-width="1.5" points="' + pts.join(" ") + '" />' +
+    dots + "</svg>";
+}
+function drawRaw() {
+  var h = "<thead><tr><th></th>";
+  for (var t = 0; t < K; t++) h += "<th>" + (t + 1) + "</th>";
+  h += "</tr></thead><tbody>";
+  for (var i = 0; i < N; i++) {
+    h += "<tr><td class=\"op-head\">X" + (i + 1) + "</td>";
+    for (var t = 0; t < K; t++) h += '<td class="val">' + cells[i][t] + "</td>";
+    h += "</tr>";
+  }
+  h += '<tr class="readonly"><td>X̄</td>';
+  for (var t = 0; t < K; t++) { var v = xbar(t); h += "<td>" + (v == null ? "" : fmt(v)) + "</td>"; }
+  h += "</tr><tr class=\"readonly\"><td>R</td>";
+  for (var t = 0; t < K; t++) { var r = range(t); h += "<td>" + (r == null ? "" : fmt(r)) + "</td>"; }
+  h += "</tr></tbody>";
+  document.getElementById("rawTbl").innerHTML = h;
+}
+var rawSnap = [];
+function rawCells() { return document.querySelectorAll("#rawTbl td.val"); }
+function setRawMode(editing) {
+  document.getElementById("rawEditBtn").style.display = editing ? "none" : "";
+  document.getElementById("rawCancelBtn").style.display = editing ? "" : "none";
+  document.getElementById("rawSaveBtn").style.display = editing ? "" : "none";
+}
+function startRawEdit() {
+  rawSnap = [];
+  rawCells().forEach(function (td) {
+    var v = td.textContent.trim();
+    rawSnap.push(v);
+    td.innerHTML = '<input value="' + v + '" />';
+  });
+  setRawMode(true);
+}
+function cancelRawEdit() {
+  rawCells().forEach(function (td, i) { td.textContent = rawSnap[i]; });
+  setRawMode(false);
+}
+function saveRawEdit() {
+  var tds = rawCells();
+  var vals = [];
+  tds.forEach(function (td) {
+    var inp = td.querySelector("input");
+    vals.push(inp ? inp.value.trim() : td.textContent.trim());
+  });
+  for (var i = 0; i < N; i++) {
+    for (var t = 0; t < K; t++) {
+      var v = vals[i * K + t];
+      if (v !== "" && isNaN(Number(v))) {
+        toast("存在非数字，请改后再保存");
+        return;
+      }
+      cells[i][t] = v;
+    }
+  }
+  setRawMode(false);
+  paint();
+  toast("已保存，报告已按新数据重算");
+}
+initCells();
+document.addEventListener("DOMContentLoaded", paint);
+</script>
+</body>
+</html>

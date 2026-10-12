@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>稳定性数据录入</title>
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embedded');</script>
+  <link rel="stylesheet" href="css/demo.css" />
+</head>
+<body data-mod="stab">
+<div class="app">
+  <header class="header">
+    <div class="brand">计量 MSA</div>
+    <div class="header-right">
+      <span>角色</span>
+      <select id="roleSel" onchange="setRole(this.value); render();">
+        <option value="planner">计划员</option>
+        <option value="appraiser">测量人 · 王工</option>
+      </select>
+      <span>张明</span>
+    </div>
+  </header>
+  <aside class="sidebar">
+    <div id="msaNav"></div>
+  </aside>
+  <main>
+    <div id="verdictBox"></div>
+    <div class="card">
+      <div class="toolbar">
+        <div class="progress" id="prog"></div>
+        <div class="toolbar-right">
+          <button class="btn" type="button" data-planner-only id="importBtn" onclick="document.getElementById('imp').click()">从 Excel 导入</button>
+          <input id="imp" type="file" accept=".xlsx,.xls" hidden onchange="doImport(this)" />
+          <a class="btn" href="stab.html">返回列表</a>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="data matrix" id="mx"></table>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="js/app.js"></script>
+<script>
+var N = 3;
+var K = 25;
+var A2 = 1.023;
+var D4 = 2.574;
+var cells = [];
+var mode = (new URLSearchParams(location.search).get("id")) || "running";
+
+var STABLE = [
+  ["20.012", "20.015", "20.010"],
+  ["20.013", "20.011", "20.014"],
+  ["20.010", "20.012", "20.013"],
+  ["20.014", "20.016", "20.012"],
+  ["20.011", "20.013", "20.012"],
+  ["20.015", "20.012", "20.014"],
+  ["20.012", "20.010", "20.013"],
+  ["20.013", "20.014", "20.011"],
+  ["20.010", "20.013", "20.012"],
+  ["20.014", "20.012", "20.015"],
+  ["20.011", "20.014", "20.012"],
+  ["20.013", "20.010", "20.011"],
+  ["20.012", "20.015", "20.013"],
+  ["20.014", "20.011", "20.012"],
+  ["20.010", "20.012", "20.014"],
+  ["20.013", "20.015", "20.012"],
+  ["20.011", "20.013", "20.010"],
+  ["20.012", "20.014", "20.013"],
+  ["20.015", "20.011", "20.012"],
+  ["20.013", "20.012", "20.014"],
+  ["20.010", "20.014", "20.011"],
+  ["20.012", "20.013", "20.015"],
+  ["20.014", "20.010", "20.013"],
+  ["20.011", "20.012", "20.014"],
+  ["20.013", "20.015", "20.011"]
+];
+
+function seedVal(t, i) {
+  if (mode === "reject" && t === 6 && i === 2) return "20.086";
+  return STABLE[t][i];
+}
+function filledLimit() {
+  if (mode === "done" || mode === "reject") return K;
+  if (mode === "pending") return 0;
+  return 18;
+}
+function initCells() {
+  var lim = filledLimit();
+  cells = [];
+  for (var i = 0; i < N; i++) {
+    cells[i] = [];
+    for (var t = 0; t < K; t++) {
+      cells[i][t] = t < lim ? seedVal(t, i) : "";
+    }
+  }
+}
+function colComplete(t) {
+  for (var i = 0; i < N; i++) {
+    if (cells[i][t] === "" || isNaN(Number(cells[i][t]))) return false;
+  }
+  return true;
+}
+function xbar(t) {
+  if (!colComplete(t)) return "";
+  var s = 0;
+  for (var i = 0; i < N; i++) s += Number(cells[i][t]);
+  return (s / N).toFixed(4);
+}
+function range(t) {
+  if (!colComplete(t)) return "";
+  var nums = [];
+  for (var i = 0; i < N; i++) nums.push(Number(cells[i][t]));
+  return (Math.max.apply(null, nums) - Math.min.apply(null, nums)).toFixed(4);
+}
+function stats() {
+  var xs = [], rs = [];
+  for (var t = 0; t < K; t++) {
+    if (!colComplete(t)) continue;
+    xs.push(Number(xbar(t)));
+    rs.push(Number(range(t)));
+  }
+  var k1 = xs.length;
+  var filled = 0;
+  for (var i = 0; i < N; i++) for (var t = 0; t < K; t++) if (cells[i][t] !== "") filled++;
+  if (k1 === 0) {
+    return { filled: filled, k1: 0 };
+  }
+  var xbb = xs.reduce(function (a, b) { return a + b; }, 0) / k1;
+  var rbar = rs.reduce(function (a, b) { return a + b; }, 0) / k1;
+  var uclx = xbb + A2 * rbar;
+  var lclx = xbb - A2 * rbar;
+  var uclr = D4 * rbar;
+  var xOos = xs.some(function (v) { return v > uclx || v < lclx; });
+  var rOos = rs.some(function (v) { return v > uclr; });
+  return {
+    filled: filled, k1: k1, xbb: xbb, rbar: rbar,
+    uclx: uclx, lclx: lclx, uclr: uclr,
+    xOos: xOos, rOos: rOos, reject: xOos || rOos
+  };
+}
+function paintVerdict(st) {
+  var box = document.getElementById("verdictBox");
+  if (mode === "pending" || st.k1 < 1) {
+    box.innerHTML = '<div class="verdict"><div class="big">尚无完整子组</div><div>填齐某一列的 X1～X3 后给出正式判定。未填满样本数仍为执行中。</div></div>';
+    return;
+  }
+  var ok = !st.reject;
+  box.innerHTML =
+    '<div class="verdict ' + (ok ? "ok" : "danger") + '">' +
+    '<div class="big">' + (ok ? "测量系统可接受" : "测量系统不可接受") + "</div>" +
+    "<div>" + (ok
+      ? "控制图分析显示，测量过程是稳定的，因为没有出现明显可见的特殊原因影响。测量系统可接受。"
+      : "控制图分析显示，测量过程是不稳定的，出现明显可见的特殊原因影响。测量系统不可接受。") +
+    " · 均值图" + (st.xOos ? "超限" : "未超限") + " · 极差图" + (st.rOos ? "超限" : "未超限") +
+    " · 完整子组 " + st.k1 + " / " + K + " · 正式判定</div></div>";
+}
+function countFilled() {
+  var c = 0;
+  for (var i = 0; i < N; i++) for (var t = 0; t < K; t++) if (cells[i][t] !== "") c++;
+  return c;
+}
+function render() {
+  var st = stats();
+  paintVerdict(st);
+  var h = "<thead><tr><th></th>";
+  for (var t = 0; t < K; t++) h += "<th>" + (t + 1) + "</th>";
+  h += "</tr></thead><tbody>";
+  for (var i = 0; i < N; i++) {
+    h += "<tr><td class=\"op-head\">X" + (i + 1) + "</td>";
+    for (var t = 0; t < K; t++) {
+      h += '<td><input data-i="' + i + '" data-t="' + t + '" value="' + cells[i][t] + '" /></td>';
+    }
+    h += "</tr>";
+  }
+  h += '<tr class="readonly"><td>X̄</td>';
+  for (var t = 0; t < K; t++) h += "<td>" + xbar(t) + "</td>";
+  h += "</tr><tr class=\"readonly\"><td>R</td>";
+  for (var t = 0; t < K; t++) h += "<td>" + range(t) + "</td>";
+  h += "</tr></tbody>";
+  document.getElementById("mx").innerHTML = h;
+  var all = N * K;
+  var done = countFilled() === all;
+  document.getElementById("prog").textContent =
+    "已填 " + countFilled() + " / " + all + " · 完整子组 " + st.k1 + " / " + K +
+    (done ? " · 已完成" : " · 执行中（判定可提前看）");
+  document.querySelectorAll("#mx input").forEach(function (inp) {
+    inp.addEventListener("change", function () {
+      var v = inp.value.trim();
+      if (v !== "" && isNaN(Number(v))) {
+        toast("请输入数字");
+        inp.value = cells[+inp.dataset.i][+inp.dataset.t];
+        return;
+      }
+      cells[+inp.dataset.i][+inp.dataset.t] = v;
+      if (countFilled() === N * K) {
+        toast("样本已填齐，进入已完成");
+        location.href = "stab-report.html" + (mode === "reject" ? "?id=reject" : "");
+        return;
+      }
+      render();
+    });
+  });
+  applyRole();
+}
+function doImport(inp) {
+  if (!inp.files || !inp.files[0]) return;
+  toast("已按稳定性模板测量区导入（演示）");
+  mode = "running";
+  initCells();
+  render();
+  inp.value = "";
+}
+initCells();
+document.addEventListener("DOMContentLoaded", render);
+</script>
+</body>
+</html>

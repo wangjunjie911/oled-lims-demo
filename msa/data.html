@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GRR 数据录入</title>
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embedded');</script>
+  <link rel="stylesheet" href="css/demo.css" />
+</head>
+<body data-mod="grr">
+<div class="app">
+  <header class="header">
+    <div class="brand">计量 MSA</div>
+    <div class="header-right">
+      <span>角色</span>
+      <select id="roleSel" onchange="setRole(this.value); paintRole();">
+        <option value="planner">计划员</option>
+        <option value="appraiser">评价人 · 王工</option>
+      </select>
+      <span>张明</span>
+    </div>
+  </header>
+  <aside class="sidebar">
+    <div id="msaNav"></div>
+  </aside>
+  <main>
+    <div class="card">
+      <div class="toolbar">
+        <div class="progress" id="prog">已填 54 / 90</div>
+        <a class="btn" href="index.html">返回列表</a>
+      </div>
+      <div class="table-wrap">
+        <table class="data matrix" id="mx"></table>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="js/app.js"></script>
+<script>
+var parts = ["P01","P02","P03","P04","P05","P06","P07","P08","P09","P10"];
+var ops = ["王工","李工","赵工"];
+var data = {};
+function seed() {
+  ops.forEach(function (op, oi) {
+    data[op] = [[],[],[]];
+    for (var t = 0; t < 3; t++) {
+      for (var p = 0; p < 10; p++) {
+        var filled = oi < 2 || t < 2 || p < 4;
+        data[op][t][p] = filled ? (20.01 + p * 0.02 + oi * 0.01 + t * 0.005).toFixed(3) : "";
+      }
+    }
+  });
+}
+function avg(arr) {
+  var n = 0, s = 0;
+  arr.forEach(function (v) { if (v !== "") { s += parseFloat(v); n++; } });
+  return n ? (s / n).toFixed(3) : "";
+}
+function rng(arr) {
+  var nums = arr.filter(function (v) { return v !== ""; }).map(Number);
+  if (!nums.length) return "";
+  return (Math.max.apply(null, nums) - Math.min.apply(null, nums)).toFixed(3);
+}
+function countFilled() {
+  var c = 0;
+  ops.forEach(function (op) {
+    data[op].forEach(function (row) {
+      row.forEach(function (v) { if (v !== "") c++; });
+    });
+  });
+  return c;
+}
+function render() {
+  var role = localStorage.getItem("grrRole") || "planner";
+  var h = "<thead><tr><th>评价人</th><th>试验</th>";
+  parts.forEach(function (p) { h += "<th>" + p + "</th>"; });
+  h += "</tr></thead><tbody>";
+  ops.forEach(function (op, oi) {
+    var hide = role === "appraiser" && op !== "王工";
+    for (var t = 0; t < 3; t++) {
+      h += "<tr>";
+      if (t === 0) h += '<td class="op-head" rowspan="5">' + op + "</td>";
+      h += "<td>" + (t + 1) + "</td>";
+      for (var p = 0; p < 10; p++) {
+        var v = data[op][t][p];
+        if (hide) h += "<td data-appraiser-hide>—</td>";
+        else h += '<td><input data-op="' + oi + '" data-t="' + t + '" data-p="' + p + '" value="' + v + '" /></td>';
+      }
+      h += "</tr>";
+    }
+    h += '<tr class="readonly"><td>均值</td>';
+    for (var p = 0; p < 10; p++) {
+      var col = [data[op][0][p], data[op][1][p], data[op][2][p]];
+      h += "<td>" + (hide ? "—" : avg(col)) + "</td>";
+    }
+    h += "</tr><tr class=\"readonly\"><td>极差</td>";
+    for (var p = 0; p < 10; p++) {
+      var col = [data[op][0][p], data[op][1][p], data[op][2][p]];
+      h += "<td>" + (hide ? "—" : rng(col)) + "</td>";
+    }
+    h += "</tr>";
+  });
+  h += "</tbody>";
+  document.getElementById("mx").innerHTML = h;
+  document.getElementById("prog").textContent = "已填 " + countFilled() + " / 90";
+  document.querySelectorAll("#mx input").forEach(function (inp) {
+    inp.addEventListener("change", function () {
+      data[ops[+inp.dataset.op]][+inp.dataset.t][+inp.dataset.p] = inp.value;
+      if (countFilled() === 90) location.href = "report.html";
+      else render();
+    });
+  });
+  applyRole();
+}
+function paintRole() { render(); }
+seed();
+document.addEventListener("DOMContentLoaded", render);
+</script>
+</body>
+</html>
