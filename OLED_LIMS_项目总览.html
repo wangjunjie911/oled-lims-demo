@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>奥来德 LIMS · 项目总览</title>
+<style>
+/* ============ 设计令牌 ============ */
+:root{
+  --primary:#004098;
+  --primary-hover:#00357A;
+  --primary-soft:#E8F0FA;
+  --primary-grad:linear-gradient(135deg,#0052D9 0%,#004098 100%);
+  --teal:#0B7285;
+  --teal-soft:#E6F6F8;
+  --teal-grad:linear-gradient(135deg,#1098AD 0%,#0B7285 100%);
+
+  --ink:#1D2129;      /* 主标题 */
+  --text:#4E5969;     /* 正文 */
+  --muted:#86909C;    /* 辅助 */
+  --border:#E5E6EB;
+  --bg:#F5F6F8;
+  --surface:#FFFFFF;
+
+  --radius:14px;
+  --radius-sm:8px;
+  --shadow-sm:0 1px 2px rgba(16,24,40,.04);
+  --shadow-lg:0 12px 32px rgba(16,24,40,.10);
+  --ring:0 0 0 3px rgba(0,64,152,.15);
+}
+
+/* ============ 基础重置 ============ */
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  font-family:"PingFang SC","Microsoft YaHei",-apple-system,BlinkMacSystemFont,Arial,sans-serif;
+  font-size:14px;color:var(--text);
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  display:flex;flex-direction:column;
+}
+
+/* 页面背景微渐变，提升层次 */
+.main{
+  flex:1;width:100%;
+  background:
+    radial-gradient(1200px 500px at 50% -10%,#EAF1FB 0%,rgba(234,241,251,0) 60%),
+    var(--bg);
+}
+
+/* ============ 顶部导航 ============ */
+.top{
+  position:sticky;top:0;z-index:10;
+  height:56px;padding:0 clamp(16px,4vw,32px);
+  background:rgba(255,255,255,.86);
+  backdrop-filter:saturate(180%) blur(12px);
+  -webkit-backdrop-filter:saturate(180%) blur(12px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{
+  width:34px;height:34px;flex-shrink:0;border-radius:9px;
+  background:var(--primary-grad);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 10px rgba(0,64,152,.28);
+}
+.logo svg{width:20px;height:20px}
+.brand-name{font-size:15px;font-weight:600;color:var(--ink);white-space:nowrap}
+.brand-sub{font-size:12px;color:var(--muted);white-space:nowrap}
+.brand-sep{width:1px;height:16px;background:var(--border)}
+
+/* ============ 免责提示条 ============ */
+.notice{
+  display:flex;align-items:flex-start;gap:8px;
+  padding:10px clamp(16px,4vw,32px);
+  background:linear-gradient(90deg,#FFF7F0 0%,#FFFDFB 100%);
+  border-bottom:1px solid #F6E4D0;
+}
+.notice svg{width:15px;height:15px;color:#B25E00;flex-shrink:0;margin-top:2px}
+.notice span{font-size:12.5px;line-height:1.55;color:#8A5A24}
+
+/* ============ 主体内容 ============ */
+.container{
+  width:100%;max-width:840px;margin:0 auto;
+  padding:clamp(36px,6vw,64px) clamp(16px,4vw,24px) 48px;
+}
+
+/* Hero */
+.hero{text-align:center;margin-bottom:clamp(28px,5vw,44px)}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 12px;border-radius:999px;
+  background:var(--primary-soft);color:var(--primary);
+  font-size:12px;font-weight:600;letter-spacing:.5px;
+}
+.eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--primary)}
+.h1{
+  margin:16px 0 10px;font-size:clamp(24px,4.5vw,32px);
+  font-weight:700;color:var(--ink);letter-spacing:-.2px;line-height:1.25;
+}
+.sub{
+  margin:0 auto;max-width:520px;
+  font-size:15px;color:var(--muted);line-height:1.7;
+}
+
+/* ============ 卡片网格 ============ */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,3vw,24px)}
+
+a.card{
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;gap:0;
+  padding:26px 26px 22px;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--radius);
+  text-decoration:none;color:inherit;
+  box-shadow:var(--shadow-sm);
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+}
+/* 顶部装饰色条 */
+a.card::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--primary-grad);opacity:0;transition:opacity .18s ease;
+}
+a.card:hover{
+  transform:translateY(-3px);
+  border-color:rgba(0,64,152,.35);
+  box-shadow:var(--shadow-lg);
+}
+a.card:hover::before{opacity:1}
+a.card:focus-visible{outline:none;border-color:var(--primary);box-shadow:var(--ring)}
+
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.card-ico{
+  width:48px;height:48px;border-radius:12px;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 14px rgba(16,24,40,.16);
+}
+.card-ico svg{width:24px;height:24px}
+.card-ico.pc{background:var(--primary-grad)}
+.card-ico.app{background:var(--teal-grad)}
+.badge{
+  display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;
+  font-size:12px;font-weight:600;
+}
+.badge.pc{background:var(--primary-soft);color:var(--primary)}
+.badge.app{background:var(--teal-soft);color:var(--teal)}
+
+.card-title{font-size:18px;font-weight:600;color:var(--ink);margin:0 0 8px}
+.card-desc{margin:0;font-size:13.5px;line-height:1.6;color:var(--text);min-height:44px}
+
+.tags{list-style:none;display:flex;flex-wrap:wrap;gap:8px;padding:0;margin:16px 0 0}
+.tags li{
+  font-size:12px;color:var(--text);
+  padding:4px 10px;border-radius:6px;background:#F7F8FA;
+  border:1px solid var(--border);
+}
+
+.card-cta{
+  margin-top:18px;padding-top:16px;border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:14px;font-weight:600;
+}
+.card-cta .txt{color:var(--primary)}
+a.card.app .card-cta .txt{color:var(--teal)}
+.card-cta .arrow{
+  width:22px;height:22px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .18s ease,background .18s ease,color .18s ease;
+}
+.card-cta .arrow svg{width:16px;height:16px}
+.card-cta .arrow.pc{background:var(--primary-soft);color:var(--primary)}
+.card-cta .arrow.app{background:var(--teal-soft);color:var(--teal)}
+a.card:hover .card-cta .arrow{transform:translateX(3px)}
+a.card.pc:hover .card-cta .arrow.pc{background:var(--primary);color:#fff}
+a.card.app:hover .card-cta .arrow.app{background:var(--teal);color:#fff}
+
+/* ============ 页脚 ============ */
+.foot{
+  margin-top:clamp(24px,4vw,36px);
+  text-align:center;font-size:12.5px;color:var(--muted);line-height:1.7;
+}
+.foot code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  background:#EEF0F3;color:var(--text);
+  padding:1px 6px;border-radius:4px;font-size:11.5px;
+}
+
+/* ============ 响应式 ============ */
+@media (max-width:640px){
+  .brand-sub,.brand-sep{display:none}
+  .grid{grid-template-columns:1fr}
+  a.card{padding:22px 20px 18px}
+  .card-desc{min-height:0}
+  .container{padding-bottom:40px}
+}
+
+/* 触控设备：放大可点区域 */
+@media (hover:none){
+  a.card{transform:none}
+  a.card:active{transform:scale(.985)}
+}
+
+/* 减少动态效果偏好 */
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+}
+</style>
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v6.3L4.6 18a2 2 0 0 0 1.8 3h11.2a2 2 0 0 0 1.8-3L14 8.3V2"/><path d="M8.5 2h7"/><path d="M7 15h10"/></svg>
+      </span>
+      <span class="brand-name">奥来德 LIMS</span>
+      <span class="brand-sep"></span>
+      <span class="brand-sub">Demo 项目总览</span>
+    </div>
+  </header>
+
+  <div class="notice">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+    <span>该原型方案仅用于核对模块字段和按钮交互的基础功能，不支持功能交互和业务逻辑实现。</span>
+  </div>
+
+  <main class="main">
+    <div class="container">
+      <div class="hero">
+        <span class="eyebrow">DEMO 入口</span>
+        <h1 class="h1">选择演示端</h1>
+        <p class="sub">点击下方入口进入对应 Demo。PC 与 APP 共用本地 Mock，可在两端顶栏互相切换。</p>
+      </div>
+
+      <div class="grid">
+        <a class="card pc" href="./OLED_LIMS_PC_Login.html">
+          <div class="card-head">
+            <span class="card-ico pc" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+            </span>
+            <span class="badge pc">PC</span>
+          </div>
+          <h2 class="card-title">PC 端 Demo</h2>
+          <p class="card-desc">先进入 PC 登录页，登录后进入台账、主数据、SPC、MSA 等桌面端交互。</p>
+          <ul class="tags">
+            <li>登录</li><li>台账</li><li>主数据</li><li>SPC</li><li>MSA</li>
+          </ul>
+          <div class="card-cta">
+            <span class="txt">进入 PC 端</span>
+            <span class="arrow pc" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+          </div>
+        </a>
+
+        <a class="card app" href="./OLED_LIMS_APP_Demo.html">
+          <div class="card-head">
+            <span class="card-ico app" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18h2"/></svg>
+            </span>
+            <span class="badge app">APP</span>
+          </div>
+          <h2 class="card-title">APP 端 Demo</h2>
+          <p class="card-desc">移动端登录、首页模块、取样与审批等现场作业场景。</p>
+          <ul class="tags">
+            <li>登录</li><li>首页模块</li><li>取样</li><li>审批</li>
+          </ul>
+          <div class="card-cta">
+            <span class="txt">进入 APP 端</span>
+            <span class="arrow app" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+          </div>
+        </a>
+      </div>
+
+      <p class="foot">入口文件：<code>OLED_LIMS_PC_Login.html</code> · <code>OLED_LIMS_Demo.html</code> · <code>OLED_LIMS_APP_Demo.html</code></p>
+    </div>
+  </main>
+</body>
+</html>

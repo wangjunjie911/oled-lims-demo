@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>偏倚分析 Demo</title>
+<script>if (window.self !== window.top) document.documentElement.classList.add('embedded');</script>
+<style>
+:root{
+  --bg:#f7f8fa; --bg-gray:#f0f2f5; --surface:#fff; --border:#ebedf0;
+  --primary:#006be6; --primary-hover:#4080ff; --primary-soft:#006be626;
+  --text:#323233; --text-secondary:#969799; --text-third:#646566;
+  --success:#2da641; --success-bg:#f0faf2; --warning:#ed6a0c; --warning-bg:#fff5ed;
+  --danger:#d40000; --danger-bg:#ffebeb; --hover:#f2f3f4; --header-table:#f5f7fa;
+  --radius:8px; --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font:14px/1.5 var(--font);color:var(--text);background:var(--bg)}
+.app{display:flex;flex-direction:column;height:100vh}
+
+/* 顶栏 */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:52px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+.brand{font-weight:600;color:var(--primary);display:flex;align-items:center;gap:10px}
+.brand .crumb{font-size:12px;color:var(--text-secondary);font-weight:400}
+.topbar-right{display:flex;align-items:center;gap:12px;color:var(--text-third);font-size:13px}
+.topbar-right select{height:28px;border:1px solid var(--border);border-radius:4px;padding:0 8px;color:var(--text)}
+
+/* 内容区 */
+.body{flex:1;overflow:auto;padding:16px 20px 40px}
+.view{display:block}
+.view.hidden{display:none}
+
+/* 需求标注标签 */
+.req-tag{display:inline-block;margin-left:8px;padding:0 8px;height:20px;line-height:20px;font-size:11px;font-weight:400;color:#7a5b00;background:#fff7e0;border:1px solid #ffe1a8;border-radius:999px;vertical-align:middle;cursor:default}
+.req-tag:hover{background:#ffefc2}
+
+/* 卡片 */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:12px}
+.card.fill{display:flex;flex-direction:column}
+
+/* 按钮 */
+.btn{display:inline-flex;align-items:center;height:32px;padding:7px 14px;border-radius:4px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;font-size:14px;font-family:inherit}
+.btn:hover{background:var(--hover)}
+.btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-hover);border-color:var(--primary-hover)}
+.btn-danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.btn-link{background:none;border:none;color:var(--primary);cursor:pointer;font:inherit;padding:0}
+.btn-sm{height:28px;padding:4px 12px;font-size:13px}
+
+/* 查询 */
+.query{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end}
+.query-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 16px}
+.field label{display:block;font-size:12px;color:var(--text-third);margin-bottom:4px}
+.field input,.field select{width:100%;height:32px;border:1px solid var(--border);border-radius:4px;padding:0 8px;font:inherit;color:var(--text);background:#fff}
+.query-actions{display:flex;gap:8px}
+
+/* 工具栏 */
+.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px}
+.toolbar-right{display:flex;gap:8px}
+
+/* 表格 */
+.table-wrap{overflow:auto}
+table.data{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+table.data th{background:var(--header-table);color:var(--text-third);font-size:12px;font-weight:500;text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+table.data td{padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--surface)}
+table.data tbody tr:hover td{background:var(--hover)}
+table.data a{color:var(--primary);text-decoration:none}
+
+/* 徽标 */
+.badge{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px}
+.badge-ok{background:var(--success-bg);color:var(--success)}
+.badge-warn{background:var(--warning-bg);color:var(--warning)}
+.badge-danger{background:var(--danger-bg);color:var(--danger)}
+.badge-info{background:#e8f3ff;color:var(--primary)}
+.badge-muted{background:var(--bg-gray);color:var(--text-third)}
+
+/* 操作链接 */
+.op-link{color:var(--primary);background:none;border:none;padding:0 6px 0 0;cursor:pointer;font:inherit;font-size:13px}
+.op-link.danger{color:var(--danger)}
+.op-link.disabled{color:#c8c9cc;cursor:not-allowed;pointer-events:none}
+
+/* 分页 */
+.pager{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:13px;color:var(--text-third)}
+.pager-right{display:flex;align-items:center;gap:8px}
+.pager button{height:28px;min-width:28px;border:1px solid var(--border);background:#fff;border-radius:4px;cursor:pointer;font-family:inherit}
+.pager button.cur{background:var(--primary);color:#fff;border-color:var(--primary)}
+.pager select{height:28px;border:1px solid var(--border);border-radius:4px}
+
+/* 页头（录入/报告） */
+.page-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:16px}
+.page-head h1{margin:0;font-size:18px;font-weight:600;display:flex;align-items:center;gap:6px}
+.head-actions{display:flex;gap:8px}
+
+/* 摘要网格 */
+.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 24px}
+.summary .item{font-size:13px}
+.summary .item .k{color:var(--text-third);font-size:12px}
+.summary .item .v{color:var(--text);margin-top:2px;font-weight:500}
+
+/* 录入矩阵 */
+.matrix-row{display:grid;grid-template-columns:140px repeat(10,1fr);gap:8px;align-items:center;margin-bottom:8px}
+.matrix-row .lbl{font-size:13px;color:var(--text-third)}
+.matrix-row .cell{text-align:center}
+.matrix-row .cell .idx{font-size:11px;color:var(--text-secondary);margin-bottom:4px}
+.matrix-row input{width:100%;height:34px;border:1px solid var(--border);border-radius:4px;text-align:center;font:inherit;font-variant-numeric:tabular-nums}
+.matrix-row input.err{border-color:var(--danger);background:var(--danger-bg)}
+.matrix-row input:focus{outline:none;border-color:var(--primary)}
+.ro-box{display:flex;align-items:center;height:34px;padding:0 10px;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text-third);font-variant-numeric:tabular-nums}
+
+/* 统计卡 */
+.kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:12px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px}
+.stat-card .num{font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--text)}
+.stat-card .lbl{font-size:12px;color:var(--text-secondary);margin-top:2px}
+
+/* 结论条 */
+.verdict{padding:12px 16px;border-radius:var(--radius);border:1px solid #c6e2ff;background:#e8f3ff;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.verdict.ok{border-color:#b7eb8f;background:var(--success-bg)}
+.verdict.danger{border-color:#ffa39e;background:var(--danger-bg)}
+.verdict .big{font-size:16px;font-weight:600}
+.verdict .note{font-size:12px;color:var(--text-third)}
+
+/* 图 */
+.chart-box{border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px 4px;margin-bottom:8px;background:var(--surface)}
+.chart-box svg{width:100%;height:auto}
+.caption{font-size:12px;color:var(--text-secondary);margin-bottom:14px}
+
+h2.sec{font-size:14px;font-weight:600;margin:18px 0 10px;display:flex;align-items:center;gap:6px}
+
+/* 署名 */
+.sign{display:flex;justify-content:flex-end;gap:60px;margin-top:18px;padding-top:14px;border-top:1px solid var(--border);font-size:13px;color:var(--text-third)}
+.sign span{min-width:80px;text-align:center}
+.sign .line{display:block;height:28px;border-bottom:1px solid var(--text);min-width:120px;margin-top:4px}
+
+/* 需求对照面板 */
+.req-mask{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:60}
+.req-mask.show{display:block}
+.req-panel{position:fixed;top:0;right:0;bottom:0;width:520px;max-width:90vw;background:#fff;z-index:61;box-shadow:-4px 0 20px rgba(0,0,0,.15);transform:translateX(100%);transition:transform .25s;display:flex;flex-direction:column}
+.req-panel.show{transform:translateX(0)}
+.req-panel .rp-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border)}
+.req-panel .rp-head h3{margin:0;font-size:16px;font-weight:600}
+.req-panel .rp-body{flex:1;overflow:auto;padding:16px 18px}
+.req-panel table{width:100%;border-collapse:collapse;font-size:13px}
+.req-panel th,.req-panel td{border:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top}
+.req-panel th{background:var(--header-table);color:var(--text-third);font-weight:500}
+.req-panel td code{color:var(--danger);font-size:12px}
+.req-panel .grp{font-weight:600;margin:16px 0 8px;font-size:14px}
+.req-panel .grp:first-child{margin-top:0}
+
+/* toast */
+.toast{position:fixed;top:64px;left:50%;transform:translateX(-50%);background:#323233;color:#fff;padding:8px 16px;border-radius:4px;font-size:13px;z-index:100;display:none}
+.toast.show{display:block}
+
+/* 嵌入模式：隐藏自身顶栏，铺满 */
+html.embedded .topbar{display:none}
+html.embedded .body{padding:0}
+</style>
+</head>
+<body data-mod="bias">
+<div class="app">
+  <header class="topbar">
+    <div class="brand">MSA 偏倚分析<span class="crumb">测量系统分析 / 偏倚</span></div>
+    <div class="topbar-right">
+      <button class="btn btn-sm" type="button" id="reqBtn">需求对照</button>
+      <span>角色</span>
+      <select id="roleSel" onchange="setRole(this.value)">
+        <option value="planner">计划员</option>
+        <option value="appraiser">评价人 · 王工</option>
+      </select>
+      <span>张明</span>
+    </div>
+  </header>
+
+  <div class="body">
+
+    <!-- ============ 视图一：计划列表 ============ -->
+    <section id="view-list" class="view">
+      <div class="card">
+        <div class="query">
+          <div class="query-fields">
+            <div class="field"><label>计划编号</label><input id="qNo" placeholder="请输入" /></div>
+            <div class="field"><label>仪器名称</label><input id="qName" placeholder="请输入" /></div>
+            <div class="field"><label>仪器编号</label><input id="qEqNo" placeholder="请输入" /></div>
+            <div class="field">
+              <label>状态</label>
+              <select id="qStatus">
+                <option value="">全部</option><option>待执行</option><option>执行中</option><option>已完成</option><option>已关闭</option>
+              </select>
+            </div>
+            <div class="field"><label>测量人</label><input id="qUser" placeholder="请输入" /></div>
+            <div class="field"><label>测试日期</label><input id="qDate" type="date" /></div>
+            <div class="field">
+              <label>判定结果</label>
+              <select id="qVerdict">
+                <option value="">全部</option><option>可接受</option><option>不可接受</option><option>—</option>
+              </select>
+            </div>
+          </div>
+          <div class="query-actions">
+            <button class="btn btn-primary" type="button" onclick="doQuery()">查询</button>
+            <button class="btn" type="button" onclick="resetQuery()">重置</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card fill">
+        <div class="toolbar">
+          <div class="toolbar-left"></div>
+          <div class="toolbar-right">
+            <button class="btn btn-primary" type="button" data-planner-only onclick="openPlan()">新增</button>
+            <button class="btn btn-danger" type="button" data-planner-only onclick="toast('请先勾选要删除的计划')">批量删除</button>
+            <button class="btn" type="button" onclick="return notExport()">导出</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th><input type="checkbox" /></th>
+                <th>序号</th><th>状态</th><th>计划编号</th><th>仪器名称</th><th>仪器编号</th>
+                <th>基准件</th><th>测量参数</th><th>测量人</th><th>测量次数</th><th>测试日期</th><th>判定</th><th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="listBody"></tbody>
+          </table>
+        </div>
+        <div class="pager">
+          <span id="pagerTotal">共 0 条</span>
+          <div class="pager-right">
+            <button type="button">‹</button><button class="cur" type="button">1</button><button type="button">›</button>
+            <span>每页</span><select><option>20</option><option>50</option></select>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 视图二：数据录入 ============ -->
+    <section id="view-data" class="view hidden">
+      <div class="page-head">
+        <h1>数据录入</h1>
+        <div class="head-actions">
+          <button class="btn" type="button" onclick="go('list')">返回列表</button>
+          <button class="btn btn-primary" type="button" onclick="saveData()">保存</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="summary" id="dataSummary"></div>
+      </div>
+
+      <div class="card">
+        <div class="toolbar" style="margin-bottom:6px">
+          <h2 class="sec" style="margin:0">基准值与测量数据</h2>
+          <span class="req-tag">模板 §1 确定基准值 · §2 记录测量样本10次</span>
+        </div>
+        <div class="matrix-row">
+          <div class="lbl">基准值（只读）</div>
+          <div style="grid-column:span 10"><div class="ro-box" id="stdVal"></div></div>
+        </div>
+        <div class="matrix-row">
+          <div class="lbl">10 次测量读数</div>
+          <div id="dataCells" style="grid-column:span 10;display:grid;grid-template-columns:repeat(10,1fr);gap:8px"></div>
+        </div>
+        <div class="hint" style="font-size:12px;color:var(--text-secondary);margin-top:6px">非数字禁止保存 · 空白 = 未测 · 10 次全部填齐后才出正式结论</div>
+      </div>
+
+      <div class="card">
+        <div class="toolbar" style="margin-bottom:6px">
+          <h2 class="sec" style="margin:0">即时统计（只读）</h2>
+          <span class="req-tag">模板 §3 数据处理</span>
+        </div>
+        <div class="kpi-row" id="statCards"></div>
+      </div>
+    </section>
+
+    <!-- ============ 视图三：报告 ============ -->
+    <section id="view-report" class="view hidden">
+      <div class="page-head">
+        <h1>偏倚分析报告</h1>
+        <div class="head-actions">
+          <button class="btn" type="button" onclick="go('list')">返回列表</button>
+          <button class="btn" type="button" onclick="return notExport()">导出</button>
+        </div>
+      </div>
+
+      <div class="verdict" id="verdictBar"></div>
+
+      <div class="card">
+        <div class="toolbar" style="margin-bottom:6px">
+          <h2 class="sec" style="margin:0">计划摘要</h2>
+          <span class="req-tag">模板封面字段 A4–A6 · 编号 A1</span>
+        </div>
+        <div class="summary" id="reportSummary"></div>
+      </div>
+
+      <div class="card">
+        <div class="toolbar" style="margin-bottom:6px">
+          <h2 class="sec" style="margin:0">统计结果</h2>
+          <span class="req-tag">模板 §3 数据处理</span>
+        </div>
+        <div class="kpi-row" id="reportStats"></div>
+      </div>
+
+      <div class="card">
+        <div class="toolbar" style="margin-bottom:6px">
+          <h2 class="sec" style="margin:0">偏倚图</h2>
+          <span class="req-tag">模板 §4 数据分析</span>
+        </div>
+        <div class="chart-box" id="biasChart"></div>
+        <div class="caption">横轴为 10 次测量序号，纵轴为偏倚（读数 − 基准值）；虚线为 95% 置信区间上下限，0 线为无偏倚参考线。</div>
+      </div>
+
+      <div class="card">
+        <div class="toolbar" style="margin-bottom:6px">
+          <h2 class="sec" style="margin:0">原始数据</h2>
+          <span class="req-tag">模板 §2 记录测量样本10次</span>
+        </div>
+        <div class="table-wrap">
+          <table class="data" id="rawTable"></table>
+        </div>
+      </div>
+
+      <div class="sign">
+        <span>审核<div class="line"></div></span>
+        <span>分析者<div class="line"></div></span>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- 需求对照面板 -->
+<div class="req-mask" id="reqMask" onclick="toggleReq(false)"></div>
+<aside class="req-panel" id="reqPanel">
+  <div class="rp-head">
+    <h3>功能 ↔ 需求文档对应关系</h3>
+    <button class="btn btn-sm" type="button" onclick="toggleReq(false)">关闭</button>
+  </div>
+  <div class="rp-body" id="reqBody"></div>
+</aside>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ 常量（对齐模板 L15/L19/L21） ============ */
+var D2 = 3.07751;     // d2（g=1 子组）
+var D2STAR = 3.17905; // d2*（n=10）
+var TV = 1.8595;      // t(v, 1-α/2)，α=0.05
+var N = 10;           // 测量次数
+
+/* ============ 数据 ============ */
+var PLANS = [
+  { id:'BIAS-20260828-001', status:'执行中', eq:'数显卡尺', eqNo:'EQ-CAL-012', type:'0–150 mm / 0.01 mm', part:'轴套 φ20', param:'长度', spec:'0–150 mm', user:'王工', date:'2026-08-28', std:'20.000', values:[20.001,20.002,20.000,20.003,null,null,null,null,null,null] },
+  { id:'BIAS-20260827-002', status:'已完成', eq:'外径千分尺', eqNo:'EQ-MIC-008', type:'0–25 mm / 0.001 mm', part:'销轴', param:'直径', spec:'0–25 mm', user:'李工', date:'2026-08-27', std:'10.000', values:[10.002,9.998,10.001,9.999,10.000,9.998,10.002,10.001,9.999,10.000] },
+  { id:'BIAS-20260825-003', status:'已完成', eq:'高度尺', eqNo:'EQ-HGT-003', type:'0–300 mm / 0.02 mm', part:'支架', param:'高度', spec:'0–300 mm', user:'王工', date:'2026-08-25', std:'50.00', values:[50.01,50.03,50.00,50.02,50.01,50.04,50.02,50.00,50.03,50.01] },
+  { id:'BIAS-20260824-004', status:'待执行', eq:'数显卡尺', eqNo:'EQ-CAL-012', type:'0–150 mm / 0.01 mm', part:'轴套 φ20', param:'长度', spec:'0–150 mm', user:'赵工', date:'2026-08-24', std:'20.000', values:[null,null,null,null,null,null,null,null,null,null] },
+  { id:'BIAS-20260820-005', status:'已关闭', eq:'深度尺', eqNo:'EQ-DEP-001', type:'0–200 mm / 0.02 mm', part:'槽宽件', param:'槽宽', spec:'0–200 mm', user:'王工', date:'2026-08-20', std:'30.00', values:[null,null,null,null,null,null,null,null,null,null] }
+];
+
+var filtered = PLANS.slice();
+var curPlan = null;   // 当前数据录入/报告对象
+var curDraft = null;  // 录入草稿（10 元素数组）
+
+/* ============ 计算（极差法） ============ */
+function computeBias(values, std) {
+  std = parseFloat(std);
+  var filled = values.filter(function(v){ return v !== null && v !== undefined && v !== ''; });
+  var n = filled.length;
+  if (n === 0) return { n:0 };
+  var sum = 0, mx = -Infinity, mn = Infinity;
+  filled.forEach(function(v){ sum += v; if(v>mx)mx=v; if(v<mn)mn=v; });
+  var mean = sum / n;
+  var sigmaR = (mx - mn) / D2STAR;
+  var bias = mean - std;
+  var sigmaB = sigmaR / Math.sqrt(n);
+  var t = sigmaB === 0 ? 0 : bias / sigmaB;
+  var half = D2 * sigmaB * TV / D2STAR;
+  var ciL = bias - half, ciU = bias + half;
+  var accept = (ciU > 0 && 0 > ciL); // 0 严格落在区间内
+  return { n:n, mean:mean, sigmaR:sigmaR, bias:bias, sigmaB:sigmaB, t:t, ciL:ciL, ciU:ciU, accept:accept, full:n===N };
+}
+
+function fmt(x, d) {
+  if (x === null || x === undefined) return '—';
+  return Number(x).toFixed(d == null ? 4 : d);
+}
+
+/* ============ 角色 ============ */
+function applyRole() {
+  var role = localStorage.getItem('grrRole') || 'planner';
+  var sel = document.getElementById('roleSel');
+  if (sel) sel.value = role;
+  document.body.setAttribute('data-role', role);
+  document.querySelectorAll('[data-planner-only]').forEach(function(el){
+    el.style.display = role === 'planner' ? '' : 'none';
+  });
+}
+function setRole(v){ localStorage.setItem('grrRole', v); applyRole(); renderList(); }
+
+/* ============ 视图切换 ============ */
+function go(view) {
+  ['list','data','report'].forEach(function(v){
+    document.getElementById('view-'+v).classList.toggle('hidden', v !== view);
+  });
+  if (view === 'data') renderData();
+  if (view === 'report') renderReport();
+}
+
+/* ============ 列表 ============ */
+function verdictOf(p) {
+  if (p.status !== '已完成') return '—';
+  var r = computeBias(p.values, p.std);
+  return r.accept ? '可接受' : '不可接受';
+}
+function badgeClass(status){
+  return { '待执行':'badge-muted', '执行中':'badge-info', '已完成':'badge-ok', '已关闭':'badge-danger' }[status];
+}
+function verdictBadge(v){
+  if (v === '—') return '<span class="badge badge-muted">—</span>';
+  return v === '可接受' ? '<span class="badge badge-ok">可接受</span>' : '<span class="badge badge-danger">不可接受</span>';
+}
+function opsOf(p) {
+  var isPlanner = document.body.getAttribute('data-role') === 'planner';
+  var d = function(enabled, label, fn){ return enabled
+    ? '<a class="op-link" href="javascript:void(0)" onclick="'+fn+'">'+label+'</a>'
+    : '<span class="op-link disabled">'+label+'</span>'; };
+  var s = p.status;
+  var edit = (s === '待执行') && isPlanner;
+  var close = (s === '待执行' || s === '执行中') && isPlanner;
+  var del = (s === '待执行' || s === '已完成') && isPlanner;
+  var entry = s !== '已关闭';
+  var report = s !== '已关闭';
+  var h = '';
+  h += d(entry, '数据录入', "openData('"+p.id+"')");
+  h += d(edit, '编辑', "openPlan('"+p.id+"')");
+  h += d(report, '报告', "openReport('"+p.id+"')");
+  h += '<a class="op-link" href="javascript:void(0)" onclick="copyPlan(\''+p.id+'\')">复制</a>';
+  h += d(close, '关闭', "closePlan('"+p.id+"')");
+  h += d(del, '删除', "delPlan('"+p.id+"')");
+  return h;
+}
+function renderList() {
+  var tb = document.getElementById('listBody');
+  var rows = '';
+  filtered.forEach(function(p, i){
+    var v = verdictOf(p);
+    rows += '<tr>' +
+      '<td><input type="checkbox" /></td>' +
+      '<td>'+(i+1)+'</td>' +
+      '<td><span class="badge '+badgeClass(p.status)+'">'+p.status+'</span></td>' +
+      '<td><a href="javascript:void(0)" onclick="openReport(\''+p.id+'\')">'+p.id+'</a></td>' +
+      '<td>'+p.eq+'</td><td>'+p.eqNo+'</td><td>'+p.part+'</td><td>'+p.param+'</td>' +
+      '<td>'+p.user+'</td><td>'+N+'</td><td>'+p.date+'</td>' +
+      '<td>'+verdictBadge(v)+'</td>' +
+      '<td>'+opsOf(p)+'</td>' +
+      '</tr>';
+  });
+  tb.innerHTML = rows;
+  document.getElementById('pagerTotal').textContent = '共 ' + filtered.length + ' 条';
+}
+function doQuery() {
+  var no = document.getElementById('qNo').value.trim();
+  var name = document.getElementById('qName').value.trim();
+  var eqNo = document.getElementById('qEqNo').value.trim();
+  var st = document.getElementById('qStatus').value;
+  var user = document.getElementById('qUser').value.trim();
+  var date = document.getElementById('qDate').value;
+  var vd = document.getElementById('qVerdict').value;
+  filtered = PLANS.filter(function(p){
+    if (no && p.id.indexOf(no) < 0) return false;
+    if (name && p.eq.indexOf(name) < 0) return false;
+    if (eqNo && p.eqNo.indexOf(eqNo) < 0) return false;
+    if (st && p.status !== st) return false;
+    if (user && p.user.indexOf(user) < 0) return false;
+    if (date && p.date !== date) return false;
+    if (vd && verdictOf(p) !== vd) return false;
+    return true;
+  });
+  renderList();
+}
+function resetQuery() {
+  ['qNo','qName','qEqNo','qStatus','qUser','qDate','qVerdict'].forEach(function(id){
+    document.getElementById(id).value = '';
+  });
+  filtered = PLANS.slice();
+  renderList();
+}
+
+/* ============ 计划新增/编辑（弹窗简化：直接提示） ============ */
+function openPlan(id) {
+  if (id) { toast('编辑计划：' + id + '（演示）'); }
+  else { toast('新增计划（演示：此处展开计划表单弹窗）'); }
+}
+function copyPlan(id){ toast('已复制为新草稿（演示）'); }
+function closePlan(id){
+  var p = findPlan(id); if (p) p.status = '已关闭';
+  toast('已关闭'); renderList();
+}
+function delPlan(id){
+  PLANS = PLANS.filter(function(p){ return p.id !== id; });
+  filtered = filtered.filter(function(p){ return p.id !== id; });
+  toast('已删除'); renderList();
+}
+function findPlan(id){ for (var i=0;i<PLANS.length;i++) if (PLANS[i].id===id) return PLANS[i]; return null; }
+
+/* ============ 数据录入 ============ */
+function openData(id) {
+  var p = findPlan(id);
+  if (!p) return;
+  curPlan = p;
+  curDraft = p.values.slice(); // 拷贝
+  go('data');
+}
+function renderData() {
+  if (!curPlan) return;
+  var p = curPlan;
+  document.getElementById('dataSummary').innerHTML =
+    '<div class="item"><div class="k">量具名称</div><div class="v">'+p.eq+'</div></div>' +
+    '<div class="item"><div class="k">量具型号</div><div class="v">'+p.type+'</div></div>' +
+    '<div class="item"><div class="k">量具编号</div><div class="v">'+p.eqNo+'</div></div>' +
+    '<div class="item"><div class="k">基准件名称</div><div class="v">'+p.part+'</div></div>' +
+    '<div class="item"><div class="k">测量参数</div><div class="v">'+p.param+'</div></div>' +
+    '<div class="item"><div class="k">参数规格</div><div class="v">'+p.spec+'</div></div>' +
+    '<div class="item"><div class="k">测试人员</div><div class="v">'+p.user+'</div></div>' +
+    '<div class="item"><div class="k">测试日期</div><div class="v">'+p.date+'</div></div>';
+  document.getElementById('stdVal').textContent = p.std;
+  var cells = document.getElementById('dataCells');
+  var html = '';
+  for (var i=0;i<N;i++) {
+    var val = curDraft[i];
+    html += '<div class="cell"><div class="idx">'+(i+1)+'</div>' +
+      '<input id="c'+i+'" type="text" value="'+(val==null?'':val)+'" ' +
+      'oninput="onCellInput('+i+')" onblur="onCellBlur('+i+')" inputmode="decimal" /></div>';
+  }
+  cells.innerHTML = html;
+  renderStats();
+}
+function onCellInput(i) {
+  var el = document.getElementById('c'+i);
+  var v = el.value.trim();
+  el.classList.remove('err');
+  if (v === '') { curDraft[i] = null; }
+  else {
+    var num = Number(v);
+    if (isNaN(num)) { el.classList.add('err'); curDraft[i] = null; }
+    else { curDraft[i] = num; }
+  }
+  renderStats();
+}
+function onCellBlur(i) {
+  var el = document.getElementById('c'+i);
+  var v = el.value.trim();
+  if (v !== '' && isNaN(Number(v))) { el.classList.add('err'); toast('请输入数字'); }
+}
+function renderStats() {
+  if (!curPlan) return;
+  var r = computeBias(curDraft, curPlan.std);
+  var d = r.n === 0;
+  var cards = [
+    { lbl:'均值 X̄', num: d?'—':fmt(r.mean,4) },
+    { lbl:'σ 重复性 (极差/d2*)', num: d?'—':fmt(r.sigmaR,4) },
+    { lbl:'偏倚 = X̄ − 基准值', num: d?'—':fmt(r.bias,4) },
+    { lbl:'σb = σr/√n', num: d?'—':fmt(r.sigmaB,4) },
+    { lbl:'t 统计量 = 偏倚/σb', num: d?'—':fmt(r.t,3) },
+    { lbl:'95% 置信区间', num: d?'—':'['+fmt(r.ciL,4)+', '+fmt(r.ciU,4)+']' }
+  ];
+  document.getElementById('statCards').innerHTML = cards.map(function(c){
+    return '<div class="stat-card"><div class="num">'+c.num+'</div><div class="lbl">'+c.lbl+'</div></div>';
+  }).join('');
+  document.getElementById('view-data').querySelector('.hint').innerHTML =
+    (r.full ? '10 次测量已填齐，可保存并生成正式结论。' : '已填 ' + r.n + ' / ' + N + ' 次 · 空白 = 未测 · 10 次全部填齐后才出正式结论');
+}
+function saveData() {
+  if (!curPlan) return;
+  var bad = 0;
+  for (var i=0;i<N;i++){ if (curDraft[i] != null && isNaN(Number(curDraft[i]))) bad++; }
+  if (bad > 0) { toast('存在非数字输入，请修正后保存'); return; }
+  var filled = curDraft.filter(function(v){ return v != null; }).length;
+  curPlan.values = curDraft.slice();
+  if (filled === N) { curPlan.status = '已完成'; toast('已保存，计划进入已完成'); }
+  else { curPlan.status = '执行中'; toast('已保存草稿（' + filled + '/' + N + '）'); }
+  filtered = PLANS.slice();
+  renderList();
+  renderStats();
+}
+
+/* ============ 报告 ============ */
+function openReport(id) {
+  var p = findPlan(id);
+  if (!p) return;
+  curPlan = p;
+  go('report');
+}
+function renderReport() {
+  if (!curPlan) return;
+  var p = curPlan;
+  var r = computeBias(p.values, p.std);
+  // 结论条
+  var bar = document.getElementById('verdictBar');
+  var vdText;
+  if (r.n === 0) { vdText = '—'; bar.className = 'verdict'; }
+  else if (r.accept) { vdText = '可接受'; bar.className = 'verdict ok'; }
+  else { vdText = '不可接受'; bar.className = 'verdict danger'; }
+  var note = '判定规则：0 在置信区间内为系统可接受，超出置信区间则为不可接受。';
+  if (r.n > 0 && !r.full) note = '（测量未填齐，结论为预览值，正式结论需 10 次全填齐）';
+  bar.innerHTML = '<span class="big">判定结果：' + vdText + '</span><span class="note">' + note + '</span>';
+
+  // 摘要
+  document.getElementById('reportSummary').innerHTML =
+    '<div class="item"><div class="k">量具名称</div><div class="v">'+p.eq+'</div></div>' +
+    '<div class="item"><div class="k">量具型号</div><div class="v">'+p.type+'</div></div>' +
+    '<div class="item"><div class="k">量具编号</div><div class="v">'+p.eqNo+'</div></div>' +
+    '<div class="item"><div class="k">基准件名称</div><div class="v">'+p.part+'</div></div>' +
+    '<div class="item"><div class="k">测量参数</div><div class="v">'+p.param+'</div></div>' +
+    '<div class="item"><div class="k">参数规格</div><div class="v">'+p.spec+'</div></div>' +
+    '<div class="item"><div class="k">测试人员</div><div class="v">'+p.user+'</div></div>' +
+    '<div class="item"><div class="k">测试日期</div><div class="v">'+p.date+'</div></div>';
+
+  // 统计卡
+  var d = r.n === 0;
+  document.getElementById('reportStats').innerHTML = [
+    { lbl:'基准值', num: p.std },
+    { lbl:'均值 X̄', num: d?'—':fmt(r.mean,4) },
+    { lbl:'σ 重复性', num: d?'—':fmt(r.sigmaR,4) },
+    { lbl:'偏倚', num: d?'—':fmt(r.bias,4) },
+    { lbl:'t 统计量', num: d?'—':fmt(r.t,3) },
+    { lbl:'95% CI', num: d?'—':'['+fmt(r.ciL,4)+', '+fmt(r.ciU,4)+']' }
+  ].map(function(c){ return '<div class="stat-card"><div class="num">'+c.num+'</div><div class="lbl">'+c.lbl+'</div></div>'; }).join('');
+
+  // 原始数据表
+  var heads = '<tr><th>次数</th>' + Array.from({length:N}, function(_,i){ return '<th>'+(i+1)+'</th>'; }).join('') + '</tr>';
+  var valRow = '<tr><td>读数</td>' + p.values.map(function(v){ return '<td>'+(v==null?'—':v)+'</td>'; }).join('') + '</tr>';
+  var biasRow = '<tr><td>偏倚（读数−基准值）</td>' + p.values.map(function(v){ return '<td>'+(v==null?'—':fmt(v-p.std,4))+'</td>'; }).join('') + '</tr>';
+  document.getElementById('rawTable').innerHTML = heads + valRow + biasRow;
+
+  drawChart(r, p.values, p.std);
+}
+
+/* ============ 偏倚图（SVG） ============ */
+function drawChart(r, values, std) {
+  var box = document.getElementById('biasChart');
+  if (r.n === 0) { box.innerHTML = '<div style="color:var(--text-secondary);font-size:13px;padding:20px 0;text-align:center">暂无数据</div>'; return; }
+  var W = 680, H = 300, padL = 64, padR = 24, padT = 22, padB = 44;
+  var pw = W - padL - padR, ph = H - padT - padB;
+  var pts = [];
+  values.forEach(function(v, i){ if (v != null) pts.push({ x:i+1, y:v - std }); });
+  var yAll = pts.map(function(p){ return p.y; }).concat([0, r.ciL, r.ciU]);
+  var yMin = Math.min.apply(null, yAll), yMax = Math.max.apply(null, yAll);
+  var span = yMax - yMin || 1;
+  var padY = span * 0.18;
+  yMin -= padY; yMax += padY; span = yMax - yMin;
+  function X(x){ return padL + (x - 1) / (N - 1) * pw; }
+  function Y(y){ return padT + (yMax - y) / span * ph; }
+
+  var g = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg">';
+  // 网格 + y 轴刻度
+  var ticks = 5;
+  for (var t = 0; t <= ticks; t++) {
+    var yv = yMin + span * t / ticks;
+    var yy = Y(yv);
+    g += '<line x1="'+padL+'" y1="'+yy+'" x2="'+(W-padR)+'" y2="'+yy+'" stroke="#f0f2f5" stroke-width="1"/>';
+    g += '<text x="'+(padL-8)+'" y="'+(yy+4)+'" text-anchor="end" font-size="11" fill="#969799">'+fmt(yv,4)+'</text>';
+  }
+  // 0 参考线
+  g += '<line x1="'+padL+'" y1="'+Y(0)+'" x2="'+(W-padR)+'" y2="'+Y(0)+'" stroke="#969799" stroke-width="1.2" stroke-dasharray="5,4"/>';
+  g += '<text x="'+(W-padR)+'" y="'+(Y(0)-4)+'" text-anchor="end" font-size="11" fill="#646566">0</text>';
+  // CI 上下限
+  g += '<line x1="'+padL+'" y1="'+Y(r.ciU)+'" x2="'+(W-padR)+'" y2="'+Y(r.ciU)+'" stroke="#d40000" stroke-width="1.2" stroke-dasharray="5,4"/>';
+  g += '<text x="'+(W-padR)+'" y="'+(Y(r.ciU)-4)+'" text-anchor="end" font-size="11" fill="#d40000">上限 '+fmt(r.ciU,4)+'</text>';
+  g += '<line x1="'+padL+'" y1="'+Y(r.ciL)+'" x2="'+(W-padR)+'" y2="'+Y(r.ciL)+'" stroke="#d40000" stroke-width="1.2" stroke-dasharray="5,4"/>';
+  g += '<text x="'+(W-padR)+'" y="'+(Y(r.ciL)-4)+'" text-anchor="end" font-size="11" fill="#d40000">下限 '+fmt(r.ciL,4)+'</text>';
+  // 散点连线
+  g += '<polyline fill="none" stroke="#006be6" stroke-width="1.5" points="' + pts.map(function(p){ return X(p.x)+','+Y(p.y); }).join(' ') + '"/>';
+  pts.forEach(function(p){
+    g += '<circle cx="'+X(p.x)+'" cy="'+Y(p.y)+'" r="4" fill="#006be6"/>';
+  });
+  // x 轴刻度
+  for (var i=1;i<=N;i++) {
+    g += '<text x="'+X(i)+'" y="'+(H-padB+16)+'" text-anchor="middle" font-size="11" fill="#969799">'+i+'</text>';
+  }
+  g += '<text x="'+(padL+pw/2)+'" y="'+(H-8)+'" text-anchor="middle" font-size="12" fill="#646566">测量序号</text>';
+  g += '</svg>';
+  box.innerHTML = g;
+}
+
+/* ============ 需求对照面板 ============ */
+var REQ_ROWS = [
+  { grp:'模块与流程', rows:[
+    ['计划列表 / 查询 / 行操作（新增·编辑·数据录入·报告·复制·关闭·删除·批量删除·导出）','模块定位（单基准件 10 次重复测量偏倚研究）'],
+    ['视图流转：列表 → 数据录入 → 报告','模板「封面 → 测量 → 数据处理 → 结论」结构']
+  ]},
+  { grp:'封面 / 计划字段', rows:[
+    ['量具名称 / 型号 / 编号','模板 A4–A6 <code>{equipmentName}</code> / <code>{typeName}</code> / <code>{equipmentNum}</code>'],
+    ['基准件名称 / 测量参数 / 参数规格','模板 A4–A6 <code>{nameOfReferencePart}</code> / <code>{measuringParam}</code> / <code>{paramSpecification}</code>'],
+    ['测试人员 / 测试日期','模板 A4–A5 <code>{measuringUserName}</code> / <code>{addTime}</code>'],
+    ['报告编号','模板 A1「MSA偏倚分析表」 / I3「编号：XL-GL-PK-081-02」']
+  ]},
+  { grp:'数据录入', rows:[
+    ['基准值（只读）','§1 确定基准值：<code>{standardValue}</code>（A8/C8）'],
+    ['10 次测量读数输入','§2 记录测量样本10次：<code>{list.measureValue}</code>（B11:K12）'],
+    ['非数字禁存 · 空=未测 · 填齐出结论','录入校验（模板空值按 0 的缺陷已纠正）']
+  ]},
+  { grp:'统计计算', rows:[
+    ['均值 X̄ = Σ读数 / 10','§3 数据处理 G15 <code>=SUM(B12:K12)/10</code>'],
+    ['σ重复性 = (Max−Min) / d2*','§3 G16，d2* = 3.17905（n=10 极差法）'],
+    ['偏倚 = X̄ − 基准值','§3 G17 <code>=G15-C8</code>'],
+    ['σb = σr / √n','§3 G18 <code>=G16/SQRT(10)</code>'],
+    ['t 统计量 = 偏倚 / σb','§3 G19 <code>=G17/G18</code>'],
+    ['95% CI = 偏倚 ± d2·σb·tv / d2*','§3 B21/B22，tv=1.8595、d2=3.07751、d2*=3.17905']
+  ]},
+  { grp:'图表与结论', rows:[
+    ['偏倚图（偏倚散点 + CI 上下限 + 0 线）','§4 数据分析（上限值/下限值/偏倚 三行）'],
+    ['判定：0 在置信区间内 → 可接受','§5 结论 A43 <code>=IF(AND(上限>0,0>下限),"可接受","不可接受")</code>'],
+    ['署名：审核 / 分析者','模板 E45「审核」 / I45「分析者」'],
+    ['导出','模板套打（本期提示「导出暂未开放」）']
+  ]}
+];
+function renderReq() {
+  var body = document.getElementById('reqBody');
+  var html = '<p style="font-size:13px;color:var(--text-third);margin:0 0 8px">本 demo 各功能点与《偏倚分析报告.xlsx》（偏倚 Sheet）需求的对应关系如下：</p>';
+  REQ_ROWS.forEach(function(sec){
+    html += '<div class="grp">' + sec.grp + '</div>';
+    html += '<table><tr><th style="width:46%">功能点</th><th>对应需求（模板）</th></tr>';
+    sec.rows.forEach(function(r){ html += '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>'; });
+    html += '</table>';
+  });
+  body.innerHTML = html;
+}
+function toggleReq(on) {
+  document.getElementById('reqMask').classList.toggle('show', on);
+  document.getElementById('reqPanel').classList.toggle('show', on);
+}
+
+/* ============ toast / 导出 ============ */
+function toast(msg) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(window.__t);
+  window.__t = setTimeout(function(){ el.classList.remove('show'); }, 2200);
+}
+function notExport(){ toast('导出暂未开放'); return false; }
+
+/* ============ 初始化 ============ */
+document.getElementById('reqBtn').addEventListener('click', function(){ toggleReq(true); });
+document.addEventListener('DOMContentLoaded', function(){
+  applyRole();
+  renderList();
+  renderReq();
+});
+</script>
+</body>
+</html>

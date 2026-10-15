@@ -1,7 +1,7 @@
 /**
  * 备注面板 Mermaid 初始化（ESM，由 Demo HTML 以 type=module 引入）
  */
-import mermaid from '../vendor/mermaid/mermaid.esm.min.mjs';
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 
 mermaid.initialize({
   startOnLoad: false,

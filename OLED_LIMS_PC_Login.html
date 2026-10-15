@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>奥莱德 LIMS · 登录</title>
+<style>
+:root{
+  --primary:#004098;
+  --primary-hover:#00357A;
+  --danger:#F53F3F;
+  --text:#1D2129;
+  --text-2:#4E5969;
+  --text-3:#86909C;
+  --placeholder:#C9CDD4;
+  --border:#DCDFE6;
+  --border-err:#F53F3F;
+  --bg-input:#fff;
+  --header-h:56px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  font-family:"PingFang SC","Microsoft YaHei",Arial,sans-serif;
+  font-size:14px;color:var(--text-2);
+  background:#0a1a2e;
+}
+.page{
+  min-height:100%;
+  display:flex;flex-direction:column;
+  background:
+    linear-gradient(90deg, rgba(6,18,36,.25) 0%, rgba(6,18,36,.15) 45%, rgba(6,18,36,.35) 100%),
+    url("./img/pc-login-bg.jpg") center / cover no-repeat;
+}
+.top{
+  height:var(--header-h);
+  padding:0 28px;
+  background:#fff;
+  border-bottom:1px solid #EEF0F3;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.brand{
+  display:inline-flex;align-items:center;gap:10px;
+  text-decoration:none;color:var(--text);
+}
+.brand img{height:28px;width:auto;display:block}
+.brand-fallback{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:16px;font-weight:600;color:#1a1a1a;
+}
+.brand-fallback .mark{
+  width:28px;height:28px;border-radius:6px;
+  background:linear-gradient(135deg,#5B8DEF,#004098);
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.brand-fallback .mark svg{width:16px;height:16px;color:#fff}
+.qr-box{display:flex;flex-direction:column;align-items:center;gap:2px}
+.qr-box img{
+  width:44px;height:44px;display:block;
+  border:1px solid #E5E6EB;border-radius:2px;background:#fff;
+}
+.qr-box span{font-size:11px;color:var(--text-3);line-height:1.2}
+
+.stage{
+  flex:1;min-height:0;
+  display:flex;align-items:center;justify-content:flex-end;
+  padding:32px 8vw 48px;
+}
+.card{
+  width:min(420px,100%);
+  background:#fff;
+  border-radius:8px;
+  box-shadow:0 12px 40px rgba(0,0,0,.22);
+  padding:36px 40px 32px;
+}
+.card h1{
+  margin:0 0 8px;
+  font-size:28px;font-weight:700;color:var(--text);
+  letter-spacing:.02em;line-height:1.25;
+}
+.card .lead{
+  margin:0 0 28px;
+  font-size:13px;color:var(--text-3);line-height:1.55;
+}
+.field{margin-bottom:16px}
+.field label{display:block}
+.ctl{
+  width:100%;height:40px;
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:0 12px;
+  font-size:14px;color:var(--text);
+  background:var(--bg-input);
+  outline:none;
+  transition:border-color .15s,box-shadow .15s;
+  appearance:none;-webkit-appearance:none;
+}
+select.ctl{
+  padding-right:32px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%2386909C' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+  cursor:pointer;
+}
+.ctl::placeholder{color:var(--placeholder)}
+.ctl:hover{border-color:#C0C4CC}
+.ctl:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 2px rgba(0,64,152,.16);
+}
+.field.is-error .ctl{
+  border-color:var(--border-err);
+  box-shadow:none;
+}
+.field.is-error .ctl:focus{
+  box-shadow:0 0 0 2px rgba(245,63,63,.15);
+}
+.err{
+  min-height:18px;margin:6px 0 0;
+  font-size:12px;color:var(--danger);line-height:1.4;
+}
+.err:empty{min-height:0;margin:0}
+.row-ops{
+  display:flex;align-items:center;justify-content:space-between;
+  margin:4px 0 22px;
+}
+.check{
+  position:relative;display:inline-flex;align-items:center;gap:8px;
+  font-size:13px;color:var(--text-2);cursor:pointer;user-select:none;
+}
+.check input{position:absolute;opacity:0;width:1px;height:1px}
+.check i{
+  width:14px;height:14px;border:1px solid #DCDFE6;border-radius:2px;
+  background:#fff;box-sizing:border-box;flex-shrink:0;
+}
+.check input:checked+i{
+  background:var(--primary);border-color:var(--primary);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.2 6.2l2.6 2.6 5-5' fill='none' stroke='%23fff' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-size:10px;background-repeat:no-repeat;background-position:center;
+}
+.link{
+  border:0;background:none;padding:0;
+  font-size:13px;color:var(--text-3);cursor:pointer;
+}
+.link:hover{color:var(--primary)}
+.btn{
+  width:100%;height:42px;border:0;border-radius:4px;
+  background:var(--primary);color:#fff;
+  font-size:15px;font-weight:500;letter-spacing:.04em;cursor:pointer;
+}
+.btn:hover{background:var(--primary-hover)}
+.btn:active{background:#002B66}
+.demo-bar{
+  position:fixed;left:16px;bottom:16px;z-index:20;
+  display:flex;gap:8px;align-items:center;
+}
+.demo-bar a,.demo-bar button{
+  height:30px;padding:0 12px;border:1px solid rgba(255,255,255,.35);
+  border-radius:4px;background:rgba(0,0,0,.35);color:#fff;
+  font-size:12px;text-decoration:none;cursor:pointer;
+  backdrop-filter:blur(6px);
+  display:inline-flex;align-items:center;
+}
+.demo-bar a:hover,.demo-bar button:hover{border-color:#fff;background:rgba(0,0,0,.5)}
+
+/* 忘记密码弹层（Demo） */
+.mask{
+  position:fixed;inset:0;z-index:50;
+  background:rgba(0,0,0,.45);
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+}
+.mask[hidden]{display:none !important}
+.sheet{
+  width:min(420px,100%);
+  background:#fff;border-radius:8px;
+  box-shadow:0 12px 40px rgba(0,0,0,.2);
+  padding:28px 32px 24px;
+}
+.sheet h2{margin:0 0 6px;font-size:18px;color:var(--text)}
+.sheet p{margin:0 0 20px;font-size:13px;color:var(--text-3);line-height:1.5}
+.sheet-ops{display:flex;gap:10px;justify-content:flex-end;margin-top:8px}
+.sheet-ops .ghost{
+  height:36px;padding:0 16px;border:1px solid var(--border);border-radius:4px;
+  background:#fff;color:var(--text-2);cursor:pointer;font-size:13px;
+}
+.sheet-ops .ghost:hover{border-color:var(--primary);color:var(--primary)}
+.sheet-ops .primary{
+  height:36px;padding:0 16px;border:0;border-radius:4px;
+  background:var(--primary);color:#fff;cursor:pointer;font-size:13px;
+}
+.sheet-ops .primary:hover{background:var(--primary-hover)}
+.toast{
+  position:fixed;top:72px;left:50%;transform:translateX(-50%);
+  z-index:60;padding:10px 18px;border-radius:4px;
+  background:rgba(29,33,41,.88);color:#fff;font-size:13px;
+  box-shadow:0 4px 16px rgba(0,0,0,.2);
+}
+.toast[hidden]{display:none !important}
+
+@media (max-width:900px){
+  .stage{justify-content:center;padding:24px 16px 40px}
+  .card{padding:28px 24px 24px}
+  .card h1{font-size:24px}
+  .qr-box{display:none}
+}
+</style>
+</head>
+<body>
+  <div class="page">
+    <header class="top">
+      <a class="brand" href="./OLED_LIMS_项目总览.html" title="返回总览">
+        <img src="./img/app-login-logo.png" alt="万物智汇" onerror="this.style.display='none';this.nextElementSibling.hidden=false" />
+        <span class="brand-fallback" hidden>
+          <span class="mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/></svg>
+          </span>
+          万物智汇
+        </span>
+      </a>
+      <div class="qr-box" title="安卓端下载（演示）">
+        <img src="./img/pc-login-qr.png" alt="安卓下载二维码" />
+        <span>安卓</span>
+      </div>
+    </header>
+
+    <main class="stage">
+      <form class="card" id="login-form" novalidate>
+        <h1>欢迎回来 👋</h1>
+        <p class="lead">请输入您的帐户信息以开始管理您的项目</p>
+
+        <div class="field" id="f-org">
+          <label>
+            <select class="ctl" id="org" name="org" aria-label="组织">
+              <option value="万物智汇有限公司" selected>万物智汇有限公司</option>
+              <option value="奥莱德光电材料">奥莱德光电材料</option>
+              <option value="演示租户">演示租户</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="field" id="f-account">
+          <label>
+            <input class="ctl" id="account" name="username" autocomplete="username" placeholder="账号" />
+          </label>
+          <div class="err" id="err-account"></div>
+        </div>
+
+        <div class="field" id="f-password">
+          <label>
+            <input class="ctl" id="password" name="password" type="password" autocomplete="current-password" placeholder="密码" />
+          </label>
+          <div class="err" id="err-password"></div>
+        </div>
+
+        <div class="row-ops">
+          <label class="check">
+            <input type="checkbox" id="remember" />
+            <i></i>
+            记住账号
+          </label>
+          <button type="button" class="link" id="btn-forgot">忘记密码?</button>
+        </div>
+
+        <button type="submit" class="btn">去登录</button>
+      </form>
+    </main>
+  </div>
+
+  <div class="demo-bar">
+    <a href="./OLED_LIMS_项目总览.html">返回总览</a>
+    <a href="./OLED_LIMS_Demo.html#home">跳过登录</a>
+  </div>
+
+  <div class="mask" id="forgot-mask" hidden>
+    <div class="sheet" role="dialog" aria-labelledby="forgot-title">
+      <h2 id="forgot-title">忘记密码</h2>
+      <p>Demo 演示：输入账号后点击发送，将提示「重置链接已发送」（无真实邮件）。</p>
+      <div class="field" id="f-forgot">
+        <label>
+          <input class="ctl" id="forgot-account" placeholder="账号 / 手机号" />
+        </label>
+        <div class="err" id="err-forgot"></div>
+      </div>
+      <div class="sheet-ops">
+        <button type="button" class="ghost" id="forgot-cancel">取消</button>
+        <button type="button" class="primary" id="forgot-send">发送重置链接</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+
+<script>
+(function () {
+  var KEY_ACCOUNT = 'oled_pc_login_account';
+  var KEY_ORG = 'oled_pc_login_org';
+  var KEY_SESSION = 'oled_pc_login_ok';
+
+  var form = document.getElementById('login-form');
+  var account = document.getElementById('account');
+  var password = document.getElementById('password');
+  var org = document.getElementById('org');
+  var remember = document.getElementById('remember');
+  var fAccount = document.getElementById('f-account');
+  var fPassword = document.getElementById('f-password');
+  var errAccount = document.getElementById('err-account');
+  var errPassword = document.getElementById('err-password');
+  var toastEl = document.getElementById('toast');
+  var toastTimer;
+
+  try {
+    var savedAcc = localStorage.getItem(KEY_ACCOUNT);
+    var savedOrg = localStorage.getItem(KEY_ORG);
+    if (savedAcc) {
+      account.value = savedAcc;
+      remember.checked = true;
+    }
+    if (savedOrg) org.value = savedOrg;
+  } catch (e) {}
+
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.hidden = true; }, 2200);
+  }
+
+  function clearErrors() {
+    fAccount.classList.remove('is-error');
+    fPassword.classList.remove('is-error');
+    errAccount.textContent = '';
+    errPassword.textContent = '';
+  }
+
+  function validate() {
+    clearErrors();
+    var ok = true;
+    if (!String(account.value || '').trim()) {
+      fAccount.classList.add('is-error');
+      errAccount.textContent = '请输入用户名';
+      ok = false;
+    }
+    if (!String(password.value || '')) {
+      fPassword.classList.add('is-error');
+      errPassword.textContent = '请输入密码';
+      ok = false;
+    }
+    return ok;
+  }
+
+  account.addEventListener('input', function () {
+    if (fAccount.classList.contains('is-error') && String(account.value).trim()) {
+      fAccount.classList.remove('is-error');
+      errAccount.textContent = '';
+    }
+  });
+  password.addEventListener('input', function () {
+    if (fPassword.classList.contains('is-error') && String(password.value)) {
+      fPassword.classList.remove('is-error');
+      errPassword.textContent = '';
+    }
+  });
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    // 免登录：点击「去登录」直接进入 PC Demo，不做账号密码校验
+    clearErrors();
+    var user = String(account.value || '').trim() || 'demo';
+    try {
+      if (remember.checked && String(account.value || '').trim()) {
+        localStorage.setItem(KEY_ACCOUNT, String(account.value).trim());
+        localStorage.setItem(KEY_ORG, org.value);
+      } else if (!remember.checked) {
+        localStorage.removeItem(KEY_ACCOUNT);
+        localStorage.removeItem(KEY_ORG);
+      }
+      sessionStorage.setItem(KEY_SESSION, '1');
+      sessionStorage.setItem('oled_pc_login_user', user);
+      sessionStorage.setItem(KEY_ORG, org.value);
+    } catch (err) {}
+    // 直接跳转到系统首页，不再经过中间登录页
+    window.location.href = './OLED_LIMS_Demo.html#home';
+  });
+
+  var mask = document.getElementById('forgot-mask');
+  var forgotAccount = document.getElementById('forgot-account');
+  var fForgot = document.getElementById('f-forgot');
+  var errForgot = document.getElementById('err-forgot');
+
+  document.getElementById('btn-forgot').addEventListener('click', function () {
+    forgotAccount.value = String(account.value || '').trim();
+    fForgot.classList.remove('is-error');
+    errForgot.textContent = '';
+    mask.hidden = false;
+    setTimeout(function () { forgotAccount.focus(); }, 50);
+  });
+  document.getElementById('forgot-cancel').addEventListener('click', function () {
+    mask.hidden = true;
+  });
+  mask.addEventListener('click', function (e) {
+    if (e.target === mask) mask.hidden = true;
+  });
+  document.getElementById('forgot-send').addEventListener('click', function () {
+    if (!String(forgotAccount.value || '').trim()) {
+      fForgot.classList.add('is-error');
+      errForgot.textContent = '请输入账号或手机号';
+      return;
+    }
+    mask.hidden = true;
+    toast('重置链接已发送（Demo）');
+  });
+})();
+</script>
+</body>
+</html>
