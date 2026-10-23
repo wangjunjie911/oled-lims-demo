@@ -10118,7 +10118,7 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
 <script src="./js/demo-announcements.js?v=1.3-spc-compare"></script>
 <script src="./vendor/echarts/echarts.min.js"></script>
 <script src="./js/spc-single-demo.js?v=2.6.1-xtao-mock"></script>
-<script src="./js/page-configs.js?v=1.68.0-chrom-ledger-layout"></script>
+<script src="./js/page-configs.js?v=1.68.1-pending-sample-row-op-label"></script>
 <script src="./js/mock-rows.js?v=2.43.0-spectrum-demo-rows"></script>
 <script src="./js/sampling-scheme-demo.js?v=1.0.3-n-lt-m"></script>
 <script src="./js/qc-spc-link.js?v=1.9.0-xtao-db"></script>
@@ -29816,7 +29816,7 @@ const app = createApp({
           return;
         }
       }
-      if(pageId.value==='pending-sample' && op.name==='质检取样'){
+      if(pageId.value==='pending-sample' && op.name==='取样'){
         openPendingSampleDialog(row);
         return;
       }
