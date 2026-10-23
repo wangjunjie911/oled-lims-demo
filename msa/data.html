@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>GRR 数据录入</title>
   <script>if (window.self !== window.top) document.documentElement.classList.add('embedded');</script>
-  <link rel="stylesheet" href="css/demo.css" />
+  <link rel="stylesheet" href="css/demo.css?v=2.0.0" />
+  <link rel="stylesheet" href="css/lims-theme.css?v=1.6.1" />
 </head>
 <body data-mod="grr">
 <div class="app">
@@ -26,8 +27,14 @@
   <main>
     <div class="card">
       <div class="toolbar">
-        <div class="progress" id="prog">已填 54 / 90</div>
-        <a class="btn" href="index.html">返回列表</a>
+        <div class="list-toolbar__info">
+          <span class="list-toolbar__title">GR&amp;R 数据录入</span>
+          <span class="list-toolbar__sel progress" id="prog">已填 54 / 90</span>
+        </div>
+        <div class="list-toolbar__actions">
+          <button class="btn" type="button" onclick="onSubmit()">提交</button>
+          <a class="btn" href="index.html">返回列表</a>
+        </div>
       </div>
       <div class="table-wrap">
         <table class="data matrix" id="mx"></table>
@@ -113,6 +120,12 @@ function render() {
   applyRole();
 }
 function paintRole() { render(); }
+function onSubmit() {
+  var c = countFilled();
+  if (c < 90) { toast("尚有 " + (90 - c) + " 个测量值未填，补齐后再提交"); return; }
+  toast("已提交，等待分析");
+  location.href = "report.html";
+}
 seed();
 document.addEventListener("DOMContentLoaded", render);
 </script>

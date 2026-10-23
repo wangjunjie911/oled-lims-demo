@@ -3,14 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>GRR 计划列表</title>
+  <title>GR&amp;R 分析 · 计划列表</title>
   <script>if (window.self !== window.top) document.documentElement.classList.add('embedded');</script>
-  <link rel="stylesheet" href="css/demo.css" />
+  <link rel="stylesheet" href="css/demo.css?v=2.0.0" />
+  <link rel="stylesheet" href="css/lims-theme.css?v=1.6.1" />
 </head>
 <body data-mod="grr">
 <div class="app">
   <header class="header">
-    <div class="brand">计量 MSA</div>
+    <div class="brand">测量系统分析</div>
     <div class="header-right">
       <span>角色</span>
       <select id="roleSel" onchange="setRole(this.value)">
@@ -23,9 +24,12 @@
   <aside class="sidebar">
     <div id="msaNav"></div>
   </aside>
+
   <main class="list-main">
-    <div class="card">
-      <div class="query">
+    <div class="panel">
+
+      <!-- 查询区 -->
+      <section class="query-area query">
         <div class="query-fields">
           <div class="field"><label>计划编号</label><input placeholder="请输入" /></div>
           <div class="field"><label>仪器名称</label><input placeholder="请输入" /></div>
@@ -40,9 +44,9 @@
               <option>已关闭</option>
             </select>
           </div>
-          <div class="field"><label>评价人</label><input placeholder="请输入" /></div>
-          <div class="field"><label>测量日期</label><input type="date" /></div>
-          <div class="field">
+          <div class="field q-more" hidden><label>评价人</label><input placeholder="请输入" /></div>
+          <div class="field q-more" hidden><label>测量日期</label><input type="date" /></div>
+          <div class="field q-more" hidden>
             <label>判定结果</label>
             <select>
               <option>全部</option>
@@ -54,47 +58,57 @@
           </div>
         </div>
         <div class="query-actions">
-          <button class="btn btn-primary" type="button">查询</button>
-          <button class="btn" type="button">重置</button>
+          <button class="btn btn-primary" type="button" onclick="onQuery()">查询</button>
+          <button class="btn" type="button" onclick="onResetQuery()">重置</button>
+          <button class="btn btn-more" type="button" id="qMoreBtn" onclick="toggleQueryMore()">更多<i class="caret">∨</i></button>
         </div>
-      </div>
-    </div>
+      </section>
 
-    <div class="card fill">
-      <div class="toolbar">
-        <div class="toolbar-left"></div>
-        <div class="toolbar-right">
+      <!-- 工具栏 -->
+      <div class="list-toolbar">
+        <div class="list-toolbar__info">
+          <span class="list-toolbar__title">GR&amp;R分析</span>
+          <span class="list-toolbar__sel">已选: <b id="selCount">0</b></span>
+        </div>
+        <div class="list-toolbar__actions">
           <button class="btn btn-primary" type="button" data-planner-only onclick="openPlan()">新增</button>
-          <button class="btn btn-danger" type="button" data-planner-only onclick="toast('请先勾选要删除的计划')">批量删除</button>
           <button class="btn" type="button" onclick="return notExport()">导出</button>
+          <button class="btn btn-danger" type="button" id="batchDelBtn" data-planner-only disabled onclick="onBatchDelete()">批量删除</button>
+          <span class="list-toolbar__icons">
+            <button class="icon-btn" type="button" title="刷新" onclick="toast('已刷新')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg>
+            </button>
+          </span>
         </div>
       </div>
+
+      <!-- 列表 -->
       <div class="table-wrap">
         <table class="data pin-cols">
           <thead>
             <tr>
-              <th><input type="checkbox" /></th>
-              <th>序号</th>
-              <th>状态</th>
-              <th>计划编号</th>
-              <th>仪器名称</th>
-              <th>仪器编号</th>
-              <th>检测项目</th>
-              <th>评价人</th>
-              <th>检验项目数量</th>
-              <th>评价人数量</th>
-              <th>试验次数</th>
-              <th>测量日期</th>
-              <th>判定</th>
-              <th>操作</th>
+              <th class="col-check"><input type="checkbox" id="checkAll" onchange="toggleAll(this)" /></th>
+              <th class="col-idx">序号</th>
+              <th style="width:78px">状态</th>
+              <th style="width:144px">计划编号</th>
+              <th style="width:96px">仪器名称</th>
+              <th style="width:110px">仪器编号</th>
+              <th style="width:96px">检测项目</th>
+              <th style="width:140px">评价人</th>
+              <th style="width:96px">检验项目数量</th>
+              <th style="width:90px">评价人数量</th>
+              <th style="width:80px">试验次数</th>
+              <th style="width:100px">测量日期</th>
+              <th style="width:82px">判定</th>
+              <th style="width:140px">操作</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="planTbody">
             <tr>
-              <td><input type="checkbox" /></td>
+              <td class="col-check"><input type="checkbox" class="row-check" onchange="countSel()" /></td>
               <td>1</td>
-              <td><span class="badge badge-info">执行中</span></td>
-              <td><a href="data.html">GRR-20260828-001</a></td>
+              <td><span class="badge badge-p">执行中</span></td>
+              <td>GRR-20260828-001</td>
               <td>数显卡尺</td>
               <td>EQ-CAL-012</td>
               <td>轴套 φ20</td>
@@ -105,19 +119,24 @@
               <td>2026-08-28</td>
               <td>—</td>
               <td>
-                <a class="op-link" href="data.html">数据录入</a>
-                <span class="op-link disabled" data-planner-only>编辑</span>
-                <a class="op-link" href="report.html">报告</a>
-                <a class="op-link" href="index.html" onclick="toast('已复制为新草稿 GRR-20260831-006');return false;">复制</a>
-                <a class="op-link danger" href="#" data-planner-only onclick="toast('已关闭');return false;">关闭</a>
-                <span class="op-link danger disabled" data-planner-only>删除</span>
+                <div class="row-op">
+                  <button class="op-link" type="button" onclick="openEntryDialog(this)">数据录入</button>
+                  <a class="op-link" href="report.html" onclick="return openReport(this)">报告</a>
+                  <button class="op-link op-more" type="button" onclick="openOpMenu(this)">更多</button>
+                  <span class="op-extra">
+                    <span class="op-link disabled" data-planner-only>编辑</span>
+                    <a class="op-link" href="#" onclick="toast('已复制为新草稿 GRR-20260831-006');return false;">复制</a>
+                    <a class="op-link danger" href="#" data-planner-only onclick="toast('已关闭');return false;">关闭</a>
+                    <span class="op-link danger disabled" data-planner-only>删除</span>
+                  </span>
+                </div>
               </td>
             </tr>
             <tr>
-              <td><input type="checkbox" /></td>
+              <td class="col-check"><input type="checkbox" class="row-check" onchange="countSel()" /></td>
               <td>2</td>
               <td><span class="badge badge-ok">已完成</span></td>
-              <td><a href="report.html">GRR-20260827-003</a></td>
+              <td>GRR-20260827-003</td>
               <td>外径千分尺</td>
               <td>EQ-MIC-008</td>
               <td>销轴</td>
@@ -128,19 +147,24 @@
               <td>2026-08-27</td>
               <td><span class="badge badge-warn">可接受</span></td>
               <td>
-                <a class="op-link" href="data.html">数据录入</a>
-                <span class="op-link disabled" data-planner-only>编辑</span>
-                <a class="op-link" href="report.html">报告</a>
-                <a class="op-link" href="#" onclick="toast('已复制为新草稿');return false;">复制</a>
-                <span class="op-link danger disabled" data-planner-only>关闭</span>
-                <a class="op-link danger" href="#" data-planner-only onclick="toast('已删除');return false;">删除</a>
+                <div class="row-op">
+                  <button class="op-link" type="button" onclick="openEntryDialog(this)">数据录入</button>
+                  <a class="op-link" href="report.html" onclick="return openReport(this)">报告</a>
+                  <button class="op-link op-more" type="button" onclick="openOpMenu(this)">更多</button>
+                  <span class="op-extra">
+                    <span class="op-link disabled" data-planner-only>编辑</span>
+                    <a class="op-link" href="#" onclick="toast('已复制为新草稿');return false;">复制</a>
+                    <span class="op-link danger disabled" data-planner-only>关闭</span>
+                    <a class="op-link danger" href="#" data-planner-only onclick="toast('已删除');return false;">删除</a>
+                  </span>
+                </div>
               </td>
             </tr>
             <tr>
-              <td><input type="checkbox" /></td>
+              <td class="col-check"><input type="checkbox" class="row-check" onchange="countSel()" /></td>
               <td>3</td>
-              <td><span class="badge badge-muted">待执行</span></td>
-              <td><a href="#" onclick="openPlan('edit-002');return false;">GRR-20260826-002</a></td>
+              <td><span class="badge badge-info">待执行</span></td>
+              <td>GRR-20260826-002</td>
               <td>高度尺</td>
               <td>EQ-HGT-003</td>
               <td>支架</td>
@@ -151,19 +175,24 @@
               <td>2026-08-26</td>
               <td>—</td>
               <td>
-                <a class="op-link" href="data.html">数据录入</a>
-                <a class="op-link" href="#" data-planner-only onclick="openPlan('edit-002');return false;">编辑</a>
-                <a class="op-link" href="report.html">报告</a>
-                <a class="op-link" href="#" onclick="toast('已复制为新草稿');return false;">复制</a>
-                <a class="op-link danger" href="#" data-planner-only onclick="toast('已关闭');return false;">关闭</a>
-                <a class="op-link danger" href="#" data-planner-only onclick="toast('已删除');return false;">删除</a>
+                <div class="row-op">
+                  <button class="op-link" type="button" onclick="openEntryDialog(this)">数据录入</button>
+                  <a class="op-link" href="report.html" onclick="return openReport(this)">报告</a>
+                  <button class="op-link op-more" type="button" onclick="openOpMenu(this)">更多</button>
+                  <span class="op-extra">
+                    <a class="op-link" href="#" data-planner-only onclick="openPlan('edit-002');return false;">编辑</a>
+                    <a class="op-link" href="#" onclick="toast('已复制为新草稿');return false;">复制</a>
+                    <a class="op-link danger" href="#" data-planner-only onclick="toast('已关闭');return false;">关闭</a>
+                    <a class="op-link danger" href="#" data-planner-only onclick="toast('已删除');return false;">删除</a>
+                  </span>
+                </div>
               </td>
             </tr>
             <tr>
-              <td><input type="checkbox" /></td>
+              <td class="col-check"><input type="checkbox" class="row-check" onchange="countSel()" /></td>
               <td>4</td>
               <td><span class="badge badge-ok">已完成</span></td>
-              <td><a href="report.html">GRR-20260825-001</a></td>
+              <td>GRR-20260825-001</td>
               <td>数显卡尺</td>
               <td>EQ-CAL-012</td>
               <td>轴套 φ20</td>
@@ -174,18 +203,23 @@
               <td>2026-08-25</td>
               <td><span class="badge badge-ok">优秀</span></td>
               <td>
-                <a class="op-link" href="data.html">数据录入</a>
-                <span class="op-link disabled" data-planner-only>编辑</span>
-                <a class="op-link" href="report.html">报告</a>
-                <a class="op-link" href="#" onclick="toast('已复制为新草稿');return false;">复制</a>
-                <span class="op-link danger disabled" data-planner-only>关闭</span>
-                <a class="op-link danger" href="#" data-planner-only onclick="toast('已删除');return false;">删除</a>
+                <div class="row-op">
+                  <button class="op-link" type="button" onclick="openEntryDialog(this)">数据录入</button>
+                  <a class="op-link" href="report.html" onclick="return openReport(this)">报告</a>
+                  <button class="op-link op-more" type="button" onclick="openOpMenu(this)">更多</button>
+                  <span class="op-extra">
+                    <span class="op-link disabled" data-planner-only>编辑</span>
+                    <a class="op-link" href="#" onclick="toast('已复制为新草稿');return false;">复制</a>
+                    <span class="op-link danger disabled" data-planner-only>关闭</span>
+                    <a class="op-link danger" href="#" data-planner-only onclick="toast('已删除');return false;">删除</a>
+                  </span>
+                </div>
               </td>
             </tr>
             <tr>
-              <td><input type="checkbox" /></td>
+              <td class="col-check"><input type="checkbox" class="row-check" onchange="countSel()" /></td>
               <td>5</td>
-              <td><span class="badge badge-danger">已关闭</span></td>
+              <td><span class="badge badge-muted">已关闭</span></td>
               <td>GRR-20260820-004</td>
               <td>深度尺</td>
               <td>EQ-DEP-001</td>
@@ -197,19 +231,24 @@
               <td>2026-08-20</td>
               <td>—</td>
               <td>
-                <span class="op-link disabled">数据录入</span>
-                <span class="op-link disabled" data-planner-only>编辑</span>
-                <span class="op-link disabled">报告</span>
-                <a class="op-link" href="#" onclick="toast('已复制为新草稿');return false;">复制</a>
-                <span class="op-link danger disabled" data-planner-only>关闭</span>
-                <a class="op-link danger" href="#" data-planner-only onclick="toast('已删除');return false;">删除</a>
+                <div class="row-op">
+                  <span class="op-link disabled">数据录入</span>
+                  <span class="op-link disabled">报告</span>
+                  <button class="op-link op-more" type="button" onclick="openOpMenu(this)">更多</button>
+                  <span class="op-extra">
+                    <span class="op-link disabled" data-planner-only>编辑</span>
+                    <a class="op-link" href="#" onclick="toast('已复制为新草稿');return false;">复制</a>
+                    <span class="op-link danger disabled" data-planner-only>关闭</span>
+                    <a class="op-link danger" href="#" data-planner-only onclick="toast('已删除');return false;">删除</a>
+                  </span>
+                </div>
               </td>
             </tr>
             <tr>
-              <td><input type="checkbox" /></td>
+              <td class="col-check"><input type="checkbox" class="row-check" onchange="countSel()" /></td>
               <td>6</td>
-              <td><span class="badge badge-muted">待执行</span></td>
-              <td><a href="data.html">GRR-20260818-002</a></td>
+              <td><span class="badge badge-info">待执行</span></td>
+              <td>GRR-20260818-002</td>
               <td>外径千分尺</td>
               <td>EQ-MIC-008</td>
               <td>销轴</td>
@@ -220,30 +259,39 @@
               <td>2026-08-18</td>
               <td>—</td>
               <td>
-                <a class="op-link" href="data.html">数据录入</a>
-                <a class="op-link" href="#" data-planner-only onclick="openPlan('edit-003');return false;">编辑</a>
-                <a class="op-link" href="report.html">报告</a>
-                <a class="op-link" href="#" onclick="toast('已复制为新草稿');return false;">复制</a>
-                <a class="op-link danger" href="#" data-planner-only onclick="toast('已关闭');return false;">关闭</a>
-                <a class="op-link danger" href="#" data-planner-only onclick="toast('已删除');return false;">删除</a>
+                <div class="row-op">
+                  <button class="op-link" type="button" onclick="openEntryDialog(this)">数据录入</button>
+                  <a class="op-link" href="report.html" onclick="return openReport(this)">报告</a>
+                  <button class="op-link op-more" type="button" onclick="openOpMenu(this)">更多</button>
+                  <span class="op-extra">
+                    <a class="op-link" href="#" data-planner-only onclick="openPlan('edit-003');return false;">编辑</a>
+                    <a class="op-link" href="#" onclick="toast('已复制为新草稿');return false;">复制</a>
+                    <a class="op-link danger" href="#" data-planner-only onclick="toast('已关闭');return false;">关闭</a>
+                    <a class="op-link danger" href="#" data-planner-only onclick="toast('已删除');return false;">删除</a>
+                  </span>
+                </div>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
+
+      <!-- 分页 -->
       <div class="pager">
-        <span>共 6 条</span>
-        <div class="pager-right">
-          <button type="button">‹</button>
-          <button class="cur" type="button">1</button>
-          <button type="button">›</button>
-          <span>每页</span>
-          <select><option>20</option><option>50</option></select>
-        </div>
+        <button class="pg-btn" type="button" disabled>‹</button>
+        <button class="pg-num cur" type="button">1</button>
+        <button class="pg-btn" type="button" disabled>›</button>
+        <span class="pg-size"><select><option>20条/页</option><option>50条/页</option></select></span>
+        <span class="pg-jump">前往 <input value="1" /> 页</span>
+        <span class="pg-total" id="pgTotal">共 6 条</span>
       </div>
     </div>
   </main>
 </div>
+
+<!-- 行操作「更多」浮层：由 openOpMenu() 动态创建（避免静态节点首帧未绘制） -->
+
+<!-- 新增/编辑计划弹窗 -->
 <div class="modal-mask" id="planMask" onclick="if(event.target===this)closePlan()">
   <div class="modal modal-lg" onclick="event.stopPropagation()">
     <div class="modal-head">
@@ -257,13 +305,11 @@
           <div class="ro" id="planNo">提交后生成 GRR-YYYYMMDD-序号</div>
         </div>
         <div class="field">
-          <label>仪器 <span style="color:var(--danger)">*</span></label>
-          <select id="eq" onchange="syncEq()">
-            <option value="">请选择</option>
-            <option value="EQ-CAL-012">EQ-CAL-012 数显卡尺</option>
-            <option value="EQ-MIC-008">EQ-MIC-008 外径千分尺</option>
-            <option value="EQ-HGT-003">EQ-HGT-003 高度尺</option>
-          </select>
+          <label><i class="req">*</i>仪器名称</label>
+          <div class="ro picker-field" id="eqName" onclick="openEqPicker()" title="点击选择仪器台账">
+            <span class="picker-text" id="eqNameText">请选择仪器</span>
+            <svg class="picker-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          </div>
         </div>
         <div class="field">
           <label>仪器编号</label>
@@ -282,11 +328,11 @@
           <div class="ro" id="eqType">—</div>
         </div>
         <div class="field">
-          <label>检测项目 <span style="color:var(--danger)">*</span></label>
+          <label><i class="req">*</i>检测项目</label>
           <input id="partName" />
         </div>
         <div class="field">
-          <label>检验项目数量 n <span style="color:var(--danger)">*</span></label>
+          <label><i class="req">*</i>检验项目数量 n</label>
           <select id="nSel">
             <option>2</option><option>3</option><option>4</option><option>5</option>
             <option>6</option><option>7</option><option>8</option><option>9</option>
@@ -294,29 +340,29 @@
           </select>
         </div>
         <div class="field">
-          <label>试验次数 r <span style="color:var(--danger)">*</span></label>
+          <label><i class="req">*</i>试验次数 r</label>
           <select id="rSel"><option>2</option><option selected>3</option></select>
         </div>
         <div class="field">
-          <label>评价人数量 <span style="color:var(--danger)">*</span></label>
+          <label><i class="req">*</i>评价人数量</label>
           <select id="opn" onchange="toggleOp3()">
             <option>2</option><option selected>3</option>
           </select>
         </div>
         <div class="field">
-          <label>评价人 1 <span style="color:var(--danger)">*</span></label>
+          <label><i class="req">*</i>评价人 1</label>
           <select id="op1"><option>王工</option><option>李工</option><option>赵工</option></select>
         </div>
         <div class="field">
-          <label>评价人 2 <span style="color:var(--danger)">*</span></label>
+          <label><i class="req">*</i>评价人 2</label>
           <select id="op2"><option>王工</option><option selected>李工</option><option>赵工</option></select>
         </div>
         <div class="field" id="op3wrap">
-          <label>评价人 3 <span style="color:var(--danger)">*</span></label>
+          <label><i class="req">*</i>评价人 3</label>
           <select id="op3"><option>王工</option><option>李工</option><option selected>赵工</option></select>
         </div>
         <div class="field">
-          <label>计划测量日期 <span style="color:var(--danger)">*</span></label>
+          <label><i class="req">*</i>计划测量日期</label>
           <input id="planDate" type="date" />
         </div>
         <div class="field span-3">
@@ -327,76 +373,738 @@
     </div>
     <div class="modal-foot" data-planner-only>
       <button class="btn" type="button" onclick="saveDraft()">保存草稿</button>
-      <a class="btn btn-primary" href="data.html">提交计划</a>
+      <button class="btn btn-primary" type="button" onclick="submitPlan()">提交计划</button>
     </div>
   </div>
 </div>
+
+<!-- 分析报告弹窗（内嵌 report.html，字段口径与数据列表一致） -->
+<div class="modal-mask" id="reportMask" onclick="if(event.target===this)closeReport()">
+  <div class="modal modal-lg report-dialog" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <h3 id="reportTitle">分析报告</h3>
+      <button type="button" class="modal-close" onclick="closeReport()" aria-label="关闭">×</button>
+    </div>
+    <div class="report-body">
+      <iframe id="reportFrame" src="about:blank" frameborder="0" title="GR&R 分析报告"></iframe>
+    </div>
+  </div>
+</div>
+
+<!-- 数据录入弹窗：先展示数据列表，再进入单个评价人的录入区 -->
+<div class="modal-mask" id="entryMask" onclick="if(event.target===this)closeEntry()">
+  <div class="modal modal-lg entry-dialog" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <h3>数据录入</h3>
+      <button type="button" class="modal-close" onclick="closeEntry()" aria-label="关闭">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="entry-meta" id="entryMeta"></div>
+
+      <!-- 视图一：数据列表（每位评价人一行） -->
+      <div id="entryListView">
+        <div class="entry-panel-title">数据列表</div>
+        <div class="entry-table-wrap">
+          <table class="data entry-table">
+            <thead>
+              <tr>
+                <th style="width:64px">序号</th>
+                <th style="width:100px">状态</th>
+                <th style="width:150px">测量人员</th>
+                <th style="width:130px">操作人员</th>
+                <th style="width:180px">提交时间</th>
+                <th style="width:120px">判定结果</th>
+                <th style="width:240px">操作</th>
+              </tr>
+            </thead>
+            <tbody id="entryTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 视图二：单个评价人录入区 -->
+      <div id="entryEditView" hidden>
+        <div class="entry-edit-head">
+          <span class="entry-op" id="entryOpName">—</span>
+          <span class="entry-progress" id="entryProgress">已填 0 / 0</span>
+        </div>
+        <div class="entry-matrix-wrap">
+          <table class="data matrix" id="entryMatrix"></table>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" type="button" id="entryBackBtn" hidden onclick="backToEntryList()">返回列表</button>
+      <button class="btn" type="button" onclick="closeEntry()">关闭</button>
+      <button class="btn btn-primary" type="button" id="entrySubmitBtn" hidden onclick="submitEntry()">提交</button>
+    </div>
+  </div>
+</div>
+
+<!-- 仪器选择弹窗（数据来源：仪器台账） -->
+<div class="modal-mask" id="eqMask" onclick="if(event.target===this)closeEqPicker()">
+  <div class="modal modal-lg eq-dialog" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <h3>选择仪器</h3>
+      <button type="button" class="modal-close" onclick="closeEqPicker()" aria-label="关闭">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="eq-query query">
+        <div class="field"><label>仪器编号</label><input id="eqQCode" oninput="renderEqTable()" placeholder="请输入" /></div>
+        <div class="field"><label>仪器名称</label><input id="eqQName" oninput="renderEqTable()" placeholder="请输入" /></div>
+      </div>
+      <div class="eq-table-wrap">
+        <table class="data eq-table">
+          <colgroup>
+            <col style="width:44px" />
+            <col style="width:110px" />
+            <col style="width:120px" />
+            <col style="width:240px" />
+            <col style="width:140px" />
+            <col style="width:130px" />
+            <col style="width:100px" />
+            <col style="width:180px" />
+            <col style="width:160px" />
+            <col style="width:100px" />
+            <col style="width:130px" />
+            <col style="width:120px" />
+            <col style="width:80px" />
+            <col style="width:100px" />
+            <col style="width:170px" />
+          </colgroup>
+          <thead>
+            <tr>
+              <th class="col-radio"></th>
+              <th>仪器状态</th>
+              <th>仪器编号</th>
+              <th>仪器名称</th>
+              <th>仪器条码</th>
+              <th>仪器类型</th>
+              <th>使用状态</th>
+              <th>规格型号</th>
+              <th>测量范围</th>
+              <th>精度等级</th>
+              <th>存放位置</th>
+              <th>责任部门</th>
+              <th>责任人</th>
+              <th>购置日期</th>
+              <th>创建时间</th>
+            </tr>
+          </thead>
+          <tbody id="eqTbody"></tbody>
+        </table>
+      </div>
+      <div class="eq-tip">字段与「基础数据 / 仪器台账」列表一致；仅「在用」仪器可选择，双击行可直接选中，表格可横向滚动查看全部字段。</div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" type="button" onclick="closeEqPicker()">取消</button>
+      <button class="btn btn-primary" type="button" onclick="confirmEqPick()">确定</button>
+    </div>
+  </div>
+</div>
+
 <script src="js/app.js"></script>
 <script>
-var EQ = {
-  "EQ-CAL-012": { spec: "0–150 mm / 0.01 mm", range: "0–150 mm", type: "卡尺" },
-  "EQ-MIC-008": { spec: "0–25 mm / 0.001 mm", range: "0–25 mm", type: "千分尺" },
-  "EQ-HGT-003": { spec: "0–300 mm / 0.02 mm", range: "0–300 mm", type: "高度尺" }
-};
-function syncEq() {
-  var v = document.getElementById("eq").value;
-  var m = EQ[v];
-  document.getElementById("eqNum").textContent = v || "—";
-  document.getElementById("eqSpec").textContent = m ? m.spec : "—";
-  document.getElementById("eqRange").textContent = m ? m.range : "—";
-  document.getElementById("eqType").textContent = m ? m.type : "—";
+/* ---------- 查询区 ---------- */
+function toggleQueryMore() {
+  var btn = document.getElementById('qMoreBtn');
+  var rows = document.querySelectorAll('.q-more');
+  var expand = rows.length && rows[0].hasAttribute('hidden');
+  rows.forEach(function (n) { if (expand) n.removeAttribute('hidden'); else n.setAttribute('hidden', ''); });
+  btn.innerHTML = (expand ? '收起' : '更多') + '<i class="caret">' + (expand ? '∧' : '∨') + '</i>';
 }
+function onQuery() { toast('已按条件查询'); }
+function onResetQuery() {
+  document.querySelectorAll('.query .field input').forEach(function (i) { i.value = ''; });
+  document.querySelectorAll('.query .field select').forEach(function (s) { s.selectedIndex = 0; });
+  toast('已重置查询条件');
+}
+
+/* ---------- 勾选 ---------- */
+function countSel() {
+  var all = document.querySelectorAll('.row-check');
+  var n = document.querySelectorAll('.row-check:checked').length;
+  document.getElementById('selCount').textContent = n;
+  var head = document.getElementById('checkAll');
+  head.checked = n > 0 && n === all.length;
+  head.indeterminate = n > 0 && n < all.length;
+  document.getElementById('batchDelBtn').disabled = n === 0;
+}
+function toggleAll(box) {
+  document.querySelectorAll('.row-check').forEach(function (c) { c.checked = box.checked; });
+  countSel();
+}
+function onBatchDelete() {
+  var n = document.querySelectorAll('.row-check:checked').length;
+  toast(n ? '已删除勾选的 ' + n + ' 条计划' : '请先勾选要删除的计划');
+}
+
+/* ---------- 行操作「更多」 ---------- */
+function closeOpMenu() {
+  var old = document.querySelector('.op-menu');
+  if (old) old.remove();
+}
+function openOpMenu(btn) {
+  closeOpMenu();
+  var extra = btn.parentNode.querySelector('.op-extra');
+  if (!extra) return;
+  var menu = document.createElement('div');
+  menu.className = 'op-menu show';
+  menu.innerHTML = extra.innerHTML;
+  var role = localStorage.getItem('grrRole') || 'planner';
+  if (role !== 'planner') {
+    menu.querySelectorAll('[data-planner-only]').forEach(function (n) { n.style.display = 'none'; });
+  }
+  document.body.appendChild(menu);
+  menu.addEventListener('click', function () { setTimeout(closeOpMenu, 0); });
+
+  var r = btn.getBoundingClientRect();
+  var mw = menu.offsetWidth;
+  var mh = menu.offsetHeight;
+  var left = Math.max(8, Math.min(r.left - 8, window.innerWidth - mw - 8));
+  var top = r.bottom + 4;
+  if (top + mh > window.innerHeight - 8) top = Math.max(8, r.top - mh - 4);
+  menu.style.left = left + 'px';
+  menu.style.top = top + 'px';
+}
+document.addEventListener('click', function (e) {
+  var menu = document.querySelector('.op-menu');
+  if (!menu || !menu.classList.contains('show')) return;
+  if (menu.contains(e.target) || e.target.closest('.op-more')) return;
+  closeOpMenu();
+});
+window.addEventListener('scroll', closeOpMenu, true);
+
+/* ---------- 计划弹窗 ---------- */
+/* 仪器台账兜底数据（主 demo 的 WMS_MOCK_ROWS 不可用时使用；含既有 3 台量具） */
+var EQ_FALLBACK_ROWS = [
+  { insStatus: "正常", code: "EQ-CAL-012", name: "数显卡尺", type: "卡尺", barcode: "EQ-CAL-012", useStatus: "在用",
+    spec: "0–150 mm / 0.01 mm", range: "0–150 mm", acc: "0.01 mm", location: "计量室 A-01", dept: "计量室", owner: "王强",
+    buyDate: "2024-03-11", createdAt: "2024-03-11 09:20" },
+  { insStatus: "正常", code: "EQ-MIC-008", name: "外径千分尺", type: "千分尺", barcode: "EQ-MIC-008", useStatus: "在用",
+    spec: "0–25 mm / 0.001 mm", range: "0–25 mm", acc: "0.001 mm", location: "计量室 A-02", dept: "计量室", owner: "李静",
+    buyDate: "2024-05-06", createdAt: "2024-05-06 14:05" },
+  { insStatus: "正常", code: "EQ-HGT-003", name: "高度尺", type: "高度尺", barcode: "EQ-HGT-003", useStatus: "在用",
+    spec: "0–300 mm / 0.02 mm", range: "0–300 mm", acc: "0.02 mm", location: "计量室 A-03", dept: "计量室", owner: "张伟",
+    buyDate: "2023-11-20", createdAt: "2023-11-20 10:12" },
+  { insStatus: "正常", code: "EQ-DEP-001", name: "深度尺", type: "深度尺", barcode: "EQ-DEP-001", useStatus: "在用",
+    spec: "0–150 mm / 0.02 mm", range: "0–150 mm", acc: "0.02 mm", location: "计量室 A-04", dept: "计量室", owner: "刘芳",
+    buyDate: "2024-01-15", createdAt: "2024-01-15 08:40" },
+  { insStatus: "正常", code: "EQ-MIC-012", name: "内径千分尺", type: "千分尺", barcode: "EQ-MIC-012", useStatus: "在用",
+    spec: "5–30 mm / 0.001 mm", range: "5–30 mm", acc: "0.001 mm", location: "计量室 A-05", dept: "计量室", owner: "陈浩",
+    buyDate: "2024-07-02", createdAt: "2024-07-02 15:30" },
+  { insStatus: "正常", code: "EQ-DIA-002", name: "杠杆千分表", type: "千分表", barcode: "EQ-DIA-002", useStatus: "在用",
+    spec: "0–1 mm / 0.001 mm", range: "0–1 mm", acc: "0.001 mm", location: "计量室 A-06", dept: "计量室", owner: "王强",
+    buyDate: "2023-09-08", createdAt: "2023-09-08 11:00" },
+  { insStatus: "待定检", code: "EQ-CAL-015", name: "数显卡尺（备用）", type: "卡尺", barcode: "EQ-CAL-015", useStatus: "停用",
+    spec: "0–200 mm / 0.01 mm", range: "0–200 mm", acc: "0.01 mm", location: "计量室 B-01", dept: "计量室", owner: "周敏",
+    buyDate: "2022-12-01", createdAt: "2022-12-01 09:00" },
+  { insStatus: "停用", code: "EQ-CAL-009", name: "游标卡尺", type: "卡尺", barcode: "EQ-CAL-009", useStatus: "报废",
+    spec: "0–300 mm / 0.02 mm", range: "0–300 mm", acc: "0.02 mm", location: "计量室 B-02", dept: "计量室", owner: "李静",
+    buyDate: "2019-04-18", createdAt: "2019-04-18 16:20" }
+];
+
+var pickedEq = null;      // 当前选中的仪器
+var pendingEqCode = '';   // 弹窗内待确认的仪器
+
+/* 取仪器台账：优先读主 demo 的 WMS_MOCK_ROWS['instrument-ledger'].main */
+function getEqLedger() {
+  try {
+    var host = (window.parent && window.parent !== window) ? window.parent : window;
+    var rows = host.WMS_MOCK_ROWS && host.WMS_MOCK_ROWS['instrument-ledger'] && host.WMS_MOCK_ROWS['instrument-ledger'].main;
+    if (rows && rows.length) {
+      return rows.map(function (r) {
+        return {
+          insStatus: r['仪器状态'] || '', code: r['仪器编号'] || '', name: r['仪器名称'] || '',
+          barcode: r['仪器条码'] || '', type: r['仪器类型'] || '', useStatus: r['使用状态'] || '',
+          spec: r['规格型号'] || '', range: r['测量范围'] || '', acc: r['精度等级'] || '',
+          location: r['存放位置'] || '', dept: r['责任部门'] || '', owner: r['责任人'] || '',
+          buyDate: r['购置日期'] || '', createdAt: r['创建时间'] || ''
+        };
+      });
+    }
+  } catch (e) { /* file:// 跨上下文读取失败时走兜底 */ }
+  return EQ_FALLBACK_ROWS;
+}
+
+function esc(v) {
+  return String(v == null ? '' : v).replace(/[&<>"]/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+  });
+}
+
+/* ---------- 仪器选择弹窗 ---------- */
+function openEqPicker() {
+  document.getElementById('eqQCode').value = '';
+  document.getElementById('eqQName').value = '';
+  pendingEqCode = pickedEq ? pickedEq.code : '';
+  renderEqTable();
+  document.getElementById('eqMask').classList.add('show');
+}
+function closeEqPicker() {
+  document.getElementById('eqMask').classList.remove('show');
+}
+function renderEqTable() {
+  var qc = (document.getElementById('eqQCode').value || '').trim().toLowerCase();
+  var qn = (document.getElementById('eqQName').value || '').trim().toLowerCase();
+  var rows = getEqLedger().filter(function (r) {
+    var okCode = !qc || String(r.code).toLowerCase().indexOf(qc) > -1;
+    var okName = !qn || String(r.name).toLowerCase().indexOf(qn) > -1;
+    return okCode && okName;
+  });
+  var html = rows.map(function (r) {
+    var disabled = r.useStatus !== '在用';
+    var picked = r.code === pendingEqCode;
+    var tagCls = r.useStatus === '在用' ? 'badge-ok' : (r.useStatus === '报废' ? 'badge-danger' : 'badge-muted');
+    return '<tr class="' + (disabled ? 'is-disabled' : '') + (picked ? ' is-picked' : '') + '"'
+      + (disabled
+          ? ' onclick="eqDisabledTip(\'' + esc(r.useStatus) + '\')"'
+          : ' onclick="pickEqRow(\'' + esc(r.code) + '\')" ondblclick="pickEqRow(\'' + esc(r.code) + '\');confirmEqPick()"')
+      + '>'
+      + '<td class="col-radio"><input type="radio" name="eqPick" ' + (picked ? 'checked ' : '') + (disabled ? 'disabled ' : '')
+      + 'onclick="event.stopPropagation();pickEqRow(\'' + esc(r.code) + '\')" /></td>'
+      + '<td>' + esc(r.insStatus || '—') + '</td>'
+      + '<td>' + esc(r.code) + '</td>'
+      + '<td title="' + esc(r.name) + '">' + esc(r.name) + '</td>'
+      + '<td>' + esc(r.barcode || '—') + '</td>'
+      + '<td>' + esc(r.type) + '</td>'
+      + '<td><span class="badge ' + tagCls + '">' + esc(r.useStatus) + '</span></td>'
+      + '<td title="' + esc(r.spec) + '">' + esc(r.spec || '—') + '</td>'
+      + '<td title="' + esc(r.range) + '">' + esc(r.range || '—') + '</td>'
+      + '<td>' + esc(r.acc || '—') + '</td>'
+      + '<td title="' + esc(r.location) + '">' + esc(r.location || '—') + '</td>'
+      + '<td>' + esc(r.dept || '—') + '</td>'
+      + '<td>' + esc(r.owner || '—') + '</td>'
+      + '<td>' + esc(r.buyDate || '—') + '</td>'
+      + '<td>' + esc(r.createdAt || '—') + '</td>'
+      + '</tr>';
+  }).join('');
+  document.getElementById('eqTbody').innerHTML = html ||
+    '<tr><td colspan="15" class="eq-empty">未匹配到仪器</td></tr>';
+}
+function eqDisabledTip(status) {
+  toast('该仪器当前「' + status + '」，不可用于 GR&R 计划');
+}
+function pickEqRow(code) {
+  pendingEqCode = code;
+  renderEqTable();
+}
+function confirmEqPick() {
+  if (!pendingEqCode) { toast('请选择一台仪器'); return; }
+  var row = getEqLedger().filter(function (r) { return r.code === pendingEqCode; })[0];
+  if (!row) { toast('仪器信息不存在'); return; }
+  if (row.useStatus !== '在用') { toast('该仪器当前「' + row.useStatus + '」，不可用于 GR&R 计划'); return; }
+  applyEq(row);
+  closeEqPicker();
+}
+/* 选中后自动回填并带出仪器信息 */
+function applyEq(row) {
+  pickedEq = row;
+  document.getElementById('eqNameText').textContent = row.name || '—';
+  document.getElementById('eqName').title = (row.code ? row.code + ' · ' : '') + (row.name || '');
+  document.getElementById('eqNum').textContent = row.code || '—';
+  document.getElementById('eqSpec').textContent = row.spec || '—';
+  document.getElementById('eqRange').textContent = row.range || '—';
+  document.getElementById('eqType').textContent = row.type || '—';
+  if (!document.getElementById('partName').value.trim()) {
+    document.getElementById('partName').value = '轴套 φ20';
+  }
+}
+function clearEq() {
+  pickedEq = null;
+  document.getElementById('eqNameText').textContent = '请选择仪器';
+  document.getElementById('eqNum').textContent = '—';
+  document.getElementById('eqSpec').textContent = '—';
+  document.getElementById('eqRange').textContent = '—';
+  document.getElementById('eqType').textContent = '—';
+}
+
+/* ---------- 计划弹窗 ---------- */
 function toggleOp3() {
-  document.getElementById("op3wrap").style.display =
-    document.getElementById("opn").value === "3" ? "" : "none";
+  document.getElementById('op3wrap').style.display =
+    document.getElementById('opn').value === '3' ? '' : 'none';
 }
 function closePlan() {
-  document.getElementById("planMask").classList.remove("show");
+  document.getElementById('planMask').classList.remove('show');
 }
 function fillDefault() {
-  document.getElementById("planNo").textContent = "提交后生成 GRR-YYYYMMDD-序号";
-  document.getElementById("eq").value = "EQ-CAL-012";
-  document.getElementById("partName").value = "轴套 φ20";
-  document.getElementById("nSel").value = "10";
-  document.getElementById("rSel").value = "3";
-  document.getElementById("opn").value = "3";
-  document.getElementById("op1").value = "王工";
-  document.getElementById("op2").value = "李工";
-  document.getElementById("op3").value = "赵工";
-  document.getElementById("planDate").value = "2026-08-28";
-  document.getElementById("remark").value = "";
-  syncEq();
-  toggleOp3();
+  document.getElementById('planNo').textContent = '提交后生成 GRR-YYYYMMDD-序号';
+  clearEq();
+  document.getElementById('partName').value = '轴套 φ20';
+  document.getElementById('nSel').value = '10';
+  document.getElementById('rSel').value = '3';
+  document.getElementById('opn').value = '3';
+  document.getElementById('op1').value = '王工';
+  document.getElementById('op2').value = '李工';
+  document.getElementById('op3').value = '赵工';
+  document.getElementById('planDate').value = '2026-08-28';
+  document.getElementById('remark').value = '';
+  document.getElementById('op3wrap').style.display = '';
+}
+function fillEqByCode(code) {
+  var row = getEqLedger().filter(function (r) { return r.code === code; })[0]
+    || EQ_FALLBACK_ROWS.filter(function (r) { return r.code === code; })[0];
+  if (row) applyEq(row);
 }
 function openPlan(id) {
-  document.getElementById("planTitle").textContent = id ? "编辑计划" : "新增计划";
+  document.getElementById('planTitle').textContent = id ? '编辑计划' : '新增计划';
   fillDefault();
-  if (id === "edit-002") {
-    document.getElementById("planNo").textContent = "GRR-20260826-002";
-    document.getElementById("eq").value = "EQ-HGT-003";
-    document.getElementById("partName").value = "支架";
-    document.getElementById("nSel").value = "10";
-    document.getElementById("rSel").value = "2";
-    document.getElementById("opn").value = "2";
-    document.getElementById("planDate").value = "2026-08-26";
-    syncEq();
+  if (id === 'edit-002') {
+    document.getElementById('planNo').textContent = 'GRR-20260826-002';
+    fillEqByCode('EQ-HGT-003');
+    document.getElementById('partName').value = '支架';
+    document.getElementById('nSel').value = '10';
+    document.getElementById('rSel').value = '2';
+    document.getElementById('opn').value = '2';
+    document.getElementById('planDate').value = '2026-08-26';
     toggleOp3();
   }
-  if (id === "edit-001") {
-    document.getElementById("planNo").textContent = "GRR-20260828-001";
+  if (id === 'edit-001') {
+    document.getElementById('planNo').textContent = 'GRR-20260828-001';
+    fillEqByCode('EQ-CAL-012');
   }
-  if (id === "edit-003") {
-    document.getElementById("planNo").textContent = "GRR-20260818-002";
-    document.getElementById("eq").value = "EQ-MIC-008";
-    document.getElementById("partName").value = "销轴";
-    document.getElementById("planDate").value = "2026-08-18";
-    syncEq();
+  if (id === 'edit-003') {
+    document.getElementById('planNo').textContent = 'GRR-20260818-002';
+    fillEqByCode('EQ-MIC-008');
+    document.getElementById('partName').value = '销轴';
+    document.getElementById('planDate').value = '2026-08-18';
   }
-  document.getElementById("planMask").classList.add("show");
+  document.getElementById('planMask').classList.add('show');
 }
 function saveDraft() {
   closePlan();
-  toast("已保存草稿");
+  toast('已保存草稿（未生成任务）');
+}
+
+/* ---------- 提交计划：生成任务并停留在列表 ---------- */
+function buildOps() {
+  var n = Number(document.getElementById('opn').value);
+  var arr = [document.getElementById('op1').value, document.getElementById('op2').value];
+  if (n === 3) arr.push(document.getElementById('op3').value);
+  return arr;
+}
+function nextPlanNo(dateStr) {
+  var d = dateStr ? new Date(dateStr) : new Date();
+  var ymd = isNaN(d.getTime()) ? '' : '' + d.getFullYear()
+    + ('0' + (d.getMonth() + 1)).slice(-2) + ('0' + d.getDate()).slice(-2);
+  var seq = document.querySelectorAll('#planTbody tr').length + 1;
+  return 'GRR-' + (ymd || '20260828') + '-' + ('00' + seq).slice(-3);
+}
+function submitPlan() {
+  if (!pickedEq) { toast('请选择仪器'); return; }
+  var part = document.getElementById('partName').value.trim();
+  if (!part) { toast('请输入检测项目'); return; }
+  if (!document.getElementById('planDate').value) { toast('请选择计划测量日期'); return; }
+
+  var ops = buildOps();
+  var plan = {
+    no: nextPlanNo(document.getElementById('planDate').value),
+    eqName: pickedEq.name, eqNum: pickedEq.code,
+    part: part, ops: ops.join(' / '),
+    n: document.getElementById('nSel').value,
+    opCount: String(ops.length),
+    r: document.getElementById('rSel').value,
+    date: document.getElementById('planDate').value
+  };
+  addPlanRow(plan);
+  closePlan();
+  toast('计划已提交，已生成任务 ' + plan.no);
+}
+function addPlanRow(p) {
+  var tbody = document.getElementById('planTbody');
+  var tr = document.createElement('tr');
+  tr.className = 'row-new';
+  tr.innerHTML =
+      '<td class="col-check"><input type="checkbox" class="row-check" onchange="countSel()" /></td>'
+    + '<td class="idx"></td>'
+    + '<td><span class="badge badge-info">待执行</span></td>'
+    + '<td>' + esc(p.no) + '</td>'
+    + '<td>' + esc(p.eqName) + '</td>'
+    + '<td>' + esc(p.eqNum) + '</td>'
+    + '<td>' + esc(p.part) + '</td>'
+    + '<td>' + esc(p.ops) + '</td>'
+    + '<td>' + esc(p.n) + '</td>'
+    + '<td>' + esc(p.opCount) + '</td>'
+    + '<td>' + esc(p.r) + '</td>'
+    + '<td>' + esc(p.date) + '</td>'
+    + '<td>—</td>'
+    + '<td><div class="row-op">'
+    +   '<button class="op-link" type="button" onclick="openEntryDialog(this)">数据录入</button>'
+    +   '<a class="op-link" href="report.html" onclick="return openReport(this)">报告</a>'
+    +   '<button class="op-link op-more" type="button" onclick="openOpMenu(this)">更多</button>'
+    +   '<span class="op-extra">'
+    +     '<a class="op-link" href="#" data-planner-only onclick="toast(\'编辑：演示版未开放\');return false;">编辑</a>'
+    +     '<a class="op-link" href="#" onclick="toast(\'已复制为新草稿\');return false;">复制</a>'
+    +     '<a class="op-link danger" href="#" data-planner-only onclick="toast(\'已关闭\');return false;">关闭</a>'
+    +     '<a class="op-link danger" href="#" data-planner-only onclick="toast(\'已删除\');return false;">删除</a>'
+    +   '</span>'
+    + '</div></td>';
+  tbody.insertBefore(tr, tbody.firstChild);
+  renumberRows();
+  refreshListMeta();
+  if (typeof applyRole === 'function') applyRole();
+  setTimeout(function () {
+    tr.scrollIntoView({ block: 'nearest' });
+    setTimeout(function () { tr.classList.remove('row-new'); }, 1600);
+  }, 30);
+}
+function renumberRows() {
+  var trs = document.querySelectorAll('#planTbody tr');
+  for (var i = 0; i < trs.length; i++) {
+    var cell = trs[i].children[1];
+    if (cell) cell.textContent = String(i + 1);
+  }
+}
+function refreshListMeta() {
+  var n = document.querySelectorAll('#planTbody tr').length;
+  var el = document.getElementById('pgTotal');
+  if (el) el.textContent = '共 ' + n + ' 条';
+  countSel();
+}
+
+/* ---------- 判定结果（与报告结论同源，三档口径） ---------- */
+var PLAN_RR = 18.42;   /* 报告 KPI：%R&R（对 TV），与 report.html 同一数据源 */
+function planVerdict() {
+  if (PLAN_RR < 10) return '优秀';
+  if (PLAN_RR < 30) return '可接受';
+  return '不可接受';
+}
+function verdictBadge(v) {
+  if (v === '优秀') return '<span class="badge badge-ok">' + v + '</span>';
+  if (v === '可接受') return '<span class="badge badge-warn">' + v + '</span>';
+  if (v === '不可接受') return '<span class="badge badge-danger">' + v + '</span>';
+  return '—';
+}
+
+/* ---------- 数据录入：按评价人分别录入 / 提交 ---------- */
+var ENTRY_KEY = 'grrEntryV1';
+var ENTRY_STORE = loadEntryStore();
+var curPlan = null;
+var curOpIdx = -1;
+
+function loadEntryStore() {
+  try { return JSON.parse(localStorage.getItem(ENTRY_KEY) || '{}') || {}; } catch (e) { return {}; }
+}
+function saveEntryStore() {
+  try { localStorage.setItem(ENTRY_KEY, JSON.stringify(ENTRY_STORE)); } catch (e) {}
+}
+function buildEmptyMatrix(n, r) {
+  var m = [];
+  for (var t = 0; t < r; t++) {
+    var row = [];
+    for (var p = 0; p < n; p++) row.push('');
+    m.push(row);
+  }
+  return m;
+}
+/* 已提交评价人的示例测量值（仅用于演示回填，与旧 data.html 的 seed 同口径） */
+function seedMatrix(n, r, opIdx) {
+  var m = [];
+  for (var t = 0; t < r; t++) {
+    var row = [];
+    for (var p = 0; p < n; p++) {
+      row.push((20.01 + p * 0.02 + opIdx * 0.01 + t * 0.005).toFixed(3));
+    }
+    m.push(row);
+  }
+  return m;
+}
+function nowStr() {
+  var d = new Date();
+  function p(n) { return ('0' + n).slice(-2); }
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate())
+    + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+function pad2(n) { return ('0' + n).slice(-2); }
+
+/* 从列表行读取计划信息（评价人来自计划，保持一一对应） */
+function readPlanRow(tr) {
+  var c = tr.children;
+  var ops = (c[7].textContent || '').split('/').map(function (x) { return x.trim(); }).filter(Boolean);
+  return {
+    no: c[3].textContent.trim(), eqName: c[4].textContent.trim(), eqNum: c[5].textContent.trim(),
+    part: c[6].textContent.trim(), ops: ops,
+    n: Number(c[8].textContent) || 10, r: Number(c[10].textContent) || 3,
+    date: c[11].textContent.trim(), status: c[2].textContent.trim()
+  };
+}
+/* 录入数据按「计划编号 + 评价人」隔离；首次打开按计划状态预置示例进度 */
+function ensureEntry(plan) {
+  var rec = ENTRY_STORE[plan.no];
+  if (rec && rec.ops && rec.ops.length === plan.ops.length) return rec;
+  rec = {
+    part: plan.part, eqName: plan.eqName, eqNum: plan.eqNum, n: plan.n, r: plan.r,
+    ops: plan.ops.map(function (name, i) {
+      var submitted = plan.status === '已完成' || (plan.status === '执行中' && i === 0);
+      return {
+        name: name,
+        status: submitted ? '已提交' : '未提交',
+        time: submitted ? (plan.date + ' 10:57') : '',
+        operator: submitted ? '管理人员' : '',
+        values: submitted ? seedMatrix(plan.n, plan.r, i) : buildEmptyMatrix(plan.n, plan.r)
+      };
+    })
+  };
+  ENTRY_STORE[plan.no] = rec;
+  saveEntryStore();
+  return rec;
+}
+
+function openEntryDialog(btn) {
+  var tr = btn.closest('tr');
+  curPlan = readPlanRow(tr);
+  ensureEntry(curPlan);
+  curOpIdx = -1;
+  document.getElementById('entryMeta').textContent =
+    '计划 ' + curPlan.no + ' · 检测项目 ' + curPlan.part + ' · 仪器 ' + curPlan.eqNum + ' ' + curPlan.eqName
+    + ' · ' + curPlan.n + ' 件 × ' + curPlan.r + ' 次 · 评价人 ' + curPlan.ops.length + ' 人';
+  renderEntryList();
+  showEntryView('list');
+  document.getElementById('entryMask').classList.add('show');
+}
+function openReport(a) {
+  var p = readPlanRow(a.closest('tr'));
+  var eq = getEqLedger().filter(function (r) { return r.code === p.eqNum; })[0]
+    || EQ_FALLBACK_ROWS.filter(function (r) { return r.code === p.eqNum; })[0] || {};
+  var q = '?plan=' + encodeURIComponent(p.no)
+    + '&part=' + encodeURIComponent(p.part)
+    + '&eqName=' + encodeURIComponent(p.eqName)
+    + '&eqNum=' + encodeURIComponent(p.eqNum)
+    + '&spec=' + encodeURIComponent(eq.spec || '')
+    + '&range=' + encodeURIComponent(eq.range || '')
+    + '&date=' + encodeURIComponent(p.date)
+    + '&verdict=' + encodeURIComponent(planVerdict())
+    + '&n=' + p.n + '&r=' + p.r;
+  document.getElementById('reportTitle').textContent = '分析报告 · ' + p.no;
+  document.getElementById('reportFrame').src = 'report.html' + q;
+  document.getElementById('reportMask').classList.add('show');
+  return false;
+}
+function closeReport() {
+  document.getElementById('reportMask').classList.remove('show');
+  document.getElementById('reportFrame').src = 'about:blank';
+}
+function closeEntry() {
+  document.getElementById('entryMask').classList.remove('show');
+}
+function showEntryView(view) {
+  var isList = view === 'list';
+  document.getElementById('entryListView').hidden = !isList;
+  document.getElementById('entryEditView').hidden = isList;
+  document.getElementById('entryBackBtn').hidden = isList;
+  document.getElementById('entrySubmitBtn').hidden = isList;
+}
+function renderEntryList() {
+  var rec = ENTRY_STORE[curPlan.no];
+  var html = rec.ops.map(function (op, i) {
+    var submitted = op.status === '已提交';
+    var tag = submitted ? 'badge-ok' : 'badge-muted';
+    /* 未提交：数据录入可点、编辑置灰；已提交：数据录入置灰、编辑可点 */
+    var entryBtn = submitted
+      ? '<button class="btn btn-sm btn-ghost" type="button" disabled>数据录入</button>'
+      : '<button class="btn btn-sm btn-primary" type="button" onclick="editEntry(' + i + ')">数据录入</button>';
+    var editBtn = submitted
+      ? '<button class="btn btn-sm btn-primary" type="button" onclick="editEntry(' + i + ')">编辑</button>'
+      : '<button class="btn btn-sm btn-ghost" type="button" disabled>编辑</button>';
+    return '<tr>'
+      + '<td>' + (i + 1) + '</td>'
+      + '<td><span class="badge ' + tag + '">' + op.status + '</span></td>'
+      + '<td>' + esc(op.name) + '</td>'
+      + '<td>' + esc(op.operator || '—') + '</td>'
+      + '<td>' + esc(op.time || '—') + '</td>'
+      + '<td>' + verdictBadge(planVerdict()) + '</td>'
+      + '<td>' + entryBtn + editBtn + '</td>'
+      + '</tr>';
+  }).join('');
+  document.getElementById('entryTbody').innerHTML = html;
+}
+function backToEntryList() {
+  curOpIdx = -1;
+  renderEntryList();
+  showEntryView('list');
+}
+function editEntry(i) {
+  curOpIdx = i;
+  var op = ENTRY_STORE[curPlan.no].ops[i];
+  document.getElementById('entryOpName').textContent = '测量人员：' + op.name
+    + (op.status === '已提交' ? '（已提交，修改后可重新提交）' : '（未提交）');
+  renderMatrix(op);
+  showEntryView('edit');
+}
+function renderMatrix(op) {
+  var n = curPlan.n;
+  var r = op.values.length;
+  var h = '<thead><tr><th style="width:96px">试验</th>';
+  for (var p = 0; p < n; p++) h += '<th>P' + pad2(p + 1) + '</th>';
+  h += '</tr></thead><tbody>';
+  for (var t = 0; t < r; t++) {
+    h += '<tr><td class="op-head">第 ' + (t + 1) + ' 次</td>';
+    for (var p2 = 0; p2 < n; p2++) {
+      h += '<td><input data-t="' + t + '" data-p="' + p2 + '" value="' + esc(op.values[t][p2] || '') + '" /></td>';
+    }
+    h += '</tr>';
+  }
+  h += '<tr class="readonly"><td>均值</td>';
+  for (var p3 = 0; p3 < n; p3++) h += '<td class="calc-avg" data-p="' + p3 + '">—</td>';
+  h += '</tr><tr class="readonly"><td>极差</td>';
+  for (var p4 = 0; p4 < n; p4++) h += '<td class="calc-rng" data-p="' + p4 + '">—</td>';
+  h += '</tr></tbody>';
+  var mx = document.getElementById('entryMatrix');
+  mx.innerHTML = h;
+  mx.querySelectorAll('input').forEach(function (inp) { inp.addEventListener('input', onEntryInput); });
+  recalcMatrix();
+  updateProgress();
+}
+function onEntryInput(e) {
+  var inp = e.target;
+  var op = ENTRY_STORE[curPlan.no].ops[curOpIdx];
+  op.values[Number(inp.dataset.t)][Number(inp.dataset.p)] = inp.value.trim();
+  recalcMatrix();
+  updateProgress();
+}
+function recalcMatrix() {
+  var op = ENTRY_STORE[curPlan.no].ops[curOpIdx];
+  var n = curPlan.n;
+  for (var p = 0; p < n; p++) {
+    var nums = [];
+    for (var t = 0; t < op.values.length; t++) {
+      var v = op.values[t][p];
+      if (v !== '' && !isNaN(Number(v))) nums.push(Number(v));
+    }
+    var avgCell = document.querySelector('.calc-avg[data-p="' + p + '"]');
+    var rngCell = document.querySelector('.calc-rng[data-p="' + p + '"]');
+    if (!nums.length) { avgCell.textContent = '—'; rngCell.textContent = '—'; continue; }
+    var sum = nums.reduce(function (a, b) { return a + b; }, 0);
+    avgCell.textContent = (sum / nums.length).toFixed(3);
+    rngCell.textContent = (Math.max.apply(null, nums) - Math.min.apply(null, nums)).toFixed(3);
+  }
+}
+function updateProgress() {
+  var op = ENTRY_STORE[curPlan.no].ops[curOpIdx];
+  var total = curPlan.n * curPlan.r;
+  var filled = 0;
+  op.values.forEach(function (row) {
+    row.forEach(function (v) { if (v !== '' && !isNaN(Number(v))) filled++; });
+  });
+  document.getElementById('entryProgress').textContent = '已填 ' + filled + ' / ' + total;
+}
+function submitEntry() {
+  var op = ENTRY_STORE[curPlan.no].ops[curOpIdx];
+  var total = curPlan.n * curPlan.r;
+  var filled = 0;
+  op.values.forEach(function (row) {
+    row.forEach(function (v) { if (v !== '' && !isNaN(Number(v))) filled++; });
+  });
+  if (filled < total) {
+    toast(op.name + ' 还有 ' + (total - filled) + ' 个测量值未填，补齐后再提交');
+    return;
+  }
+  op.status = '已提交';
+  op.time = nowStr();
+  op.operator = '张明';
+  saveEntryStore();
+  backToEntryList();
+  toast(op.name + ' 的录入结果已提交');
 }
 </script>
 </body>

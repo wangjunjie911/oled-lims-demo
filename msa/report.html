@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>GRR 分析报告</title>
   <script>if (window.self !== window.top) document.documentElement.classList.add('embedded');</script>
-  <link rel="stylesheet" href="css/demo.css" />
+  <link rel="stylesheet" href="css/demo.css?v=2.0.0" />
+  <link rel="stylesheet" href="css/lims-theme.css?v=1.6.1" />
 </head>
 <body data-mod="grr">
 <div class="app">
@@ -15,7 +16,7 @@
       <span>角色</span>
       <select id="roleSel" onchange="setRole(this.value)">
         <option value="planner">计划员</option>
-        <option value="appraiser">评价人 · 王工</option>
+        <option value="appraiser">测量人员 · 王工</option>
       </select>
       <span>张明</span>
     </div>
@@ -26,32 +27,36 @@
   <main>
     <div class="page-head">
       <div>
-        <h1>分析报告</h1>
+        <h1>GR&amp;R 分析报告</h1>
+        <p>GRR-20260827-003 · 外径千分尺 EQ-MIC-008 · 销轴</p>
       </div>
       <div class="head-actions">
         <button class="btn" type="button" onclick="return notExport()">导出</button>
-        <a class="btn" href="index.html">返回列表</a>
+        <a class="btn" href="index.html" onclick="return goList()">返回列表</a>
         <a class="btn btn-primary" href="#" onclick="toast('已复制为新草稿');return false;">复制为新计划</a>
       </div>
     </div>
 
     <div class="verdict warn">
-      <div class="big">10%≤%R&amp;R&lt;30%，测量系统可接受</div>
+      <div class="big">
+        <span class="verdict-tag" id="verdictTag">可接受</span>
+        10%≤%R&amp;R&lt;30%，测量系统可接受
+      </div>
       <div>%R&amp;R = 18.42%（对 TV）· ndc = 7 · 极差图无点出限</div>
     </div>
 
     <div class="card">
       <div class="form-grid">
-        <div class="field"><label>计划编号</label><div class="ro">GRR-20260827-003</div></div>
-        <div class="field"><label>仪器</label><div class="ro">外径千分尺 / EQ-MIC-008</div></div>
-        <div class="field"><label>规格 / 量程</label><div class="ro">0–25 mm / 0.001 mm</div></div>
-        <div class="field"><label>检测项目</label><div class="ro">销轴</div></div>
-        <div class="field"><label>评价人</label><div class="ro">王工 / 李工 / 赵工</div></div>
-        <div class="field"><label>检验项目数量</label><div class="ro">10</div></div>
-        <div class="field"><label>评价人数量</label><div class="ro">3</div></div>
-        <div class="field"><label>试验次数</label><div class="ro">3</div></div>
-        <div class="field"><label>分析日期</label><div class="ro">2026-08-27</div></div>
-        <div class="field"><label>制定</label><div class="ro">张明 2026-08-27 16:02</div></div>
+        <div class="field"><label>计划编号</label><div class="ro" id="planNo">GRR-20260827-003</div></div>
+        <div class="field"><label>仪器</label><div class="ro" id="eqText">外径千分尺 / EQ-MIC-008</div></div>
+        <div class="field"><label>规格 / 量程</label><div class="ro" id="specText">0–25 mm / 0.001 mm</div></div>
+        <div class="field"><label>检测项目</label><div class="ro" id="partText">销轴</div></div>
+        <div class="field"><label>测量人员</label><div class="ro" id="opNames">王工 / 李工 / 赵工</div></div>
+        <div class="field"><label>检验项目数量</label><div class="ro" id="nText">10</div></div>
+        <div class="field"><label>测量人员数量</label><div class="ro" id="opCount">3</div></div>
+        <div class="field"><label>试验次数</label><div class="ro" id="rText">3</div></div>
+        <div class="field"><label>分析日期</label><div class="ro" id="dateText">2026-08-27</div></div>
+        <div class="field"><label>制定</label><div class="ro" id="makerText">张明 2026-08-27 16:02</div></div>
         <div class="field"><label>审核（署名，非审批）</label><div class="ro">—</div></div>
       </div>
     </div>
@@ -61,6 +66,23 @@
       <div class="stat-card"><div class="num">7</div><div class="lbl">ndc = ⌊1.41×PV/GRR⌋</div></div>
       <div class="stat-card"><div class="num">0.0048</div><div class="lbl">GRR（6σ）</div></div>
       <div class="stat-card"><div class="num">0.0261</div><div class="lbl">TV</div></div>
+    </div>
+
+    <h2 class="sec">录入提交记录</h2>
+    <div class="card" style="padding:0">
+      <table class="data">
+        <thead>
+          <tr>
+            <th style="width:64px">序号</th>
+            <th style="width:100px">状态</th>
+            <th style="width:160px">测量人员</th>
+            <th style="width:140px">操作人员</th>
+            <th style="width:190px">提交时间</th>
+            <th style="width:130px">判定结果</th>
+          </tr>
+        </thead>
+        <tbody id="submitTbody"></tbody>
+      </table>
     </div>
 
     <h2 class="sec">变差分解（对 TV）</h2>
@@ -95,7 +117,7 @@
             points="50,108 108,100 166,104 224,96 282,102 340,90 398,98 456,92 514,86 572,94" />
         </svg>
       </div>
-      <p class="caption">横轴：零件 P01–P10 · 纵轴：各评价人零件均值 · 虚线 UCLx / LCLx（A2×R̄）· 蓝王工 / 绿李工 / 橙赵工</p>
+      <p class="caption">横轴：零件 P01–P10 · 纵轴：各测量人员零件均值 · 虚线 UCLx / LCLx（A2×R̄）· 蓝王工 / 绿李工 / 橙赵工</p>
     </div>
 
     <h2 class="sec">极差图</h2>
@@ -127,7 +149,7 @@
       <div class="table-wrap">
         <table class="data matrix" id="rawTbl">
           <thead>
-            <tr><th>评价人</th><th>试验</th><th>P01</th><th>P02</th><th>P03</th><th>P04</th><th>P05</th><th>P06</th><th>P07</th><th>P08</th><th>P09</th><th>P10</th></tr>
+            <tr><th>测量人员</th><th>试验</th><th>P01</th><th>P02</th><th>P03</th><th>P04</th><th>P05</th><th>P06</th><th>P07</th><th>P08</th><th>P09</th><th>P10</th></tr>
           </thead>
           <tbody>
             <tr><td rowspan="3">王工</td><td>1</td><td class="val">12.001</td><td class="val">12.021</td><td class="val">12.040</td><td class="val">12.062</td><td class="val">12.081</td><td class="val">12.102</td><td class="val">12.120</td><td class="val">12.141</td><td class="val">12.162</td><td class="val">12.180</td></tr>
@@ -189,6 +211,72 @@ function saveRawEdit() {
   setRawMode(false);
   toast("已保存，报告已按新数据重算");
 }
+</script>
+
+<script>
+function goList() {
+  if (window.parent && window.parent !== window && typeof window.parent.closeReport === 'function') {
+    window.parent.closeReport();
+    return false;
+  }
+  return true;
+}
+(function () {
+  var q = new URLSearchParams(location.search);
+  var plan = q.get('plan') || 'GRR-20260827-003';
+  var part = q.get('part') || '销轴';
+  var eqName = q.get('eqName') || '外径千分尺';
+  var eqNum = q.get('eqNum') || 'EQ-MIC-008';
+  var n = q.get('n') || '10';
+  var r = q.get('r') || '3';
+
+  var sub = document.querySelector('.page-head p');
+  if (sub) sub.textContent = plan + ' · ' + eqName + ' ' + eqNum + ' · ' + part;
+  var set = function (id, v) { var el = document.getElementById(id); if (el) el.textContent = v; };
+  var spec = q.get('spec') || '';
+  var range = q.get('range') || '';
+  var date = q.get('date') || '2026-08-27';
+  var verdict = q.get('verdict') || '可接受';
+  function verdictTagHtml(v) {
+    var cls = v === '优秀' ? 'badge-ok' : (v === '不可接受' ? 'badge-danger' : 'badge-warn');
+    return '<span class="badge ' + cls + '">' + v + '</span>';
+  }
+  var vt = document.getElementById('verdictTag');
+  if (vt) {
+    vt.textContent = verdict;
+    vt.className = 'verdict-tag ' + (verdict === '优秀' ? 'is-ok' : (verdict === '不可接受' ? 'is-danger' : 'is-warn'));
+  }
+  set('planNo', plan); set('eqText', eqName + ' / ' + eqNum); set('partText', part);
+  set('nText', n); set('rText', r); set('dateText', date);
+  var specText = spec || '—';
+  if (range && spec.indexOf(range) === -1) specText += ' / ' + range;
+  set('specText', specText);
+  set('makerText', '张明 · ' + date);
+
+  var store = {};
+  try { store = JSON.parse(localStorage.getItem('grrEntryV1') || '{}') || {}; } catch (e) {}
+  var rec = store[plan];
+  var ops = (rec && rec.ops && rec.ops.length)
+    ? rec.ops
+    : [{ name: '王工', status: '已提交', operator: '管理人员', time: '2026-08-27 10:57' },
+       { name: '李工', status: '未提交', operator: '', time: '' },
+       { name: '赵工', status: '未提交', operator: '', time: '' }];
+
+  set('opNames', ops.map(function (o) { return o.name; }).join(' / '));
+  set('opCount', String(ops.length));
+
+  document.getElementById('submitTbody').innerHTML = ops.map(function (o, i) {
+    var tag = o.status === '已提交' ? 'badge-ok' : 'badge-muted';
+    return '<tr>'
+      + '<td>' + (i + 1) + '</td>'
+      + '<td><span class="badge ' + tag + '">' + o.status + '</span></td>'
+      + '<td>' + o.name + '</td>'
+      + '<td>' + (o.operator || '—') + '</td>'
+      + '<td>' + (o.time || '—') + '</td>'
+      + '<td>' + verdictTagHtml(verdict) + '</td>'
+      + '</tr>';
+  }).join('');
+})();
 </script>
 </body>
 </html>
