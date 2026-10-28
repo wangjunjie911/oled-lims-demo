@@ -10505,12 +10505,12 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
 <script src="./js/demo-announcements.js?v=1.3-spc-compare"></script>
 <script src="./vendor/echarts/echarts.min.js"></script>
 <script src="./js/spc-single-demo.js?v=2.6.1-xtao-mock"></script>
-<script src="./js/page-configs.js?v=1.77.0-lab-archive-tab-rename"></script>
+<script src="./js/page-configs.js?v=1.79.0-lab-archive-expired-no-add"></script>
 <script src="./js/mock-rows.js?v=2.54.0-type-cat"></script>
 <script src="./js/sampling-scheme-demo.js?v=1.0.3-n-lt-m"></script>
 <script src="./js/qc-spc-link.js?v=1.9.0-xtao-db"></script>
 <script src="./js/dict-catalog.js?v=1.4.0-unused-clean"></script>
-<script src="./js/page-prd-notes.js?v=1.67.0-lab-archive-lock-master"></script>
+<script src="./js/page-prd-notes.js?v=1.68.0-lab-archive-batch-input"></script>
 <script src="./js/remarks-markdown.js"></script>
 <script type="module" src="./js/remarks-mermaid-init.js"></script>
 <script src="./js/remarks-mermaid.js?v=1.4.0"></script>
@@ -10720,7 +10720,9 @@ const DEMO_CHANGE_LOG = [
   { date:'2026-10-28', module:'样品列表', where:'样品列表-新增/编辑弹窗-样品种类', text:'「样品种类」不再随「数据源=物料列表」锁定，恢复为可选可改的下拉（选物料仍自动带出，带出后允许手动修正）；样品名称 / 规格保持原锁定逻辑' },
   { date:'2026-10-28', module:'样品档案', where:'样品档案-已过期-过期处理', text:'二次确认弹窗文案改为「是否对已选择样品进行报废处理？」' },
   { date:'2026-10-28', module:'修改记录', where:'修改记录-列表条目', text:'按反馈删除 3 个模块的历史条目（图谱识别 / 漂移规则 / MSA，共 8 项），其余 10 个模块保留' },
-  { date:'2026-10-28', module:'样品档案', where:'样品档案-新增/编辑弹窗-规格/种类/计量单位', text:'所选样品带出的「样品规格 / 样品种类 / 计量单位」改为不可修改（只读灰底），样品名称仍可编辑' }
+  { date:'2026-10-28', module:'样品档案', where:'样品档案-新增/编辑弹窗-规格/种类/计量单位', text:'所选样品带出的「样品规格 / 样品种类 / 计量单位」改为不可修改（只读灰底），样品名称仍可编辑' },
+  { date:'2026-10-28', module:'样品档案', where:'样品档案-新增/编辑弹窗-批号', text:'「批号」由字典下拉改为手输并设为必填：未填时「生成条码」与保存均拦截，生成条码时按填写的批号带入条码子行' },
+  { date:'2026-10-28', module:'样品档案', where:'样品档案-已过期-工具栏', text:'「已过期」Tab 删除「新增」按钮（现为 标签打印 / 批量删除 / 过期处理），建档入口仅保留在「样品档案」Tab' }
 ];
 const INSP_SAMPLE_DEFECT_SEED_ROWS = JSON.parse(JSON.stringify((((window.WMS_MOCK_ROWS || {})['insp-sample'] || {})['finished-product'] || []).filter(r => String(r.id || '').startsWith('is-pm-dc-'))));
 const INSP_SCHEME_DEFECT_SEED_ROWS = JSON.parse(JSON.stringify((((window.WMS_MOCK_ROWS || {})['insp-scheme'] || {}).material || []).filter(r => r['方案编码'] === 'FA-DC-PRODUCT-V1')));
@@ -33054,7 +33056,7 @@ const app = createApp({
       return { ok:true, n: Number(s) };
     }
     function generateLabBarcodes(){
-      const need = ['样品编码','样品名称','样品规格','样品种类','计量单位','生成条码数','存放仓库','存放库位'];
+      const need = ['样品编码','样品名称','样品规格','样品种类','计量单位','批号','生成条码数','存放仓库','存放库位'];
       for(const k of need){
         if(!String(formModel[k]||'').trim()){ ElMessage.warning('请先填写'+k); return; }
       }
@@ -35876,6 +35878,8 @@ const app = createApp({
         const kind = String(formModel['样品种类']||'').trim();
         const unit = String(formModel['计量单位']||'').trim();
         if(!code || !name || !spec || !kind || !unit){ ElMessage.warning('请补全样品编码、名称、规格、种类和计量单位'); return; }
+        const batchNo = String(formModel['批号']||'').trim();
+        if(!batchNo){ ElMessage.warning('请填写批号'); return; }
         const qtyRaw = String(formModel['建档数量']||'').trim();
         if(qtyRaw && !/^[1-9]\d*$/.test(qtyRaw)){ ElMessage.warning('建档数量只能是正整数'); return; }
         const validityNum = String(formModel['有效期']||'').trim();
