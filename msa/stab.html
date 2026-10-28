@@ -266,10 +266,6 @@
           <div class="ro" id="eqSpec">—</div>
         </div>
         <div class="field">
-          <label>仪器量程</label>
-          <div class="ro" id="eqRange">—</div>
-        </div>
-        <div class="field">
           <label>仪器类型</label>
           <div class="ro" id="eqType">—</div>
         </div>
@@ -359,7 +355,6 @@ function syncEq() {
   var m = EQ[v];
   document.getElementById("eqNum").textContent = v || "—";
   document.getElementById("eqSpec").textContent = m ? m.spec : "—";
-  document.getElementById("eqRange").textContent = m ? m.range : "—";
   document.getElementById("eqType").textContent = m ? m.type : "—";
 }
 function closePlan() {

@@ -149,10 +149,16 @@ body{margin:0;font-family:"PingFang SC","Microsoft YaHei",Arial,sans-serif;font-
 .app-aside .el-menu-item.is-active{color:var(--color-menu-active-text);background:var(--color-menu-active-bg);font-weight:500}
 .app-aside .el-sub-menu.is-opened>.el-sub-menu__title,.app-aside .el-sub-menu.is-active>.el-sub-menu__title{color:var(--color-menu-parent-open)}
 .app-aside .el-menu-item .el-menu-tooltip__trigger,.app-aside .el-sub-menu__title{display:flex;align-items:center}
-/* 菜单标红项（红名单见 MENU_DANGER_INDEXES：样品列表/待取样任务/样品接收/样品任务分配/抽样方案；其余菜单不受影响） */
+/* 菜单标红项（红名单见 MENU_DANGER_INDEXES：样品列表/待取样任务/样品接收/样品任务分配/抽样方案；
+   以及三个模块 检验管理/测量系统分析/色谱计算 —— 命中模块时其下全部子项一并标红；其余菜单不受影响） */
 .app-aside .el-menu-item.menu-text-danger{color:var(--color-danger)}
 /* 选中 / 悬停态保持红色（EP 的 is-active 会用 --el-menu-active-color 覆盖，需显式提级） */
 .app-aside .el-menu-item.menu-text-danger.is-active,.app-aside .el-menu-item.menu-text-danger:hover{color:var(--color-danger)}
+/* 分组标题（一级/二级/三级模块）标红：特异性需与上面 is-opened 规则同级并置于其后，否则展开时被蓝字覆盖 */
+.app-aside .el-sub-menu.menu-text-danger>.el-sub-menu__title{color:var(--color-danger)}
+/* 命中红名单的分组，其下所有子项（二级/三级目录，如 报检单 / Kappa分析 / 漂移规则设置）一并为红色 */
+.app-aside .el-sub-menu.menu-text-danger .el-menu-item,
+.app-aside .el-sub-menu.menu-text-danger .el-sub-menu__title{color:var(--color-danger)}
 .menu-item-label{display:inline-flex;align-items:center;gap:0;min-width:0}
 .menu-icon{width:16px;height:16px;margin-right:8px;flex-shrink:0;stroke:currentColor;fill:none}
 .menu-badge{color:var(--color-badge);font-size:12px;margin-left:2px;font-weight:400}
@@ -185,6 +191,61 @@ body{margin:0;font-family:"PingFang SC","Microsoft YaHei",Arial,sans-serif;font-
 body.remarks-open .demo-scope-tip{display:none}
 .mode-switch{flex-shrink:0}
 .sync-chip{flex-shrink:0}
+
+/* ===== 顶栏「修改记录」入口 + 弹层（2026-10-28） =====
+   规格对齐既有顶栏控件：30px 高 / 4px 圆角 / #C5D4EB 边框 / #004098 主色，与 重置、公告铃铛 同一排 */
+.changelog-chip{
+  flex-shrink:0;display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px;
+  border:1px solid #C5D4EB;border-radius:4px;background:#fff;color:#004098;
+  font-size:12px;line-height:1;cursor:pointer;white-space:nowrap;
+}
+.changelog-chip:hover,.changelog-chip.on{border-color:#004098;background:#E8F0FA}
+.changelog-chip svg{width:14px;height:14px;display:block}
+.changelog-chip__num{
+  min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#004098;color:#fff;
+  font-size:11px;font-weight:600;line-height:18px;text-align:center;font-variant-numeric:tabular-nums;
+}
+.changelog-chip.on .changelog-chip__num{background:#00357A}
+
+.changelog-popper{padding:0!important;max-width:min(96vw,720px);border-radius:6px}
+.changelog{font-size:12px;color:#262626}
+.changelog__hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:12px 14px 10px;border-bottom:1px solid var(--color-border)}
+.changelog__title{font-size:14px;font-weight:600;color:#004098}
+.changelog__range{margin-left:8px;font-size:12px;color:#8C8C8C}
+.changelog__hd-main{min-width:0}
+.changelog__total{font-size:12px;color:#595959;white-space:nowrap;flex-shrink:0;text-align:right}
+.changelog__total b{color:#004098;font-size:13px}
+.changelog__total-sub{display:block;margin-top:2px;font-size:11px;color:#8C8C8C}
+.changelog__row{display:grid;grid-template-columns:38px 88px 146px minmax(0,1fr);gap:0 10px;align-items:start}
+.changelog__row--hd{padding:7px 14px;background:#FAFAFA;border-bottom:1px solid var(--color-border);font-size:12px;font-weight:600;color:#8C8C8C}
+.changelog__body{max-height:min(58vh,430px);overflow-y:auto;padding:0 14px}
+.changelog__body .changelog__row{padding:8px 0;border-bottom:1px dashed #F0F0F0}
+.changelog__body .changelog__row:last-child{border-bottom:0}
+.changelog__seq{color:#8C8C8C;font-variant-numeric:tabular-nums}
+.changelog__date{color:#595959;white-space:nowrap;font-variant-numeric:tabular-nums}
+.changelog__mod{color:#004098;font-weight:600;line-height:1.5;word-break:break-word;min-width:0}
+.changelog__mod-name{display:block}
+.changelog__where{display:block;margin-top:2px;font-size:11px;font-weight:400;line-height:1.45;color:#6B7C93;word-break:break-word}
+.changelog__cnt{display:inline-block;margin-left:4px;padding:0 5px;border-radius:8px;background:#E8F0FA;color:#004098;font-size:10px;font-style:normal;font-weight:600;line-height:15px;vertical-align:1px;white-space:nowrap}
+.changelog__txt{color:#595959;line-height:1.55;word-break:break-word;min-width:0}
+.changelog__item{display:flex;gap:6px}
+.changelog__item + .changelog__item{margin-top:4px;padding-top:4px;border-top:1px dotted #EDEDED}
+.changelog__item-date{flex-shrink:0;color:#A6A6A6;font-size:11px;line-height:1.7;font-variant-numeric:tabular-nums}
+.changelog__item-txt{min-width:0}
+.changelog__item-where{font-style:normal;font-weight:600;color:#004098;margin-right:6px}
+.changelog__more{margin-top:4px;padding:0;border:0;background:transparent;color:#004098;font-size:11px;line-height:1.6;cursor:pointer}
+.changelog__more:hover{color:#00357A;text-decoration:underline}
+.changelog__empty{padding:30px 20px 32px;text-align:center}
+.changelog__empty-title{font-size:13px;font-weight:600;color:#262626;margin-bottom:6px}
+.changelog__empty-sub{font-size:12px;color:#8C8C8C;line-height:1.6}
+.changelog__ft{padding:8px 14px;border-top:1px solid var(--color-border);background:#FAFAFA;font-size:11px;color:#8C8C8C;line-height:1.5}
+@media (max-width:760px){
+  .changelog__row{grid-template-columns:34px 88px minmax(0,1fr)}
+  .changelog__row--hd{display:none}
+  .changelog__txt{grid-column:2 / -1;margin-top:2px}
+  .changelog__body .changelog__row{padding:10px 0}
+}
+
 /* 移动端：侧栏抽屉 + 汉堡按钮 */
 .app-aside__toggle{display:none}
 .app-aside__mask{display:none}
@@ -747,6 +808,22 @@ body:has(.el-dialog.chrom-form-fullscreen.is-fullscreen) .remarks-toggle{visibil
 .insp-receive__info strong{font-size:13px;color:#303133;word-break:break-all}
 .insp-receive__section{margin-top:14px}
 .insp-receive__hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-size:14px;font-weight:600;color:#303133}
+/* 样品接收 · 留样新增 / 标签打印（2026-10-23）：上游单据带出信息块 + 标签预览 */
+.lab-retain__info{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 16px;padding:12px 14px;background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:4px}
+.lab-retain__info>div{display:flex;flex-direction:column;gap:4px;min-width:0}
+.lab-retain__info span{font-size:12px;color:#909399}
+.lab-retain__info strong{font-size:13px;color:#303133;word-break:break-all}
+.lab-retain__hint{font-size:12px;color:#86909C;line-height:1.5;margin-top:2px}
+.lab-retain__warn{margin-top:8px;padding:6px 10px;font-size:12px;line-height:1.5;color:#8C6D1F;background:#FFFBE6;border-left:3px solid #FAAD14;border-radius:2px}
+.lab-retain__empty{margin-top:8px;padding:16px;text-align:center;font-size:13px;color:#86909C;background:#FAFBFC;border:1px dashed var(--color-border);border-radius:4px}
+.lab-label__bar{display:flex;align-items:center;gap:12px;margin-bottom:10px;font-size:13px;color:#4E5969}
+.lab-label__count{margin-left:auto;font-size:13px;color:#1D2129}
+/* 样品档案 · 标签打印：模板下拉两段式（模板名 + 类型）与来源提示 */
+.lab-label__hint{font-size:12px;color:#86909C;line-height:1.5;margin:-2px 0 10px}
+.lab-label__opt{display:flex;align-items:center;gap:8px;width:100%}
+.lab-label__opt-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lab-label__opt-type{font-size:12px;color:#86909C;flex-shrink:0}
+@media (max-width:960px){.lab-retain__info{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 /* 仪器台账 · 新增/编辑表单：4 列栅格（对齐设计稿） */
 .el-dialog.il-form-dialog.demo-dialog--biz{max-width:min(96vw,1600px)!important}
@@ -833,9 +910,13 @@ body:has(.el-dialog.chrom-form-fullscreen.is-fullscreen) .remarks-toggle{visibil
 .spc-entry__panel{background:#fff;border:1px solid #e8ecf4;border-radius:8px;box-shadow:0 1px 2px rgba(16,38,84,.04)}
 .spc-entry__panel-title{font-size:14px;font-weight:600;color:#333e86;line-height:22px;letter-spacing:.2px}
 /* ① 检验类 */
-.spc-entry__nav{width:170px;flex:0 0 170px;display:flex;flex-direction:column;padding:12px 12px 16px;overflow-y:auto}
-.spc-entry__cat{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding:0 10px 0 12px;min-height:44px;border:1px solid #b1d1ff;border-left:4px solid #102adf;border-radius:6px;background:#ebf3ff;color:#102adf;font-size:13px;font-weight:600}
-.spc-entry__cat-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.spc-entry__nav{width:186px;flex:0 0 186px;display:flex;flex-direction:column;gap:6px;padding:12px 12px 16px;overflow-y:auto}
+.spc-entry__cat{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:0;padding:7px 10px 7px 12px;border:1px solid #e6eaf2;border-left:3px solid transparent;border-radius:6px;background:#fafbfd;color:#242526;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,border-color .15s}
+.spc-entry__cat:hover{background:#f4f7fc;border-color:#d6e2fb}
+.spc-entry__cat.is-on{border-color:#b1d1ff;border-left-color:#102adf;background:#ebf3ff;color:#102adf}
+.spc-entry__cat-name{display:flex;flex-direction:column;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.spc-entry__cat-en{font-size:10px;font-weight:400;color:#8a90a0;line-height:12px;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.spc-entry__cat.is-on .spc-entry__cat-en{color:#5b76c9}
 .spc-entry__check{width:16px;height:16px;border-radius:50%;border:1.5px solid #c3c8d2;display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:#c3c8d2;flex-shrink:0;line-height:1;background:#fff}
 .spc-entry__check.is-ok{border-color:#67c23a;color:#67c23a;background:#f0f9eb}
 .spc-entry__check.is-bad{border-color:#e6a23c;color:#e6a23c;background:#fdf6ec}
@@ -899,6 +980,23 @@ body:has(.el-dialog.chrom-form-fullscreen.is-fullscreen) .remarks-toggle{visibil
 .spc-entry-attach__name{color:#303133;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .spc-entry-attach__size{color:#909399;white-space:nowrap}
 .spc-entry-attach__empty{font-size:12px;color:#c0c4cc}
+/* 报检单「附件」字段（新增/编辑弹窗内，置于「报检备注」之前，选填） */
+.insp-order-attach{width:100%}
+.insp-order-attach__hd{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap}
+.insp-order-attach__tip{font-size:12px;color:#909399}
+.insp-order-attach__list{display:flex;flex-direction:column;gap:6px}
+.insp-order-attach__file{display:flex;align-items:center;gap:10px;font-size:12px;padding:5px 10px;background:#f5f7fa;border-radius:4px}
+.insp-order-attach__name{color:#303133;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.insp-order-attach__size{color:#909399;white-space:nowrap}
+.insp-order-attach__empty{font-size:12px;color:#c0c4cc}
+/* ④ 未匹配峰（色谱识别取数后列出） */
+.spc-entry__unmatched{flex:0 0 auto;max-height:196px;display:flex;flex-direction:column;padding:8px 14px 10px;overflow:hidden}
+.spc-entry-unmatched__src{font-size:12px;color:#8a90a0}
+.spc-entry-unmatched__body{flex:1;min-height:0;overflow:auto;margin-top:6px}
+.spc-entry-peaks{border-collapse:collapse;width:100%;font-size:12px;table-layout:fixed}
+.spc-entry-peaks th,.spc-entry-peaks td{border:1px solid #ebeef5;padding:5px 8px;color:#606266;background:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spc-entry-peaks th{background:#f5f7fa;font-weight:600;color:#909399;text-align:center;position:sticky;top:0}
+.spc-entry-peaks td.is-center{text-align:center}
 /* ===== 数据录入-按样品：快速录入弹窗（结构对齐设计稿：左检验类 + 右分组录入区） ===== */
 .qe-dialog{--qe-blue:#1d4ed8;--qe-line:#e5e7eb;--qe-line2:#f0f2f6;--qe-lab:#6b7280;--qe-txt:#111827;--qe-fs:clamp(12px,.45vw + 7.2px,14.5px);height:94vh;margin-top:3vh!important;display:flex;flex-direction:column;overflow:hidden;border-radius:4px}
 .qe-dialog .el-dialog__header{margin:0;padding:2px 16px 4px;flex:0 0 auto}
@@ -1274,7 +1372,10 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
 .de-type-panel__search{padding:10px 10px 6px;flex-shrink:0}
 .de-type-panel__search .el-input{width:100%}
 .de-type-panel__body{flex:1;min-height:0;overflow-y:auto;padding:2px 6px 12px}
-.de-type-node{padding:5px 8px;font-size:13px;line-height:20px;color:var(--color-text-normal);border-radius:4px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.de-type-node{display:flex;flex-direction:column;padding:5px 8px;font-size:13px;line-height:18px;color:var(--color-text-normal);border-radius:4px;cursor:pointer}
+.de-type-node__name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.de-type-node__en{font-size:10px;line-height:12px;color:#8a90a0;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.de-type-node.is-active .de-type-node__en{color:#5b76c9}
 .de-type-node:hover{background:var(--color-row-hover);color:var(--color-text-main)}
 .de-type-node.is-active{background:var(--color-menu-active-bg);color:var(--color-menu-active-text);font-weight:500}
 .de-type-empty{padding:16px 6px;font-size:12px;color:var(--color-text-secondary);text-align:center}
@@ -1307,7 +1408,12 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
 .page-panel--dict{flex-direction:row;align-items:stretch}
 .dict-type-panel{width:260px;flex-shrink:0;border-right:1px solid var(--color-border);display:flex;flex-direction:column;background:#fff;min-height:0}
 /* GC/LC 台账：分类名「物料编码/色谱柱型号」较长，左栏加宽 */
-/* ── GC/LC 台账：参考图排版（tab / 查询通栏，下方左分类卡片 + 右数据列表）── */
+
+
+/* GC/LC 台账：表头单元格两行（上行典型保留时间 / 下行定性结构） */
+.demo-vxe-grid .rt-head{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:1px;line-height:1.25;width:100%}
+.demo-vxe-grid .rt-head__tr{font-weight:600;color:var(--color-text-main);font-size:13px}
+.demo-vxe-grid .rt-head__st{font-size:11px;font-weight:400;color:var(--color-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .page-panel--dict.is-chrom-ledger{display:grid;grid-template-columns:300px minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr);grid-template-areas:"tabs tabs" "query query" "aside list";align-items:stretch;gap:0;background:#fff}
 .page-panel--dict.is-chrom-ledger>.dict-main{display:contents!important}
 .page-panel--dict.is-chrom-ledger .page-tabs{grid-area:tabs}
@@ -1321,7 +1427,7 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
 .chrom-cat-search{display:flex;gap:8px;align-items:center}
 .chrom-cat-search .el-input{flex:1;min-width:0}
 .chrom-cat-search .el-button{flex-shrink:0}
-/* 「新增分类」按参考图：白底 + 蓝边蓝字（覆盖 primary plain 的浅蓝填充） */
+/* 台账左栏按钮样式（历史：分类手工新增已下线，保留样式供空态按钮复用） */
 .page-panel--dict.is-chrom-ledger .dict-type-panel__hd .el-button.is-plain{background:#fff}
 
 .page-panel--dict.is-chrom-ledger .dict-type-panel{width:320px}
@@ -1818,16 +1924,16 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
       <div class="app-aside__scroll">
         <el-menu :default-active="activeMenu" :default-openeds="defaultOpeneds" background-color="#FFFFFF" text-color="#1D2129" active-text-color="#004098" @select="onSelectMenu">
           <template v-for="m1 in visibleMenu" :key="m1.index">
-            <el-sub-menu v-if="m1.children && m1.children.length" :index="m1.index">
+            <el-sub-menu v-if="m1.children && m1.children.length" :index="m1.index" :class="{ 'menu-text-danger': MENU_DANGER_INDEXES.includes(m1.index) }">
               <template #title>
                 <menu-icon :name="({ '首页':'home', '基础数据':'database', '生产管理':'grid', '质量管理':'shield', 'SPC 管理':'chart', '通知管理':'bell', '系统管理':'setting', '关于':'info' })[m1.title] || 'grid'"></menu-icon>
                 <span class="menu-item-label">{{ m1.title }}</span>
               </template>
               <template v-for="m2 in m1.children" :key="m2.index">
-                <el-sub-menu v-if="m2.children && m2.children.length" :index="m2.index">
+                <el-sub-menu v-if="m2.children && m2.children.length" :index="m2.index" :class="{ 'menu-text-danger': MENU_DANGER_INDEXES.includes(m2.index) }">
                   <template #title><span class="menu-item-label">{{ m2.title }}</span></template>
                   <template v-for="m3 in m2.children" :key="m3.index">
-                    <el-sub-menu v-if="m3.children && m3.children.length" :index="m3.index">
+                    <el-sub-menu v-if="m3.children && m3.children.length" :index="m3.index" :class="{ 'menu-text-danger': MENU_DANGER_INDEXES.includes(m3.index) }">
                       <template #title><span class="menu-item-label">{{ m3.title }}</span></template>
                       <el-menu-item v-for="leaf in m3.children" :key="leaf.index" :index="leaf.index">{{ leaf.title }}</el-menu-item>
                     </el-sub-menu>
@@ -1860,6 +1966,55 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
             <a href="./OLED_LIMS_APP_Demo.html" onclick="window.location.href=this.getAttribute('href');return false;">APP</a>
           </div>
           <button type="button" class="sync-chip" @click="resetDemoStore" title="清空 PC/APP 联动缓存，恢复初始 Mock">重置</button>
+          <el-popover v-model:visible="changeLogOpen" placement="bottom-end" :width="700" trigger="click" :show-arrow="false" popper-class="changelog-popper" :teleported="true">
+            <template #reference>
+              <button type="button" class="changelog-chip" :class="{ on: changeLogOpen }" :title="'查看修改记录（' + changeLogRows.length + ' 个模块 / ' + changeLogRawCount + ' 项改动）'">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+                <span>修改记录</span>
+                <span class="changelog-chip__num">{{ changeLogRows.length }}</span>
+              </button>
+            </template>
+            <div class="changelog">
+              <div class="changelog__hd">
+                <div class="changelog__hd-main">
+                  <span class="changelog__title">修改记录</span>
+                  <span v-if="changeLogRangeText" class="changelog__range">{{ changeLogRangeText }}</span>
+                </div>
+                <span class="changelog__total">共 <b>{{ changeLogRows.length }}</b> 条<span v-if="changeLogRawCount" class="changelog__total-sub">同模块已合并 · {{ changeLogRawCount }} 项改动</span></span>
+              </div>
+              <template v-if="changeLogRows.length">
+                <div class="changelog__row changelog__row--hd">
+                  <span>序号</span><span>时间</span><span>模块</span><span>修改内容</span>
+                </div>
+                <div class="changelog__body">
+                  <div v-for="row in changeLogRows" :key="row.module" class="changelog__row">
+                    <span class="changelog__seq">{{ row.seq }}</span>
+                    <span class="changelog__date">{{ row.date }}</span>
+                    <span class="changelog__mod">
+                      <span class="changelog__mod-name">{{ row.module }}<em v-if="row.count > 1" class="changelog__cnt">{{ row.count }} 项</em></span>
+                      <b v-if="row.where && changeLogShowWhereInColumn(row)" class="changelog__where">{{ row.where }}</b>
+                    </span>
+                    <div class="changelog__txt">
+                      <div v-for="(it, ii) in visibleChangeLogItems(row)" :key="ii" class="changelog__item">
+                        <span v-if="row.count > 1" class="changelog__item-date">{{ it.date }}</span>
+                        <span class="changelog__item-txt">
+                          <em v-if="row.count > 1 && it.where && isChangeLogExpanded(row.module)" class="changelog__item-where">{{ it.where }}</em>{{ it.text }}
+                        </span>
+                      </div>
+                      <button v-if="row.count > 1" type="button" class="changelog__more" @click="toggleChangeLogRow(row.module)">
+                        {{ isChangeLogExpanded(row.module) ? '收起' : '展开全部 ' + row.count + ' 项' }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </template>
+              <div v-else class="changelog__empty">
+                <div class="changelog__empty-title">该时间范围内暂无修改记录</div>
+                <div class="changelog__empty-sub">当前没有记录到改动。历史版本说明可在右侧「公告铃铛」中查看。</div>
+              </div>
+              <div v-if="changeLogRows.length" class="changelog__ft">同一模块的改动合并为一行，时间取该模块最新一次；模块下方为该次改动的具体页面 / 操作，行内默认显示最新项，展开后逐条显示各自位置与日期。序号按最新时间先后连续递增。</div>
+            </div>
+          </el-popover>
           <button type="button" class="announce-bell" :class="{ unread: announceUnread }" @click="openAnnounce" :title="'版本公告 ' + announceLatest">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
             <span v-if="announceUnread" class="announce-bell__dot"></span>
@@ -2097,12 +2252,11 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
           <!-- 数据字典左侧：字典类型树 -->
           <aside v-if="page.layout==='dict-split'" class="dict-type-panel">
             <div class="dict-type-panel__hd">
-              <!-- GC/LC 台账：关键字 + 查询 同行，下方整行「新增分类」（分类仅归属当前 Tab） -->
+              <!-- GC/LC 台账：关键字 + 查询同行；分类由「漂移规则设置」派生，不提供手工新增入口 -->
               <div class="chrom-cat-search" v-if="isChromLedgerPage()">
                 <el-input v-model="dictTypeKw" clearable placeholder="输入关键字" @keyup.enter="onQuery"></el-input>
                 <el-button type="primary" @click="onQuery">查询</el-button>
               </div>
-              <el-button v-if="isChromLedgerPage()" type="primary" plain style="width:100%" :title="'仅对当前 Tab（' + (currentTabLabel||'—') + '）生效' + ' · 新增分类'" @click="openChromCategoryForm">新增分类</el-button>
               <template v-if="!isChromLedgerPage()">
                 <div class="dict-type-panel__title">
                   <span>{{ dictSplitTypeLabel }}</span>
@@ -2115,7 +2269,7 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
               </template>
             </div>
             <div class="dict-type-panel__body">
-              <div v-if="!filteredDictTypeTree.length" class="dict-empty-tip">暂无匹配的{{ dictSplitTypeLabel }}</div>
+              <div v-if="!filteredDictTypeTree.length" class="dict-empty-tip">{{ isChromLedgerPage() ? '暂无可用的分类（数据来自「漂移规则设置」：物料 × 色谱柱型号）' : '暂无匹配的' + dictSplitTypeLabel }}</div>
               <template v-else>
                 <dict-type-tree-nodes
                   :nodes="filteredDictTypeTree"
@@ -2142,8 +2296,11 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
                 </el-input>
               </div>
               <div class="de-type-panel__body">
-                <div v-for="t in deTypeFiltered" :key="t" class="de-type-node" :class="{'is-active': deTypeActive===t}"
-                  :title="deTypeActive===t ? (t + '（点击取消筛选）') : t" @click="toggleDeType(t)">{{ t }}</div>
+                <div v-for="t in deTypeFiltered" :key="t.name" class="de-type-node" :class="{'is-active': deTypeActive===t.name}"
+                  :title="deTypeActive===t.name ? (t.name + '（点击取消筛选）') : t.name" @click="toggleDeType(t.name)">
+                  <span class="de-type-node__name">{{ t.name }}</span>
+                  <small v-if="t.en" class="de-type-node__en">{{ t.en }}</small>
+                </div>
                 <div v-if="!deTypeFiltered.length" class="de-type-empty">暂无匹配检验类</div>
               </div>
             </template>
@@ -2429,7 +2586,7 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
                 <span class="list-toolbar__title" v-if="pageId==='data-entry-type'">{{ currentTabLabel }}<span class="de-sel-count">已选: {{ selectedIds.length }}（当页已选: {{ dePageSelectedCount }}）</span></span>
                 <span class="list-toolbar__title" v-else-if="page.unqualifiedKind || page.deviationKind">{{ (currentTabLabel || page.title) }}已选: {{ selectedIds.length }}（当页已选: {{ selectedIds.length }}）</span>
                 <span class="list-toolbar__title" v-else-if="isChromLedgerPage()">数据列表</span>
-                <span class="list-toolbar__title" v-else>{{ page.title }}{{ currentTabLabel ? ' · ' + currentTabLabel : '' }}{{ dictTypeTitle ? ' · ' + dictTypeTitle : '' }}</span>
+                <span class="list-toolbar__title" v-else>{{ page.title }}{{ (currentTabLabel && currentTabLabel !== page.title) ? ' · ' + currentTabLabel : '' }}{{ dictTypeTitle ? ' · ' + dictTypeTitle : '' }}</span>
                 <span class="list-toolbar__sel" v-if="!page.unqualifiedKind && !page.deviationKind && pageId!=='data-entry-type' && !isChromLedgerPage()">已选: {{ selectedIds.length }}</span>
                 <span v-if="pageId==='lg-waybill-carrier'" class="list-toolbar__sel">当前登录：{{ demoCarrierDispatcher() }} · {{ demoCarrierName() }}</span>
               </div>
@@ -2499,6 +2656,12 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
               <div v-if="page.layout==='dict-split' && !dictTypeId && pageId==='dict'" class="dict-empty-tip">请先在左侧选择{{ dictSplitTypeLabel }}</div>
               <template v-else>
               <demo-vxe-grid :data="pagedData" :columns="pageId==='data-entry-type' ? deGridColumns : vxeColumns" :selected-ids="selectedIds" :cell-height="pageId==='data-entry-type' && deDense ? 30 : (pageId==='chromatography-column' ? 52 : 40)" @update:selected-ids="selectedIds=$event">
+                <template #rt_head="{ column }">
+                  <div class="rt-head">
+                    <div class="rt-head__tr">{{ column.title }}</div>
+                    <div class="rt-head__st" :title="chromLedgerRtStructureMap()[column.title] || '—'">{{ chromLedgerRtStructureMap()[column.title] || '—' }}</div>
+                  </div>
+                </template>
                 <template #tag="{ row, column }">
                   <span class="tag" :class="tagClass(displayTagValue(row, column.field))">{{ displayTagValue(row, column.field) }}</span>
                 </template>
@@ -2559,6 +2722,11 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
                 <template #manual_attach="{ row }">
                   <el-button link type="primary" @click="openManualAttachDialog(row)">管理</el-button>
                 </template>
+                <!-- 报检单「附件」列：数量入口 + 只读查看（数据按报检单号实时回查报检单，编辑请回报检单） -->
+                <template #insp_attach_link="{ row }">
+                  <el-button v-if="inspOrderAttachCount(row)" link type="primary" :title="inspOrderAttachNames(row)" @click="openInspOrderAttachView(row)">{{ inspOrderAttachCount(row) }} 个</el-button>
+                  <span v-else class="demo-readonly">—</span>
+                </template>
                 <template #kappa_appr="{ row }">
                   <span>{{ (row['评价人']||[]).join(' / ') }}</span>
                 </template>
@@ -2568,7 +2736,9 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
                 <!-- 列表字段按报检单类型动态生成（数据录入-按类型 / 样品任务分配）：
                      单元格值按 本行 → 报检单 → 取样 → 任务分配 顺序取值 -->
                 <template #dyn_cell="{ row, column }">
-                  <span v-if="dynIsTagField(column.field)" class="tag dyn-cell-tag" :class="tagClass(dynCellText(row, column.field))">{{ dynCellText(row, column.field) }}</span>
+                  <el-button v-if="column.field==='附件' && inspOrderAttachCount(row)" link type="primary" :title="inspOrderAttachNames(row)" @click="openInspOrderAttachView(row)">{{ inspOrderAttachCount(row) }} 个</el-button>
+                  <span v-else-if="column.field==='附件'" class="demo-readonly">—</span>
+                  <span v-else-if="dynIsTagField(column.field)" class="tag dyn-cell-tag" :class="tagClass(dynCellText(row, column.field))">{{ dynCellText(row, column.field) }}</span>
                   <span v-else class="dyn-cell-text" :title="dynCellText(row, column.field)">{{ dynCellText(row, column.field) }}</span>
                 </template>
                 <template #row_actions="{ row }">
@@ -2790,7 +2960,7 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
             </el-table>
           </div>
         </section>
-        <!-- 色谱判异规则：判定子规则配置 + 杂质项目维护 -->
+        <!-- 色谱判异规则：判定子规则配置 -->
         <section class="demo-form-section" v-if="pageId==='judge-rule'">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
             <h4 class="demo-form-section__title" style="margin:0"><span>判定子规则</span></h4>
@@ -2822,19 +2992,6 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
                 <el-button v-if="formMode!=='view'" link type="danger" size="small" @click="removeSubRule(row)">删除</el-button>
               </template>
             </el-table-column>
-          </el-table>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-            <h4 class="demo-form-section__title" style="margin:0"><span>杂质项目</span></h4>
-            <el-button v-if="formMode!=='view'" type="primary" size="small" @click="addJudgeImpurity">添加一行</el-button>
-          </div>
-          <el-table :data="judgeImpurityRows" border size="small" max-height="240">
-            <el-table-column type="index" label="序号" width="52"></el-table-column>
-            <el-table-column label="杂质名称" min-width="130"><template #default="{ row }"><el-input v-model="row.杂质名称" placeholder="输入" :disabled="formMode==='view'"></el-input></template></el-table-column>
-            <el-table-column label="是否已知" width="96"><template #default="{ row }"><el-select v-model="row.是否已知" :disabled="formMode==='view'" style="width:100%"><el-option label="是" value="是"></el-option><el-option label="否" value="否"></el-option></el-select></template></el-table-column>
-            <el-table-column label="典型保留时间" min-width="120"><template #default="{ row }"><el-input v-model="row.典型保留时间" placeholder="输入" :disabled="formMode==='view'"></el-input></template></el-table-column>
-            <el-table-column label="定性结构" min-width="120"><template #default="{ row }"><el-input v-model="row.定性结构" placeholder="输入" :disabled="formMode==='view'"></el-input></template></el-table-column>
-            <el-table-column label="标准品实测值S" width="120"><template #default="{ row }"><el-input v-model="row.标准品实测值S" placeholder="数字" :disabled="formMode==='view'"></el-input></template></el-table-column>
-            <el-table-column label="操作" width="64" fixed="right"><template #default="{ $index }"><el-button v-if="formMode!=='view'" link type="danger" @click="removeJudgeImpurity($index)">删除</el-button></template></el-table-column>
           </el-table>
         </section>
         <!-- Kappa分析：类别定义 -->
@@ -3126,22 +3283,8 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
                 <el-table-column label="典型保留时间" width="120">
                   <template #default="{ row }"><el-input v-model="row.典型保留时间" placeholder="输入，数字" :disabled="formMode==='view'" @input="onDriftImpurityTrInput(row)"></el-input></template>
                 </el-table-column>
-                <el-table-column label="有效取值范围（下限 ~ 上限）" min-width="240">
-                  <template #header>
-                    <div class="spec-th">
-                      <div class="spec-th__label">有效取值范围（下限 ~ 上限）</div>
-                      <div class="spec-th__tag" style="background:#e8f0fa;color:#004098">自动计算</div>
-                    </div>
-                  </template>
-                  <template #default="{ row }">
-                    <div style="display:flex;align-items:center;gap:4px">
-                      <el-input v-model="row.有效范围下限" size="small" placeholder="下限" :disabled="formMode==='view'" @input="onDriftImpurityRangeInput(row)"></el-input>
-                      <span style="color:#909399">~</span>
-                      <el-input v-model="row.有效范围上限" size="small" placeholder="上限" :disabled="formMode==='view'" @input="onDriftImpurityRangeInput(row)"></el-input>
-                    </div>
-                  </template>
-                </el-table-column>
                 <el-table-column label="定性结构" min-width="110"><template #default="{ row }"><el-input v-model="row.定性结构" placeholder="输入" :disabled="formMode==='view'"></el-input></template></el-table-column>
+                <el-table-column label="标准结果值" width="120"><template #default="{ row }"><el-input v-model="row.标准结果值" placeholder="数字" :disabled="formMode==='view'"></el-input></template></el-table-column>
                 <el-table-column label="UCL" width="96"><template #default="{ row }"><el-input v-model="row.UCL" placeholder="数字" :disabled="formMode==='view'"></el-input></template></el-table-column>
                 <el-table-column label="LCL" width="96"><template #default="{ row }"><el-input v-model="row.LCL" placeholder="数字" :disabled="formMode==='view'"></el-input></template></el-table-column>
                 <el-table-column label="操作" width="64" fixed="right"><template #default="{ $index }"><el-button v-if="formMode!=='view'" link type="danger" @click="removeDriftImpurity($index)">删除</el-button></template></el-table-column>
@@ -3618,10 +3761,10 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
   </el-dialog>
 
   <el-dialog v-model="judgeDemoVisible" class="demo-dialog--biz" :title="'判异演示 · ' + ((judgeDemoRule && judgeDemoRule['规则名称']) || '')" width="min(1100px, 96vw)" top="5vh" align-center destroy-on-close append-to-body>
-    <div style="margin-bottom:10px;font-size:12px;color:#8C8C8C">编辑样品峰面积实时重算纯度与杂质对比结论；点击「载入异常样品」演示纯度、已知杂质、新杂质三类不合格场景。</div>
+    <div style="margin-bottom:10px;font-size:12px;color:#8C8C8C">编辑样品峰面积实时按「判定子规则」重算杂质结论；点击「载入异常样品」演示已知杂质、新杂质两类不合格场景。</div>
     <el-alert :type="judgeDemoResult.allOk ? 'success' : 'error'" :closable="false" show-icon style="margin-bottom:12px"
       :title="judgeDemoResult.allOk ? '判异结论：合格（放行）' : '判异结论：不合格（拦截）'"
-      :description="judgeDemoResult.allOk ? ('纯度 ' + judgeDemoResult.purity.toFixed(4) + '% ≥ 99.99%，且全部杂质满足对应子规则。') : ('纯度 ' + judgeDemoResult.purity.toFixed(4) + '%（' + (judgeDemoResult.purityOk ? '达标' : '未达 99.99%') + '）；杂质判定见下方结论表。')"></el-alert>
+      :description="judgeDemoResult.allOk ? '全部杂质满足对应判定子规则。' : '存在杂质超出判定子规则阈值，判定明细见下方结论表。'"></el-alert>
     <div style="font-weight:600;margin-bottom:8px">① 标准品图谱（对照基准 · 只读）</div>
     <el-table :data="JUDGE_DEMO_STD" border size="small">
       <el-table-column prop="name" label="杂质名称" width="140"></el-table-column>
@@ -6983,6 +7126,26 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
             <el-input v-model="inspOrderForm.rdRemark" placeholder="请输入备注"></el-input>
           </el-form-item>
 
+          <!-- 附件（选填，全类型通用；随报检单落库，下游流转各模块按报检单号只读同步） -->
+          <el-form-item label="附件" style="grid-column: 1 / -1">
+            <div class="insp-order-attach">
+              <div class="insp-order-attach__hd">
+                <el-button size="small" plain @click="triggerInspOrderAttachUpload">上传附件</el-button>
+                <span class="insp-order-attach__tip">选填，支持 jpg/png/bmp/pdf/doc/docx/xls/xlsx，单个 ≤10MB，可多选</span>
+                <input type="file" id="insp-order-attach-input" multiple hidden accept=".jpg,.jpeg,.png,.bmp,.pdf,.doc,.docx,.xls,.xlsx" @change="onInspOrderAttachChange">
+              </div>
+              <div v-if="inspOrderForm.attachments && inspOrderForm.attachments.length" class="insp-order-attach__list">
+                <div v-for="f in inspOrderForm.attachments" :key="f.id" class="insp-order-attach__file">
+                  <span class="insp-order-attach__name" :title="f.name">{{ f.name }}</span>
+                  <span class="insp-order-attach__size">{{ f.sizeText }}</span>
+                  <el-button link size="small" @click="viewAttach(f)">查看</el-button>
+                  <el-button link type="danger" size="small" @click="removeInspOrderFormAttach(f)">删除</el-button>
+                </div>
+              </div>
+              <div v-else class="insp-order-attach__empty">暂无附件（选填）</div>
+            </div>
+          </el-form-item>
+
           <el-form-item label="报检备注" style="grid-column: 1 / -1">
             <el-input v-model="inspOrderForm.remark" type="textarea" :rows="2" placeholder="请输入报检申请说明、特殊加急需求或取样要求"></el-input>
           </el-form-item>
@@ -7210,6 +7373,15 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
           <strong style="color:#004098">{{ activeInspOrderRow['外检单位'] || '—' }}</strong>
         </div>
 
+        <!-- 附件（只读）：随报检单同步至各流转模块 -->
+        <div v-if="inspOrderAttachCount(activeInspOrderRow)" style="margin-top:10px; font-size:12px; color:#1e293b; background:#f0f9ff; padding:6px 12px; border-radius:4px; display:flex; align-items:center; gap:10px; flex-wrap:wrap">
+          <span style="color:#64748b">附件：</span>
+          <strong style="color:#004098">{{ inspOrderAttachCount(activeInspOrderRow) }} 个</strong>
+          <el-button link type="primary" size="small" @click="openInspOrderAttachView(activeInspOrderRow)">查看附件</el-button>
+          <span style="color:#94a3b8; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:720px" :title="inspOrderAttachNames(activeInspOrderRow)">{{ inspOrderAttachNames(activeInspOrderRow) }}</span>
+        </div>
+        <div v-else style="margin-top:10px; font-size:12px; color:#94a3b8; background:#f8fafc; padding:6px 12px; border-radius:4px">附件：—</div>
+
         <!-- 额外说明信息（复核或关闭信息） -->
         <div v-if="activeInspOrderRow['复核人']&&activeInspOrderRow['复核人']!=='—'" style="margin-top:10px; font-size:12px; color:#065f46; background:#ecfdf5; padding:6px 12px; border-radius:4px">
           <span>复核信息：</span>由 <strong>{{ activeInspOrderRow['复核人'] }}</strong> 于 {{ activeInspOrderRow['复核时间'] }} 复核；复核说明：{{ activeInspOrderRow['复核说明'] }}
@@ -7338,6 +7510,53 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
           <span>共 {{ (filteredSamples || []).length }} 条记录</span>
         </div>
       </div>
+
+      <!-- 4. 留样信息（只读；质检取样「是否留样 = 否」时整区不渲染）
+              状态列 = 实验室 / 样品接收的接收状态，两处共用 MOCK['lab-receive'] 同一批记录，天然同步 -->
+      <template v-if="inspOrderRetainVisible">
+        <div style="display:flex; align-items:center; gap:10px; margin:18px 0 12px; padding-bottom:6px; border-bottom:2px solid #004098">
+          <span style="font-size:16px; font-weight:bold; color:#004098">留样信息</span>
+          <span style="font-size:12px; color:#94a3b8">只读，接收状态与「实验室管理 / 样品接收」同步</span>
+        </div>
+        <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; padding:14px">
+          <el-table :data="inspOrderRetainRows" border stripe size="small" style="width:100%" max-height="260"
+            empty-text="暂无留样记录：质检取样选择「是否留样 = 是」并提交后生成">
+            <el-table-column prop="状态" label="状态" width="92" align="center" fixed="left">
+              <template #default="{ row }">
+                <el-tag :type="row['状态']==='已接收'?'success':(row['状态']==='已驳回'?'info':'warning')" size="small">{{ row['状态'] || '—' }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="条码号" label="条码号" width="135"></el-table-column>
+            <el-table-column prop="样品编码" label="样品编码" width="120" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="样品名称" label="样品名称" min-width="150" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="样品规格" label="样品规格" min-width="140" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="样品种类" label="样品种类" width="120" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="建档数量" label="留样数量" width="90" align="center"></el-table-column>
+            <el-table-column prop="计量单位" label="计量单位" width="90" align="center"></el-table-column>
+            <el-table-column prop="批号" label="批号" width="115"></el-table-column>
+            <el-table-column prop="取样日期" label="取样日期" width="110" align="center"></el-table-column>
+            <el-table-column prop="有效期展示" label="有效期" width="90" align="center">
+              <template #default="{ row }">{{ row['有效期展示'] || row['有效期'] || '—' }}</template>
+            </el-table-column>
+            <el-table-column prop="失效日期" label="失效日期" width="110" align="center">
+              <template #default="{ row }">{{ row['失效日期'] || '—' }}</template>
+            </el-table-column>
+            <el-table-column prop="存放仓库" label="存放仓库" min-width="140" show-overflow-tooltip>
+              <template #default="{ row }">{{ row['存放仓库'] || '—' }}</template>
+            </el-table-column>
+            <el-table-column prop="存放库位" label="存放库位" min-width="140" show-overflow-tooltip>
+              <template #default="{ row }">{{ row['存放库位'] || '—' }}</template>
+            </el-table-column>
+            <el-table-column prop="备注" label="备注" min-width="130" show-overflow-tooltip>
+              <template #default="{ row }">{{ row['备注'] || '—' }}</template>
+            </el-table-column>
+          </el-table>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; font-size:12px; color:#64748b">
+            <span>留样记录按创建时间倒序展示，表体超出高度可滚动查看</span>
+            <span>共 {{ inspOrderRetainRows.length }} 条留样记录</span>
+          </div>
+        </div>
+      </template>
     </div>
     <template #footer>
       <el-button type="primary" @click="inspOrderDetailModalVisible=false">关 闭</el-button>
@@ -7353,12 +7572,17 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
       </div>
     </template>
     <div v-if="activeSampleRow" class="spc-entry">
-      <!-- ① 检验类（左栏） -->
+      <!-- ① 检验项目类（左栏） -->
       <aside v-show="!inspSampleFullscreen" class="spc-entry__panel spc-entry__nav">
-        <div class="spc-entry__panel-title">检验类</div>
-        <div class="spc-entry__cat">
-          <span class="spc-entry__cat-name">{{ activeSampleRow._inspCategory || 'SPC气相杂质类' }}</span>
-          <span class="spc-entry__check" :class="inspSampleCatCheckClass">✓</span>
+        <div class="spc-entry__panel-title">检验项目类</div>
+        <div v-for="cat in inspSampleCategories" :key="cat.name"
+          class="spc-entry__cat" :class="{ 'is-on': inspSampleActiveCat === cat.name }"
+          @click="selectInspSampleCat(cat.name)">
+          <span class="spc-entry__cat-name">
+            {{ cat.name }}
+            <small v-if="cat.en" class="spc-entry__cat-en">{{ cat.en }}</small>
+          </span>
+          <span class="spc-entry__check" :class="inspSampleCatCheckClass(cat.name)">✓</span>
         </div>
       </aside>
 
@@ -7409,11 +7633,11 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
           <!-- ② 检验项目（中栏） -->
           <aside class="spc-entry__panel spc-entry__items">
             <div class="spc-entry__panel-title">检验项目</div>
-            <div v-for="item in (activeSampleRow._inspItems || [])" :key="item.id"
+            <div v-for="item in inspSampleCatItems" :key="item.id"
               class="spc-entry__item" :class="{ 'is-on': inspSampleActiveItemId===item.id }"
               @click="scrollToInspItem(item.id)">
               <div class="spc-entry__item-hd">
-                <span class="spc-entry__item-name">{{ item.name }}</span>
+                <span class="spc-entry__item-name" :title="item.name">{{ item.name }}</span>
                 <span class="spc-entry__check" :class="inspSampleItemCheckClass(item)">✓</span>
               </div>
               <div class="spc-entry__item-val" :class="{ 'is-bad': item.result==='不合格' }">
@@ -7427,7 +7651,7 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
             <section class="spc-entry__panel spc-entry__bar">
               <div class="spc-entry__bar-item">
                 <span>检验方法</span>
-                <el-select v-model="inspSampleMethod" placeholder="请选择" style="width:200px" clearable filterable>
+                <el-select v-model="inspSampleMethod" placeholder="请选择" style="width:230px" clearable filterable :title="inspSampleMethod">
                   <el-option v-for="m in inspSampleMethodOptions" :key="m.value" :label="m.label" :value="m.value"></el-option>
                 </el-select>
               </div>
@@ -7457,7 +7681,7 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
             </section>
 
             <section class="spc-entry__panel spc-entry__cards">
-              <div v-for="item in (activeSampleRow._inspItems || [])" :key="item.id"
+              <div v-for="item in inspSampleCatItems" :key="item.id"
                 :id="'insp-card-' + item.id" class="spc-entry-card">
                 <div class="spc-entry-card__hd">
                   <span class="spc-entry-card__tag" :class="{ 'is-qual': item.type==='定性' }">{{ item.type || '定量' }}</span>
@@ -7469,8 +7693,8 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
                   <span class="spc-entry-card__spec" :title="'指标: ' + inspSampleSpecText(item)">指标: {{ inspSampleSpecText(item) }}</span>
                 </div>
                 <div class="spc-entry-card__bd">
-                  <template v-if="inspSampleHasParams && item.type!=='定性'">
-                    <div class="spc-entry-card__params-title">样本参数 · {{ (item.sampleParams && item.sampleParams.length) ? item.sampleParams.length : 3 }} 项</div>
+                  <template v-if="item.type!=='定性' && inspSampleParamRowsOf(item).length">
+                    <div class="spc-entry-card__params-title">样本参数 · {{ inspSampleParamRowsOf(item).length }} 项</div>
                     <table class="spc-entry-param">
                       <thead>
                         <tr>
@@ -7480,14 +7704,14 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
                         </tr>
                       </thead>
                       <tbody>
-                        <tr v-for="param in inspSampleParamRows" :key="param.code">
+                        <tr v-for="param in inspSampleParamRowsOf(item)" :key="param.code">
                           <td>
-                            <span class="spc-entry-code">{{ param.code }}</span>
+                            <span v-if="param.code" class="spc-entry-code">{{ param.code }}</span>
                             <span>{{ param.name }}</span>
                           </td>
                           <td class="is-center">{{ param.formula || '—' }}</td>
                           <td v-for="n in inspSampleTestCount" :key="n">
-                            <el-input v-model="item[param.field + n]" placeholder="请输入" size="small" @input="onParamCellChange(item)"></el-input>
+                            <el-input v-model="item[param.field + n]" placeholder="请输入" size="small" @input="onInspSampleParamCellChange(item, param)"></el-input>
                           </td>
                         </tr>
                       </tbody>
@@ -7548,6 +7772,36 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
             </section>
           </div>
         </div>
+
+        <!-- ④ 未匹配峰（色谱识别取数后单独列出：台账中「定性结构」为空的峰） -->
+        <section v-if="inspUnmatchedPeaks.length" class="spc-entry__panel spc-entry__unmatched">
+          <div class="spc-entry__info-hd">
+            <span class="spc-entry__panel-title">未匹配峰 · {{ inspUnmatchedPeaks.length }} 条</span>
+            <span class="spc-entry-unmatched__src">{{ inspUnmatchedPeakSource }}（定性结构为空）</span>
+          </div>
+          <div class="spc-entry-unmatched__body">
+            <table class="spc-entry-peaks">
+              <thead>
+                <tr>
+                  <th style="width:70px">序号</th>
+                  <th style="width:130px">保留时间</th>
+                  <th style="width:130px">峰面积</th>
+                  <th style="width:130px">峰面积%</th>
+                  <th style="width:130px">峰高</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="p in inspUnmatchedPeaks" :key="p.seq">
+                  <td class="is-center">{{ p.seq }}</td>
+                  <td class="is-center">{{ p.tr }}</td>
+                  <td class="is-center">{{ p.area }}</td>
+                  <td class="is-center">{{ dePeakPctText(p) }}</td>
+                  <td class="is-center">{{ p.height }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
       </div>
     </div>
     <template #footer>
@@ -7559,6 +7813,30 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
     </template>
   </el-dialog>
 
+
+  <!-- ===== 报检单附件（只读）：报检单列表 / 待取样 / 样品接收 / 复核等页面共用 ===== -->
+  <el-dialog v-model="inspOrderAttachViewVisible" :title="inspOrderAttachViewTitle" width="min(780px, 94vw)" top="8vh" align-center destroy-on-close append-to-body>
+    <div v-if="inspOrderAttachViewRow">
+      <div style="font-size:13px;color:#64748b;margin-bottom:10px">
+        报检单号：<strong>{{ inspOrderAttachViewRow['报检单号'] || '—' }}</strong>　物料：<strong>{{ inspOrderAttachViewRow['物料名称'] || '—' }}</strong>　报检批号：<strong>{{ inspOrderAttachViewRow['报检批号'] || '—' }}</strong>
+      </div>
+      <el-table :data="inspOrderAttachViewFiles" border size="small" max-height="440" empty-text="该报检单未上传附件">
+        <el-table-column type="index" label="序号" width="60"></el-table-column>
+        <el-table-column prop="name" label="附件名称" min-width="220" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="sizeText" label="大小" width="100"></el-table-column>
+        <el-table-column prop="time" label="上传时间" width="170"></el-table-column>
+        <el-table-column label="操作" width="80">
+          <template #default="{ row }">
+            <el-button link type="primary" size="small" @click="viewAttach(row)">查看</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div style="font-size:12px;color:#c0c4cc;margin-top:8px">数据来源：报检单「附件」字段（选填），各流转模块按报检单号只读同步，新增/修改请回「报检单」办理</div>
+    </div>
+    <template #footer>
+      <el-button @click="inspOrderAttachViewVisible=false">关闭</el-button>
+    </template>
+  </el-dialog>
 
   <!-- ===== 样品检验台账: 检验附件只读汇总弹窗 ===== -->
   <el-dialog v-model="inspAttachDialogVisible" title="检验附件（只读汇总）" width="min(780px, 94vw)" top="8vh" align-center destroy-on-close append-to-body>
@@ -7604,6 +7882,16 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
           </template>
         </el-table-column>
       </el-table>
+      <!-- 报检单附件（只读）：随报检单同步，避免与本行手动上传附件混淆 -->
+      <div v-if="inspOrderAttachCount(attachDialogRow)" style="margin-top:14px">
+        <div style="font-size:13px;color:#64748b;margin-bottom:6px">报检单附件（随报检单同步 · 只读）</div>
+        <el-table :data="inspOrderAttachFiles(attachDialogRow)" border size="small" max-height="220">
+          <el-table-column type="index" label="序号" width="60"></el-table-column>
+          <el-table-column prop="name" label="附件名称" min-width="200" show-overflow-tooltip></el-table-column>
+          <el-table-column prop="sizeText" label="大小" width="100"></el-table-column>
+          <el-table-column prop="time" label="上传时间" width="170"></el-table-column>
+        </el-table>
+      </div>
     </div>
     <template #footer>
       <el-button @click="manualAttachDialogVisible=false">关闭</el-button>
@@ -8144,7 +8432,7 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
       <el-descriptions :column="4" border size="small">
         <el-descriptions-item label="计划编号">{{ stabRow['计划编号'] }}</el-descriptions-item>
         <el-descriptions-item label="仪器">{{ stabRow['仪器名称'] }} / {{ stabRow['仪器编号'] }}</el-descriptions-item>
-        <el-descriptions-item label="规格 / 量程">{{ stabRow['规格型号'] }} / {{ stabRow['量程'] }}</el-descriptions-item>
+        <el-descriptions-item label="仪器规格">{{ stabRow['规格型号'] }}</el-descriptions-item>
         <el-descriptions-item label="仪器类型">{{ stabRow['仪器类型'] }}</el-descriptions-item>
         <el-descriptions-item label="检测项目">{{ stabRow['检测项目'] }}</el-descriptions-item>
         <el-descriptions-item label="测量参数">{{ stabRow['测量参数'] }}</el-descriptions-item>
@@ -8274,11 +8562,11 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
       <el-descriptions :column="4" border size="small">
         <el-descriptions-item label="计划编号">{{ linRow['计划编号'] }}</el-descriptions-item>
         <el-descriptions-item label="仪器">{{ linRow['仪器名称'] }} / {{ linRow['仪器编号'] }}</el-descriptions-item>
-        <el-descriptions-item label="规格 / 量程">{{ linRow['规格型号'] }} / {{ linRow['量程'] }}</el-descriptions-item>
+        <el-descriptions-item label="仪器规格">{{ linRow['规格型号'] }}</el-descriptions-item>
         <el-descriptions-item label="仪器类型">{{ linRow['仪器类型'] }}</el-descriptions-item>
         <el-descriptions-item label="检测项目">{{ linRow['检测项目'] }}</el-descriptions-item>
         <el-descriptions-item label="测量人">{{ linRow['测量人'] }}</el-descriptions-item>
-        <el-descriptions-item label="检验项目数量">5</el-descriptions-item>
+        <el-descriptions-item label="样品数量">5</el-descriptions-item>
         <el-descriptions-item label="试验次数">{{ linRow['试验次数'] }}</el-descriptions-item>
         <el-descriptions-item label="测量日期">{{ linRow['测量日期'] }}</el-descriptions-item>
         <el-descriptions-item label="5 件基准值" :span="3">{{ (linRow.parts||[]).map(p=>p.x).join('、') }}</el-descriptions-item>
@@ -8729,6 +9017,105 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
     <template #footer>
       <el-button @click="labReceiveVisible=false">取消</el-button>
       <el-button type="primary" @click="confirmLabReceive">接收</el-button>
+    </template>
+  </el-dialog>
+
+  <!-- 样品接收 · 留样新增：选择上游取样单据 → 自动带出样品信息 → 生成留样（状态 待接收） -->
+  <el-dialog v-model="labRetainAddVisible" class="demo-dialog--biz lab-retain-dialog" title="留样新增" width="min(880px, 96vw)" top="8vh" align-center destroy-on-close append-to-body :close-on-click-modal="false">
+    <el-form label-width="96px">
+      <el-form-item label="上游单据" required>
+        <el-select v-model="labRetainForm.orderKey" filterable clearable placeholder="请选择已取样件的报检单" style="width:100%" @change="onLabRetainOrderChange">
+          <el-option v-for="o in labRetainUpstreamOptions" :key="o.key" :label="o.label" :value="o.key"></el-option>
+        </el-select>
+        <div class="lab-retain__hint">上游口径：待取样任务中「已取样件数 &gt; 0」的报检单，同一单号去重；已留样件数从可留样件数中扣减。</div>
+      </el-form-item>
+    </el-form>
+    <div v-if="labRetainOrder" class="lab-retain__info">
+      <div><span>报检单号</span><strong>{{ labRetainOrder['报检单号'] || '—' }}</strong></div>
+      <div><span>报检批号</span><strong>{{ labRetainOrder['报检批号'] || '—' }}</strong></div>
+      <div><span>物料编码</span><strong>{{ labRetainOrder['物料编码'] || '—' }}</strong></div>
+      <div><span>物料名称</span><strong>{{ labRetainOrder['物料名称'] || '—' }}</strong></div>
+      <div><span>物料规格</span><strong>{{ labRetainOrder['物料规格'] || '—' }}</strong></div>
+      <div><span>物料种类</span><strong>{{ labRetainOrder['物料种类'] || '—' }}</strong></div>
+      <div><span>已取样件数</span><strong>{{ labRetainOrder['已取样件数'] }} 件</strong></div>
+      <div><span>已留样件数</span><strong>{{ (labRetainOrder['已取样件数'] || 0) - labRetainAvailable }} 件</strong></div>
+    </div>
+    <div v-else class="lab-retain__empty">请先选择上游单据，系统将按单据信息自动带出样品信息</div>
+    <el-form v-if="labRetainOrder" label-width="96px" style="margin-top:12px">
+      <div class="demo-form-grid">
+        <el-form-item label="留样件数" required>
+          <el-input-number v-model="labRetainForm.count" :min="1" :max="Math.max(1, labRetainAvailable)" controls-position="right" style="width:100%"></el-input-number>
+        </el-form-item>
+        <el-form-item label="可留样件数">
+          <el-input :model-value="String(labRetainAvailable) + ' 件'" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="取样日期">
+          <el-input v-model="labRetainForm.takeDate" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="创建后打印">
+          <el-checkbox v-model="labRetainForm.printAfter">立即打印标签</el-checkbox>
+        </el-form-item>
+        <el-form-item label="备注" class="span-2">
+          <el-input v-model="labRetainForm.remark" type="textarea" :rows="2" maxlength="100" show-word-limit placeholder="选填，写入留样记录备注"></el-input>
+        </el-form-item>
+      </div>
+      <div class="lab-retain__warn" v-if="labRetainNoMaster">未匹配到样品主数据（基础数据 / 样品档案），样品编码与有效期按上游物料信息带出，不影响创建。</div>
+    </el-form>
+    <template #footer>
+      <el-button @click="labRetainAddVisible=false">取消</el-button>
+      <el-button type="primary" @click="confirmLabRetainAdd">确定新增</el-button>
+    </template>
+  </el-dialog>
+
+  <!-- 样品接收 · 标签打印：按勾选样品生成标签预览（演示打印回执，不落业务数据） -->
+  <el-dialog v-model="labLabelVisible" class="demo-dialog--biz lab-label-dialog" title="标签打印" width="min(920px, 96vw)" top="8vh" align-center destroy-on-close append-to-body>
+    <div class="lab-label__bar">
+      <span>标签模板：留样标签（100mm × 60mm）</span>
+      <span class="lab-label__count">共 {{ labLabelRows.length }} 张</span>
+    </div>
+    <el-table :data="labLabelRows" border size="small" class="demo-data-table" max-height="380" empty-text="请先在列表勾选需要打印标签的样品">
+      <el-table-column type="index" label="序号" width="58"></el-table-column>
+      <el-table-column prop="条码号" label="条码号" min-width="140"></el-table-column>
+      <el-table-column prop="样品名称" label="样品名称" min-width="150"></el-table-column>
+      <el-table-column prop="样品规格" label="样品规格" min-width="140"></el-table-column>
+      <el-table-column prop="批号" label="批号" width="120"></el-table-column>
+      <el-table-column prop="取样日期" label="取样日期" width="110"></el-table-column>
+      <el-table-column prop="报检单单号" label="报检单号" width="130"></el-table-column>
+      <el-table-column prop="份数" label="份数" width="70"></el-table-column>
+    </el-table>
+    <template #footer>
+      <el-button @click="labLabelVisible=false">取消</el-button>
+      <el-button type="primary" :disabled="!labLabelRows.length" @click="confirmLabLabelPrint">打印</el-button>
+    </template>
+  </el-dialog>
+
+  <!-- 样品档案 · 标签打印：先选「基础标签配置」中的标签模板，再打印勾选条码（演示打印回执，不写业务数据） -->
+  <el-dialog v-model="labArchiveLabelVisible" class="demo-dialog--biz lab-label-dialog" title="标签打印" width="min(920px, 96vw)" top="8vh" align-center destroy-on-close append-to-body>
+    <div class="lab-label__bar">
+      <span>标签模板</span>
+      <el-select v-model="labArchiveLabelTemplate" filterable clearable placeholder="请选择基础标签配置中的标签模板" style="width:340px">
+        <el-option v-for="t in labArchiveLabelTemplates" :key="t.名称" :label="t.名称" :value="t.名称">
+          <span class="lab-label__opt">
+            <span class="lab-label__opt-name">{{ t.名称 }}</span>
+            <span class="lab-label__opt-type">{{ t.类型 }}</span>
+          </span>
+        </el-option>
+      </el-select>
+      <span class="lab-label__count">共 {{ labArchiveLabelRows.length }} 张</span>
+    </div>
+    <div class="lab-label__hint">模板来源：基础数据 › 基础标签配置，仅列「样品标签」类型的启用模板。未在列表勾选时，请先勾选需要打印的条码。</div>
+    <el-table :data="labArchiveLabelRows" border size="small" class="demo-data-table" max-height="380" empty-text="请先在列表勾选需要打印标签的条码">
+      <el-table-column type="index" label="序号" width="58"></el-table-column>
+      <el-table-column prop="条码号" label="条码号" min-width="150"></el-table-column>
+      <el-table-column prop="样品编码" label="样品编码" min-width="120"></el-table-column>
+      <el-table-column prop="样品名称" label="样品名称" min-width="150" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="样品规格" label="样品规格" min-width="130" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="批号" label="批号" width="110"></el-table-column>
+      <el-table-column prop="失效日期" label="失效日期" width="110"></el-table-column>
+    </el-table>
+    <template #footer>
+      <el-button @click="labArchiveLabelVisible=false">取消</el-button>
+      <el-button type="primary" :disabled="!labArchiveLabelRows.length || !labArchiveLabelTemplate" @click="confirmLabArchiveLabelPrint">打印</el-button>
     </template>
   </el-dialog>
 
@@ -9512,7 +9899,7 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
     <div v-if="activeSampleRow" style="text-align:center; padding:20px 10px">
       <div style="font-size:42px; margin-bottom:12px">⚠️</div>
       <div style="font-size:14px; color:#334155; margin-bottom:10px">当前样品未完成全部检验项录入，确认提前结束录入？</div>
-      <div style="font-size:13px; color:#94a3b8">{{ activeSampleRow['样品编号'] }} · {{ activeSampleRow._inspCategory || 'SPC气相杂质类' }}</div>
+      <div style="font-size:13px; color:#94a3b8">{{ activeSampleRow['样品编号'] }} · {{ activeSampleRow._inspCategory || '外观' }}</div>
     </div>
     <template #footer>
       <el-button @click="inspSampleEndEntryVisible=false">取消</el-button>
@@ -10118,12 +10505,12 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
 <script src="./js/demo-announcements.js?v=1.3-spc-compare"></script>
 <script src="./vendor/echarts/echarts.min.js"></script>
 <script src="./js/spc-single-demo.js?v=2.6.1-xtao-mock"></script>
-<script src="./js/page-configs.js?v=1.68.1-pending-sample-row-op-label"></script>
-<script src="./js/mock-rows.js?v=2.43.0-spectrum-demo-rows"></script>
+<script src="./js/page-configs.js?v=1.77.0-lab-archive-tab-rename"></script>
+<script src="./js/mock-rows.js?v=2.54.0-type-cat"></script>
 <script src="./js/sampling-scheme-demo.js?v=1.0.3-n-lt-m"></script>
 <script src="./js/qc-spc-link.js?v=1.9.0-xtao-db"></script>
 <script src="./js/dict-catalog.js?v=1.4.0-unused-clean"></script>
-<script src="./js/page-prd-notes.js?v=1.49.0-spectrum-demo-rows"></script>
+<script src="./js/page-prd-notes.js?v=1.67.0-lab-archive-lock-master"></script>
 <script src="./js/remarks-markdown.js"></script>
 <script type="module" src="./js/remarks-mermaid-init.js"></script>
 <script src="./js/remarks-mermaid.js?v=1.4.0"></script>
@@ -10233,9 +10620,108 @@ const CFG = window.WMS_PAGE_CONFIGS || { menu:[], pages:{} };
 /* 列表行操作折叠阈值（全站统一）：有效按钮数 > ROW_OP_FOLD_THRESHOLD 时，仅直显前 ROW_OP_INLINE_MAX 个，其余进「更多」下拉 */
 const ROW_OP_FOLD_THRESHOLD = 3;
 const ROW_OP_INLINE_MAX = 2;
+/* ===== 数据录入（按样品 / 按类型）检验项目类 + 检验项目 + 指标 配置 =====
+   来源：主人 2026-10-26 提供的《检验项目 / 放行标准 Specification》表格。
+   映射口径：
+     一级「检验项目类」= 左栏分组（外观 / 含量(HPLC) / DSC / 金属离子含量 / 卤素含量）；
+     二级「检验项目」 = 中栏条目（金属离子、卤素在原表中为带子项的主项，此处把子项拆成可独立录入的检验项目）；
+     指标（放行标准）= 右栏卡片「指标」文本，严格按原表文案展示（≤500(ppb)、≥99.9%、Tm: 288.5±2.0°C (onset) 等）。
+   注意：usl/lsl/target 仅用于自动判定，展示一律以 spec 原文为准。 */
+const DE_INSP_TREE = [
+  { cat: '外观', catEn: 'Appearance', method: '目视外观检验', items: [
+    { name: '外观', type: '定性', unit: '', spec: '白色粉末', options: ['白色粉末', '异常'], passValues: ['白色粉末'] }
+  ]},
+  { cat: '含量（HPLC）', catEn: 'purity', method: '高效液相色谱法（HPLC）', paramMode: 'hplc',
+    paramRows: [
+      { code: 'RT', name: '保留时间', formula: '', field: '_paramRT_' },
+      { code: 'A',  name: '峰面积',   formula: '', field: '_paramA_' },
+      { code: 'A%', name: '峰面积%',  formula: '', field: '_paramAP_', sync: true }
+    ],
+    items: [
+    { name: '含量（HPLC）', type: '定量', unit: '%', spec: '≥99.9%', lsl: 99.9, decimals: 2 }
+  ]},
+  { cat: 'DSC', catEn: 'Thermal analysis', method: '差示扫描量热法（DSC）', items: [
+    { name: 'DSC', type: '定量', unit: '°C', spec: 'Tm: 288.5±2.0°C (onset)', target: 288.5, lsl: 286.5, usl: 290.5, decimals: 1 }
+  ]},
+  { cat: '金属离子含量', catEn: 'Metal ion content', paramMode: 'result', method: 'ICP-MS 电感耦合等离子体质谱法', items: [
+    { name: 'Li', type: '定量', unit: 'ppb', spec: '≤500(ppb)', usl: 500 },
+    { name: 'Mg', type: '定量', unit: 'ppb', spec: '≤500(ppb)', usl: 500 },
+    { name: 'K',  type: '定量', unit: 'ppb', spec: '≤500(ppb)', usl: 500 },
+    { name: 'Ca', type: '定量', unit: 'ppb', spec: '≤500(ppb)', usl: 500 },
+    { name: 'Cr', type: '定量', unit: 'ppb', spec: '≤500(ppb)', usl: 500 },
+    { name: 'Fe', type: '定量', unit: 'ppb', spec: '≤500(ppb)', usl: 500 },
+    { name: 'Ni', type: '定量', unit: 'ppb', spec: '≤500(ppb)', usl: 500 },
+    { name: 'Cu', type: '定量', unit: 'ppb', spec: '≤500(ppb)', usl: 500 },
+    { name: 'Pd', type: '定量', unit: 'ppb', spec: '≤500(ppb)', usl: 500 },
+    { name: 'Ag', type: '定量', unit: 'ppb', spec: '≤500(ppb)', usl: 500 },
+    { name: 'Sn', type: '定量', unit: 'ppb', spec: '≤500(ppb)', usl: 500 },
+    { name: 'Ba', type: '定量', unit: 'ppb', spec: '≤500(ppb)', usl: 500 },
+    { name: 'SUM（除K、Ca、Fe）', type: '定量', unit: 'ppb', spec: '≤1000(ppb)', usl: 1000 }
+  ]},
+  { cat: '卤素含量', catEn: 'Halogen content', paramMode: 'result', method: '离子色谱法（IC）', items: [
+    { name: 'F',  type: '定量', unit: 'ppm', spec: '≤2.0(ppm)', usl: 2.0, decimals: 1 },
+    { name: 'Cl', type: '定量', unit: 'ppm', spec: '≤2.0(ppm)', usl: 2.0, decimals: 1 },
+    { name: 'Br', type: '定量', unit: 'ppm', spec: '≤1.0(ppm)', usl: 1.0, decimals: 1 },
+    { name: 'I',  type: '定量', unit: 'ppm', spec: '≤1.0(ppm)', usl: 1.0, decimals: 1 }
+  ]}
+];
+/* 该配置结构版本号：行数据 _inspItems 不匹配时按本配置重建（保留同名旧录入值）
+   2026-10-27：金属离子 / 卤素的样本参数改为「只录结果值」，版本号随之升级以触发重建 */
+const DE_INSP_CFG_VER = 'release-std-20261027-hplc';
 /* 左侧菜单标红模块（需重点关注的样品流转环节）：样品列表 / 待取样任务 / 样品接收 / 样品任务分配；
-   sampling-scheme（抽样方案）为既有标红项，一并纳入统一配置，避免分散硬编码 */
-const MENU_DANGER_INDEXES = ['lab-sample', 'pending-sample', 'sample-receive', 'sample-assign', 'sampling-scheme'];
+   sampling-scheme（抽样方案）为既有标红项，一并纳入统一配置，避免分散硬编码；
+   2026-10-23 追加三个分组标题：检验管理（质量管理下的二级分组）/ 测量系统分析 / 色谱计算 */
+const MENU_DANGER_INDEXES = ['lab-sample', 'pending-sample', 'sample-receive', 'sample-assign', 'sampling-scheme',
+  'g-质量管理/检验管理', 'g-MSA测量系统分析', 'g-色谱计算'];
+/* ===== DEMO 修改记录（2026-10-23 上周五 ~ 2026-10-28）=====
+   用途：顶栏「修改记录」入口的数据源，按时间先后展示每次改动的模块与内容。
+   数据来源：项目开发日志（.workbuddy/memory/2026-10-23.md / 10-26.md / 10-27.md）
+   与本目录 .backup-<主题>-<时间戳>/ 改动前快照，逐条对应实际发生的改动，未做推测补写。
+   ★ 维护约定（2026-10-28 主人定）：每完成一次修改就往数组里**追加一条**，不手工合并、不覆盖旧条目。
+     界面侧 changeLogRows 会按 module 自动归并成一行，时间取该模块**最新**那次，展开后按日期列出全部子项；
+     因此这里只负责"如实流水"，合并口径改动只调 computed，不动数据。
+     module 取值请复用既有标签以保证归并生效：图谱识别 / 待取样任务 / 漂移规则 / 样品接收 / 判异规则 /
+     GC/LC 台账 / 侧栏菜单 / 报检单 / 数据录入 / MSA / 样品档案 / 样品列表 / 基础标签配置。
+     where 必填：具体到某个按钮或页面区域，用「页面-位置」串起来，例如「物料列表-新增」
+     「报检单-检验详情-原始记录」「漂移规则-编辑弹窗-标准结果值」；不要只写大类。 */
+const DEMO_CHANGE_LOG = [
+  { date:'2026-10-23', module:'待取样任务', where:'待取样任务-行操作', text:'行操作按钮「质检取样」改为「取样」，同步 HTML 分发分支避免点击落到兜底提示' },
+  { date:'2026-10-23', module:'样品接收', where:'样品接收-工具栏 / 行操作', text:'行操作新增「驳回」，工具栏新增「标签打印 / 留样新增」并支持关联上游单据生成样品信息' },
+  { date:'2026-10-23', module:'判异规则', where:'判异规则-编辑弹窗', text:'删除「纯度判定 / 杂质对比判定 / 杂质项目」三块，仅保留基础信息与判定子规则' },
+  { date:'2026-10-23', module:'GC/LC 台账', where:'GC/LC 台账-规则保存联动', text:'漂移规则保存后自动同步台账分类与表头列，同步异常不阻断规则保存' },
+  { date:'2026-10-23', module:'侧栏菜单', where:'侧栏菜单-分组标题', text:'「检验管理 / 测量系统分析 / 色谱计算」三个分组标题标红，统一走红名单配置' },
+  { date:'2026-10-23', module:'报检单', where:'报检单-检验详情-留样信息', text:'详情弹窗「样品信息」下方新增只读「留样信息」区域，随留样状态自动展示或隐藏' },
+  { date:'2026-10-23', module:'侧栏菜单', where:'侧栏菜单-子项', text:'标红向下传染至分组下全部子项，选中态不再被主色蓝字覆盖' },
+  { date:'2026-10-23', module:'GC/LC 台账', where:'GC/LC 台账-页签映射', text:'判异规则新增「规则分类 / 使用检验类型」字段，台账按规则映射页签与数据' },
+  { date:'2026-10-23', module:'报检单', where:'报检单-检验详情-留样信息', text:'「留样信息」区域补齐 13 个报检单类型演示数据（共 24 条，含 1 条已驳回）' },
+  { date:'2026-10-23', module:'GC/LC 台账', where:'GC/LC 台账-左栏分类', text:'左栏分类改为漂移规则派生（物料 × 色谱柱型号），下线「新增分类」入口' },
+  { date:'2026-10-23', module:'GC/LC 台账', where:'GC/LC 台账-页签', text:'页签固定 13 个不随规则裁剪，未被规则引用的页签保留并显示「暂无数据」' },
+  { date:'2026-10-23', module:'GC/LC 台账', where:'GC/LC 台账-列表列', text:'列表改为「序号 | 批号 | 两行内容列」（上行典型保留时间 / 下行定性结构）' },
+  { date:'2026-10-26', module:'GC/LC 台账', where:'GC/LC 台账-表头', text:'典型保留时间与定性结构移到表头两行展示，数据行只保留数值，取消逐行重复文本' },
+  { date:'2026-10-26', module:'侧栏菜单', where:'侧栏菜单-顶部标题', text:'隐藏侧栏顶部「奥来德_LIMS_DEMO」标题（保留 DOM 与样式，可随时恢复）' },
+  { date:'2026-10-26', module:'数据录入', where:'数据录入-检验项目类 / 项目 / 指标', text:'检验项目类 / 检验项目 / 指标按《放行标准 Specification》重构：5 类、金属离子 13 项、卤素 4 项' },
+  { date:'2026-10-27', module:'数据录入', where:'数据录入-弹窗-样本参数', text:'金属离子 / 卤素的样本参数改为只录「结果值」，检验结果取多次录入的均值' },
+  { date:'2026-10-27', module:'数据录入', where:'数据录入-弹窗-检验方法', text:'检验方法改为按检验项目类绑定，切换检验类时自动切换对应方法' },
+  { date:'2026-10-27', module:'数据录入', where:'数据录入-弹窗-含量（HPLC）参数', text:'含量（HPLC）参数改为 保留时间 / 峰面积 / 峰面积%，结果取面积归一化纯度' },
+  { date:'2026-10-27', module:'数据录入', where:'数据录入（按类型）-左栏 / 列表列', text:'「按类型」页左栏统一为 5 类检验类，列表一度改为检验项目维度并重写 13 个页签列' },
+  { date:'2026-10-27', module:'数据录入', where:'数据录入（按类型）-列表', text:'按类型列表回退为样品行 + 全量上游字段，撤销上一版的列改造' },
+  { date:'2026-10-27', module:'数据录入', where:'数据录入（按类型）-检验类名称列', text:'「检验类名称」统一为 5 类口径，左栏点击即按该字段筛选列表' },
+  { date:'2026-10-27', module:'数据录入', where:'数据录入-弹窗-检验项目类', text:'录入弹窗「检验项目类」按行收窄，仅显示该行所属类别，其余不显示' },
+  { date:'2026-10-27', module:'数据录入', where:'数据录入-弹窗-图谱识别取数', text:'色谱识别取数改为从 GC/LC 台账取数，并新增未匹配峰列表（序号 / 保留时间 / 峰面积 / 峰面积% / 峰高）' },
+  { date:'2026-10-28', module:'报检单', where:'报检单-检验详情-附件', text:'新增「附件」选填字段（多文件上传 / 查看 / 删除），位置在「报检备注」之前、13 个报检类型通用；列表与下游流转模块（待取样任务 / 样品接收 / 样品任务分配 / 数据录入-按类型 / 待复核报检单 / 样品检验台账）按报检单号只读同步「N 个」入口' },
+  { date:'2026-10-28', module:'样品档案', where:'样品档案-列表列 / 查询 / 编辑表单', text:'列表删除「使用状态」列（全部 / 已过期两个 Tab），查询条件与编辑表单该字段暂留' },
+  { date:'2026-10-28', module:'样品档案', where:'样品档案-列表列（状态）', text:'「状态」列前移到「条码号」之前并固定左侧，两个 Tab 列序一致' },
+  { date:'2026-10-28', module:'样品档案', where:'样品档案-工具栏-标签打印', text:'工具栏「新增」前新增「标签打印」：弹窗内选择基础标签配置的启用模板（默认优先样品类），按勾选条码打印并给出演示回执' },
+  { date:'2026-10-28', module:'基础标签配置', where:'基础标签配置-类型 / 模板', text:'基础标签配置补「样品标签」类型与 2 个启用模板（样品留样标签 / 样品条码小标签），供样品档案标签打印选用' },
+  { date:'2026-10-28', module:'样品档案', where:'样品档案-使用状态下线', text:'「使用状态」整体下线：查询条件、编辑表单、列表精确匹配一并移除，接收与编辑保存不再写入该字段（历史数据字段保留不展示）' },
+  { date:'2026-10-28', module:'样品档案', where:'样品档案-标签打印-模板下拉', text:'「标签打印」模板下拉限定为「样品标签」类型的启用模板，不再列出仪器 / 试剂等其它类型' },
+  { date:'2026-10-28', module:'样品档案', where:'样品档案-主 Tab', text:'主 Tab 由「全部」改名「样品档案」，并下线该 Tab 的「过期处理」按钮（过期处理保留在「已过期」Tab）' },
+  { date:'2026-10-28', module:'样品档案', where:'样品档案-已过期-过期处理', text:'「已过期」Tab 的「过期处理」落地：弹窗二次确认后把过期样品状态置为「报废」，勾选优先、未勾选按当前全部过期件处理' },
+  { date:'2026-10-28', module:'样品列表', where:'样品列表-新增/编辑弹窗-样品种类', text:'「样品种类」不再随「数据源=物料列表」锁定，恢复为可选可改的下拉（选物料仍自动带出，带出后允许手动修正）；样品名称 / 规格保持原锁定逻辑' },
+  { date:'2026-10-28', module:'样品档案', where:'样品档案-已过期-过期处理', text:'二次确认弹窗文案改为「是否对已选择样品进行报废处理？」' },
+  { date:'2026-10-28', module:'修改记录', where:'修改记录-列表条目', text:'按反馈删除 3 个模块的历史条目（图谱识别 / 漂移规则 / MSA，共 8 项），其余 10 个模块保留' },
+  { date:'2026-10-28', module:'样品档案', where:'样品档案-新增/编辑弹窗-规格/种类/计量单位', text:'所选样品带出的「样品规格 / 样品种类 / 计量单位」改为不可修改（只读灰底），样品名称仍可编辑' }
+];
 const INSP_SAMPLE_DEFECT_SEED_ROWS = JSON.parse(JSON.stringify((((window.WMS_MOCK_ROWS || {})['insp-sample'] || {})['finished-product'] || []).filter(r => String(r.id || '').startsWith('is-pm-dc-'))));
 const INSP_SCHEME_DEFECT_SEED_ROWS = JSON.parse(JSON.stringify((((window.WMS_MOCK_ROWS || {})['insp-scheme'] || {}).material || []).filter(r => r['方案编码'] === 'FA-DC-PRODUCT-V1')));
 const MOCK = window.WMS_MOCK_ROWS || {};
@@ -10243,14 +10729,45 @@ const MOCK = window.WMS_MOCK_ROWS || {};
 (function clearStaleMockCache(){
   try{
     var MK = 'wms-demo-mock-v5-xtao-db', VK = 'wms-demo-mock-shape-ver';
-if(localStorage.getItem(VK) !== 'spectrum-demo-rows-20261023'){
+if(localStorage.getItem(VK) !== 'type-cat-20261027'){
     localStorage.removeItem(MK);
-    localStorage.setItem(VK, 'spectrum-demo-rows-20261023');
+    localStorage.setItem(VK, 'type-cat-20261027');
   }
   }catch(e){ /* 隐私模式等场景忽略 */ }
 })();
 const STORE = window.WMS_DEMO_STORE;
 if(STORE) STORE.hydrateMock(MOCK);
+/* 基础标签配置「样品标签」演示数据自愈：原数据只覆盖仪器/钢瓶/试剂/试液/标准物质，样品类模板缺失，
+   而样品档案的「标签打印」需要能选到样品类模板。幂等：按模板名判断，已存在则跳过。 */
+(function seedTagConfigSampleTemplates(){
+  const bag = MOCK['tag-config'] || (MOCK['tag-config'] = {});
+  if(!Array.isArray(bag.types)) bag.types = [];
+  if(!Array.isArray(bag.main)) bag.main = [];
+  const TYPE = '样品标签';
+  let changed = false;
+  if(!bag.types.some(t => t && t['名称'] === TYPE)){
+    bag.types.push({ id:'bt-007', 编码:TYPE, 名称:TYPE, 上级字典:'', 备注:'样品档案 / 留样管理', 系统开发:false, 分组节点:false });
+    changed = true;
+  }
+  [
+    { id:'tag-010', name:'样品留样标签', memo:'条码 + 样品信息' },
+    { id:'tag-011', name:'样品条码小标签', memo:'仅条码号' }
+  ].forEach(t => {
+    if(bag.main.some(r => r && r['基础标签模板名称'] === t.name)) return;
+    bag.main.push({
+      id: t.id,
+      typeId: 'bt-007',
+      基础标签模板名称: t.name,
+      基础标签类型: TYPE,
+      启用状态: '启用',
+      备注: t.memo,
+      创建人: '张三',
+      创建时间: '2026-10-28 09:00:00'
+    });
+    changed = true;
+  });
+  if(changed && STORE && STORE.saveMockSilent) STORE.saveMockSilent(MOCK);
+})();
 (function seedInstrumentLedger(){
   const seed = (window.WMS_MOCK_ROWS || {})['instrument-ledger'];
   if(!seed || !seed.main || !seed.main.length) return;
@@ -10259,6 +10776,58 @@ if(STORE) STORE.hydrateMock(MOCK);
   MOCK['instrument-ledger'] = JSON.parse(JSON.stringify(seed));
   if(STORE && STORE.saveMockSilent) STORE.saveMockSilent(MOCK);
   else if(STORE && STORE.saveMock) STORE.saveMock(MOCK);
+})();
+/* 报检单「附件」演示数据自愈：老 localStorage 缓存不含 报检附件 字段，按结构补齐。
+   仅为演示观感——每个报检类型保留「有附件 / 无附件」两种形态，验证列表与下游同步逻辑。
+   只在字段缺失时写入，不覆盖用户手工上传的附件；文件名按 报检单号 派生以保证稳定。 */
+(function seedInspOrderAttachments(){
+  const bag = MOCK['insp-order'] || {};
+  const DOCS = {
+    'purchase-incoming': ['供应商质检报告COA.pdf', '装箱单.jpg'],
+    'finished-mix': ['混样配比记录.xlsx', '混样前批次追溯表.pdf'],
+    'finished-product': ['成品出厂检验委托单.pdf', '成品外观照片.jpg'],
+    'made-product': ['工序流转卡.jpg', '过程巡检记录.xlsx'],
+    'customer-recycle': ['回收料交接单.pdf', '回收料外观确认.jpg'],
+    'customer-return': ['客户投诉与退货单.pdf', '退货实物照片.jpg'],
+    'retain-sample': ['留样复检申请单.pdf'],
+    'heat-resistance': ['耐热试验委托单.pdf', '耐热周期确认表.xlsx'],
+    'rd-test': ['实验记录扫描件.pdf', '送检清单.xlsx'],
+    'in-wh-recheck': ['库存复检申请单.pdf'],
+    'general': ['送检说明.pdf'],
+    'small-sample': ['小样送检单.pdf', '钢瓶编号清单.xlsx'],
+    'external': ['外检委托单.pdf', '钢瓶检验记录.jpg']
+  };
+  const SIZES = [1284.5, 862.0, 156.2, 2048.0];
+  let changed = false;
+  Object.keys(bag).forEach(tabName=>{
+    const list = bag[tabName];
+    if(!Array.isArray(list)) return;
+    const names = DOCS[tabName] || DOCS['general'];
+    list.forEach((r, idx)=>{
+      if(!r) return;
+      if(Array.isArray(r['报检附件'])) return;      // 已有字段（含空数组）则保持原样
+      // idx % 3 === 0 → 2 个；=== 1 → 1 个；其余 → 0 个（保留无附件单据用于对照）
+      const take = (idx % 3 === 0) ? Math.min(2, names.length) : ((idx % 3 === 1) ? 1 : 0);
+      const no = String(r['报检单号'] || '').trim();
+      const time = String(r['报检时间'] || '').trim() || '2026-10-01 09:00:00';
+      const files = [];
+      for(let i = 0; i < take; i++){
+        const kb = SIZES[(idx + i) % SIZES.length];
+        files.push({
+          id: 'ioatt-seed-' + (no || idx) + '-' + i,
+          name: (no ? (no + '_') : '') + names[i],
+          size: Math.round(kb * 1024),
+          sizeText: kb >= 1024 ? (kb / 1024).toFixed(2) + ' MB' : kb.toFixed(1) + ' KB',
+          ext: (names[i].split('.').pop() || '').toLowerCase(),
+          time: time,
+          source: '报检单上传'
+        });
+      }
+      r['报检附件'] = files;
+      changed = true;
+    });
+  });
+  if(changed && STORE && STORE.saveMockSilent) STORE.saveMockSilent(MOCK);
 })();
 (function normalizeChromColumnModels(){
   const bag = MOCK['chromatography-column'] || {};
@@ -10705,7 +11274,7 @@ const app = createApp({
     const driftFilterMax = ref('');
     const driftMatRows = ref([]);
     const driftColRows = ref([]);
-    const newDriftImpurity = () => ({ 是否主峰: '否', 典型保留时间: '', 有效范围下限: '', 有效范围上限: '', 定性结构: '', UCL: '', LCL: '' });
+    const newDriftImpurity = () => ({ 是否主峰: '否', 典型保留时间: '', 有效范围下限: '', 有效范围上限: '', 定性结构: '', 标准结果值: '', UCL: '', LCL: '' });
     const newDriftMat = () => ({ 物料编码: '', 物料名称: '' });
     const newDriftCol = () => ({ 色谱柱型号: '' });
     const addDriftImpurity = () => { driftImpurityRows.value.push(newDriftImpurity()); };
@@ -10825,6 +11394,7 @@ const app = createApp({
             上限: hi==null ? tr + d.hi : hi,
             是否主峰: x.是否主峰==='是',
             定性结构: x.定性结构 || '',
+            标准结果值: String(x.标准结果值 || '').trim(),
             UCL: x.UCL || '', LCL: x.LCL || ''
           };
         })
@@ -11278,13 +11848,7 @@ const app = createApp({
     }
 
     // ===== 色谱判异规则（judge-rule）=====
-    const judgeImpurityRows = ref([]);
-    const newJudgeImpurity = () => ({ 杂质名称:'', 是否已知:'是', 典型保留时间:'', 定性结构:'', '标准品实测值S':'' });
-    const addJudgeImpurity = () => { judgeImpurityRows.value.push(newJudgeImpurity()); };
-    const removeJudgeImpurity = (i) => { judgeImpurityRows.value.splice(i,1); };
-    function resetJudgeForm(){
-      judgeImpurityRows.value = [newJudgeImpurity(), newJudgeImpurity()];
-    }
+    // 说明：判异口径仅保留「判定子规则」；纯度判定、杂质对比判定与杂质项目维护已移除
 
     // ===== 色谱数据台账（chrom-ledger）=====
     const CHROM_LEDGER_RT_LIST = ['1.142','2.142','3.142','4.142','5.156','7.652','8.186'];
@@ -11297,6 +11861,243 @@ const app = createApp({
       if(dim==='峰面积&保留时间') return (v.a!=null && v.t!=null) ? (v.a + '（' + v.t + '）') : '—';
       return v.a != null ? v.a : '—';
     }
+
+    /* ===== 漂移规则 → GC/LC 台账 联动（分类 + 表头） ===== */
+    function chromLedgerTabDefs(){ return (((CFG.pages || {})['insp-order'] || {}).tabs) || []; }
+
+    // 台账页签：由「启用 + 规则分类=GC/LC」的判异规则所用「使用检验类型」决定数量/名称/顺序
+    function chromLedgerPageTabs(){
+      const pid = pageId.value;
+      const defs = chromLedgerTabDefs();
+      if(pid !== 'chrom-ledger-gc' && pid !== 'chrom-ledger-lc') return defs;
+      storeTick.value;
+      const want = pid === 'chrom-ledger-gc' ? 'GC' : 'LC';
+      const used = new Set();
+      (((MOCK['judge-rule'] || {}).main) || []).forEach(r=>{
+        if(String(r['启用状态'] || '启用') !== '启用') return;
+        const cat = String(r['规则分类'] || '').trim().toUpperCase();
+        if(cat !== want) return;
+        splitDun(r['使用检验类型']).forEach(lb=> used.add(lb));
+      });
+      const hit = defs.filter(t=> used.has(t.label)).map(t=> ({ name: t.name, label: t.label }));
+      // 兜底：该分类下无启用规则 / 规则未填使用检验类型 / 值全非法 → 回退全部基础页签，保证页面可用
+      return hit.length ? hit : defs.map(t=> ({ name: t.name, label: t.label }));
+    }
+
+    // GC/LC 台账左栏分类：完全由漂移规则派生（一个物料 + 一个色谱柱型号 = 一行）
+    function chromLedgerDerivedTypes(pid, tab){
+      const want = pid === 'chrom-ledger-gc' ? 'GC' : 'LC';
+      const t = String(tab || '').trim();
+      {
+        const out = [];
+        (((MOCK['drift-rule'] || {}).main) || []).forEach(r=>{
+          if(String(r['启用状态'] || '启用') !== '启用') return;
+          if(String(r['规则分类'] || '').trim().toUpperCase() !== want) return;
+          chromLedgerCatsOfRule(r).forEach(c=>{
+            const id = 'rtcat::' + c.物料编码 + '::' + c.色谱柱型号;
+            if(out.some(x=> x.id === id)) return;
+            out.push({
+              id, tab: t,
+              编码: c.物料编码, 名称: c.名称, 上级字典: '', 备注: '', 系统开发: false, 分组节点: false,
+              物料编码: c.物料编码, 物料名称: c.物料名称, 物料规格: c.物料规格, 色谱柱型号: c.色谱柱型号,
+              ruleCode: String(r['规则编码'] || ''), ruleName: String(r['规则名称'] || ''),
+            });
+          });
+        });
+        return out;
+      }
+    }
+    function chromLedgerPageByRuleCategory(cat){
+      const c = String(cat || '').trim().toUpperCase();
+      if(c === 'GC') return 'chrom-ledger-gc';
+      if(c === 'LC') return 'chrom-ledger-lc';
+      return '';
+    }
+    // 规则的「适用物料 × 色谱柱型号」展开为台账分类（名称＝物料编码/型号；无型号时退化为物料编码）
+    function chromLedgerCatsOfRule(rule){
+      const mats = (Array.isArray(rule && rule._mats) ? rule._mats : [])
+        .filter(m=> String((m || {})['物料编码'] || '').trim());
+      const models = (Array.isArray(rule && rule._columns) ? rule._columns : [])
+        .map(c=> String((c || {})['色谱柱型号'] || '').trim()).filter(Boolean);
+      const matList = ((MOCK['mat-list'] || {}).main) || [];
+      const out = [];
+      mats.forEach(m=>{
+        const code = String(m['物料编码'] || '').trim();
+        const master = matList.find(r=> String(r['物料编码'] || '') === code) || {};
+        (models.length ? models : ['']).forEach(md=>{
+          out.push({
+            物料编码: code,
+            物料名称: String(m['物料名称'] || master['物料名称'] || '').trim(),
+            物料规格: String(master['物料规格'] || '').trim(),
+            色谱柱型号: md,
+            名称: md ? (code + '/' + md) : code,
+          });
+        });
+      });
+      return out;
+    }
+    // 规则「使用检验类型」→ 台账页签；为空 / 匹配不到时覆盖全部页签
+    function chromLedgerTabsOfRule(rule){
+      const defs = chromLedgerTabDefs();
+      const used = String((rule && rule['使用检验类型']) || '').split(/[、,，]/).map(s=> s.trim()).filter(Boolean);
+      if(!used.length) return { tabs: defs.map(t=> t.name), fallbackAll: true };
+      const hit = defs.filter(t=> used.includes(t.label)).map(t=> t.name);
+      return { tabs: hit.length ? hit : defs.map(t=> t.name), fallbackAll: !hit.length };
+    }
+    // 同步分类：新增 / 更新 / 清理（编辑后不再命中的旧分类、规则改分类后的另一页旧分类）
+    function syncChromLedgerByRule(rule){
+      const res = { pageId:'', added:0, updated:0, removed:0, tabs:0, note:'' };
+      if(!rule) return res;
+      const pid = chromLedgerPageByRuleCategory(rule['规则分类']);
+      const ruleCode = String(rule['规则编码'] || '').trim() || String(rule['规则名称'] || '').trim();
+      // 规则改分类（GC↔LC）时，先清掉另一个台账页里属于本规则的分类
+      ['chrom-ledger-gc', 'chrom-ledger-lc'].forEach(other=>{
+        if(other === pid) return;
+        const bag = MOCK[other];
+        if(!bag || !Array.isArray(bag.types)) return;
+        const before = bag.types.length;
+        bag.types = bag.types.filter(t=> String(t.ruleCode || '') !== ruleCode);
+        res.removed += before - bag.types.length;
+      });
+      if(!pid){
+        res.note = '规则分类为「' + (String(rule['规则分类'] || '').trim() || '未设置') + '」，仅 GC / LC 分类会同步到台账';
+        return res;
+      }
+      res.pageId = pid;
+      const cats = chromLedgerCatsOfRule(rule);
+      if(!cats.length){
+        res.note = '规则未配置「适用物料」，无法生成台账分类';
+        return res;
+      }
+      const bag = MOCK[pid] = MOCK[pid] || {};
+      const types = bag.types = bag.types || [];
+      const tabInfo = chromLedgerTabsOfRule(rule);
+      // 只写入当前台账实际展示的页签（页签由判异规则的检验类型决定），避免分类落到不可见页签
+      const visible = chromLedgerPageTabs().map(t=> t.name);
+      const realTabs = tabInfo.tabs.filter(n=> visible.includes(n));
+      if(!realTabs.length){
+        res.note = '规则的「使用检验类型」与当前台账页签（由判异规则决定）无交集，未生成分类';
+        return res;
+      }
+      tabInfo.tabs = realTabs;
+      res.tabs = realTabs.length;
+      const prefix = pid === 'chrom-ledger-gc' ? 'gc' : 'lc';
+      const want = new Set(cats.map(c=> c.物料编码 + '|' + c.色谱柱型号));
+      const stamp = Date.now();
+      tabInfo.tabs.forEach(tab=>{
+        for(let i = types.length - 1; i >= 0; i--){
+          const t = types[i];
+          if(String(t.tab || '') !== tab) continue;
+          if(String(t.ruleCode || '') !== ruleCode) continue;
+          if(!want.has(String(t.物料编码 || '') + '|' + String(t.色谱柱型号 || ''))){ types.splice(i, 1); res.removed++; }
+        }
+        cats.forEach((c, ci)=>{
+          const hit = types.find(t=> String(t.tab || '') === tab
+            && String(t.物料编码 || '') === c.物料编码
+            && String(t.色谱柱型号 || '') === c.色谱柱型号);
+          if(hit){
+            Object.assign(hit, {
+              编码: c.物料编码, 名称: c.名称,
+              物料名称: c.物料名称 || hit.物料名称 || '',
+              物料规格: c.物料规格 || hit.物料规格 || '',
+              ruleCode, ruleName: String(rule['规则名称'] || ''),
+            });
+            res.updated++;
+          } else {
+            types.push({
+              id: 'cc-' + prefix + '-' + tab + '-' + ruleCode + '-' + stamp + '-' + ci,
+              tab,
+              编码: c.物料编码, 名称: c.名称,
+              上级字典: '', 备注: '', 系统开发: false, 分组节点: false,
+              物料编码: c.物料编码, 物料名称: c.物料名称, 物料规格: c.物料规格, 色谱柱型号: c.色谱柱型号,
+              ruleCode, ruleName: String(rule['规则名称'] || ''),
+            });
+            res.added++;
+          }
+        });
+      });
+      return res;
+    }
+    // 表头：当前台账页 + 当前 tab 下命中规则的典型保留时间（升序去重）；无明细回退默认 7 列
+    function chromLedgerRtList(){
+      const pid = pageId.value;
+      if(pid !== 'chrom-ledger-gc' && pid !== 'chrom-ledger-lc') return CHROM_LEDGER_RT_LIST.slice();
+      storeTick.value;                                  // 规则增删改后随 storeTick 重算列
+      const want = pid === 'chrom-ledger-gc' ? 'GC' : 'LC';
+      const tab = String(activeTab.value || '').trim();
+      const set = new Set();
+      (((MOCK['drift-rule'] || {}).main) || []).forEach(r=>{
+        if(String(r['规则分类'] || '').trim().toUpperCase() !== want) return;
+        if(String(r['启用状态'] || '启用') !== '启用') return;
+        const tabInfo = chromLedgerTabsOfRule(r);
+        if(tab && tabInfo.tabs.length && !tabInfo.tabs.includes(tab)) return;
+        (Array.isArray(r._impurities) ? r._impurities : []).forEach(x=>{
+          const tr = driftNum(x && x['典型保留时间']);
+          if(tr != null) set.add(tr.toFixed(3));
+        });
+      });
+      const arr = Array.from(set).sort((a, b)=> Number(a) - Number(b));
+      return arr.length ? arr : CHROM_LEDGER_RT_LIST.slice();
+    }
+
+    // 台账行 → 命中的漂移规则明细（多条规则纵向分组：上行典型保留时间 / 下行定性结构）
+    function chromLedgerRowRtPairs(row){
+      const pid = pageId.value;
+      if(pid !== 'chrom-ledger-gc' && pid !== 'chrom-ledger-lc') return [];
+      const want = pid === 'chrom-ledger-gc' ? 'GC' : 'LC';
+      const matName = String((row || {})['物料名称'] || '').trim();
+      const matList = ((MOCK['mat-list'] || {}).main) || [];
+      const matCode = (matList.find(m=> String(m['物料名称'] || '') === matName) || {})['物料编码'] || '';
+      const out = [];
+      (((MOCK['drift-rule'] || {}).main) || []).forEach(r=>{
+        if(String(r['启用状态'] || '启用') !== '启用') return;
+        if(String(r['规则分类'] || '').trim().toUpperCase() !== want) return;
+        const mats = (Array.isArray(r._mats) ? r._mats : []).map(x=> String((x||{})['物料编码'] || ''));
+        if(mats.length){
+          if(!matCode || !mats.includes(matCode)) return;
+        }
+        const imps = (Array.isArray(r._impurities) ? r._impurities : []).filter(x=> x && String(x['典型保留时间'] || '').trim());
+        if(!imps.length) return;
+        out.push({
+          ruleCode: String(r['规则编码'] || ''),
+          ruleName: String(r['规则名称'] || ''),
+          trs: imps.map(x=> String(x['典型保留时间']).trim()),
+          structures: imps.map(x=> String(x['定性结构'] || '').trim()),
+        });
+      });
+      return out;
+    }
+
+    // 表头用：典型保留时间 → 定性结构（取「启用 + 规则分类=GC/LC」规则的 _impurities，先到先得）
+    function chromLedgerRtStructureMap(){
+      const pid = pageId.value;
+      if(pid !== 'chrom-ledger-gc' && pid !== 'chrom-ledger-lc') return {};
+      storeTick.value;
+      const want = pid === 'chrom-ledger-gc' ? 'GC' : 'LC';
+      const map = {};
+      (((MOCK['drift-rule'] || {}).main) || []).forEach(r=>{
+        if(String(r['启用状态'] || '启用') !== '启用') return;
+        if(String(r['规则分类'] || '').trim().toUpperCase() !== want) return;
+        (Array.isArray(r._impurities) ? r._impurities : []).forEach(x=>{
+          const tr = driftNum(x && x['典型保留时间']);
+          if(tr == null) return;
+          const key = tr.toFixed(3);
+          const st = String((x && x['定性结构']) || '').trim();
+          if(!(key in map) || (!map[key] && st)) map[key] = st;
+        });
+      });
+      return map;
+    }
+    // 行高：按最多「规则分组数」撑开，避免两行内容被裁剪
+    const chromLedgerPairsCellHeight = computed(()=>{
+      if(!isChromLedgerPage()) return 40;
+      let maxGroups = 1;
+      (tableData.value || []).forEach(r=>{
+        const n = chromLedgerRowRtPairs(r).length;
+        if(n > maxGroups) maxGroups = n;
+      });
+      return Math.max(64, maxGroups * 52 + 12);
+    });
     // ===== GC/LC 台账 · 左侧分类（物料编码 / 色谱柱型号）=====
     // 分类即 MOCK[pageId].types 的一条，名称展示为「物料编码/色谱柱型号」；台账行用 typeId 归属分类
     const chromCategoryVisible = ref(false);
@@ -11463,9 +12264,6 @@ const app = createApp({
       const peaks = judgeDemoPeaks.value;
       const active = subRules.value.filter(r=>r.enabled).slice().sort((a,b)=>a.order-b.order);
       const total = peaks.reduce((s,p)=> s + (Number(p.峰面积)||0), 0);
-      const main = peaks.find(p=> p.是否主峰==='是');
-      const purity = main ? (Number(main.峰面积)||0)/total*100 : 0;
-      const purityOk = purity >= 99.99;
       const rows = peaks.filter(p=> p.是否主峰!=='是').map(p=>{
         const content = total ? (Number(p.峰面积)||0)/total*100 : 0;
         const absent = !(Number(p.峰面积)>0);
@@ -11487,8 +12285,8 @@ const app = createApp({
         }
         return { ...p, _content: content.toFixed(4), _rule: rule, _ok: ok, _verdict: verdict };
       });
-      const allOk = purityOk && rows.every(r=> r._ok);
-      return { purity, purityOk, rows, allOk };
+      const allOk = rows.every(r=> r._ok);
+      return { rows, allOk };
     });
     function openJudgeDemo(row){
       judgeDemoRule.value = row;
@@ -12933,6 +13731,55 @@ const app = createApp({
       announceOpen.value = false;
       try{ localStorage.setItem(ANNOUNCE_DISMISS_KEY, announceLatest); }catch(e){}
     }
+    /* ===== 修改记录（顶栏入口）：按模块归并、时间取最新、序号连续递增 =====
+       与「版本公告」分工：公告 = 里程碑/可开发口径；修改记录 = 每次改动的流水，只读、不做已读状态。
+       归并口径（2026-10-28 主人定）：相同 module 汇总为一行，行时间取该模块最新一次改动日期；
+       行内保留全部子项（按日期升序），默认只展开最新 1 项，可「展开全部 N 项」查看历史。
+       定位口径（2026-10-28 主人追加）：模块列必须落到**具体按钮或页面**（where，如「报检单-检验详情-原始记录」），
+       不在大类层面止步；折叠态显示最新子项的 where，展开态每条子项各带自己的 where 并隐藏列上的 where，避免重复。 */
+    const changeLogOpen = ref(false);
+    const changeLogExpanded = ref([]);
+    const changeLogRawCount = (typeof DEMO_CHANGE_LOG !== 'undefined' ? DEMO_CHANGE_LOG.length : 0);
+    const changeLogRows = computed(()=>{
+      const raw = (typeof DEMO_CHANGE_LOG !== 'undefined' ? DEMO_CHANGE_LOG : []).slice()
+        .sort((a, b)=> String(a.date).localeCompare(String(b.date)));
+      const bag = new Map();
+      raw.forEach(r=>{
+        const mod = String(r.module || '').trim() || '其他';
+        if(!bag.has(mod)) bag.set(mod, { module: mod, date: String(r.date || ''), items: [] });
+        const g = bag.get(mod);
+        if(String(r.date || '') > g.date) g.date = String(r.date || '');   /* 行时间 = 最新一次 */
+        g.items.push({ date: String(r.date || ''), where: String(r.where || ''), text: String(r.text || '') });
+      });
+      /* 按最新时间升序；同日保持首次出现顺序（Map 插入序 + 稳定排序） */
+      const list = [...bag.values()].sort((a, b)=> a.date < b.date ? -1 : (a.date > b.date ? 1 : 0));
+      return list.map((g, i)=>{
+        const latest = g.items[g.items.length - 1] || {};
+        return { seq: i + 1, date: g.date, module: g.module, where: latest.where || g.module,
+                 items: g.items, count: g.items.length };
+      });
+    });
+    function isChangeLogExpanded(mod){ return changeLogExpanded.value.indexOf(mod) >= 0; }
+    function toggleChangeLogRow(mod){
+      const i = changeLogExpanded.value.indexOf(mod);
+      if(i >= 0) changeLogExpanded.value.splice(i, 1);
+      else changeLogExpanded.value.push(mod);
+    }
+    function visibleChangeLogItems(row){
+      const items = (row && row.items) || [];
+      if(!items.length) return [];
+      return isChangeLogExpanded(row.module) ? items : [items[items.length - 1]];
+    }
+    /* 折叠时 where 显示在模块列；展开后逐条显示，列上不再重复 */
+    function changeLogShowWhereInColumn(row){
+      return !(row && row.count > 1 && isChangeLogExpanded(row.module));
+    }
+    const changeLogRangeText = computed(()=>{
+      const rows = changeLogRows.value;
+      if(!rows.length) return '';
+      const first = rows[0].date, last = rows[rows.length - 1].date;
+      return first === last ? first : first + ' ~ ' + last;
+    });
     const qcLedgerBatchAddVisible = ref(false);
     const PAGE_PRD_NOTES = window.WMS_PAGE_PRD_NOTES || {};
     const remarksNote = computed(()=> {
@@ -13234,28 +14081,22 @@ const app = createApp({
     const deDense = ref(false);
     const deFullscreen = ref(false);
     const deTypeList = computed(()=>{
-      storeTick.value;
-      const bag = MOCK['data-entry-type'] || {};
-      const tabOrder = ((CFG.pages['data-entry-type']||{}).tabs||[]).map(t=> t.name);
-      const out = [];
-      const push = (name)=>{
-        const n = String(name||'').trim();
-        if(n && n!=='—' && !out.includes(n)) out.push(n);
-      };
-      tabOrder.forEach(tab=> (bag[tab]||[]).forEach(r=> push(r['检验类名称'])));
-      Object.keys(bag).forEach(tab=> (bag[tab]||[]).forEach(r=> push(r['检验类名称'])));
-      return out;
+      // 2026-10-27：与「数据录入-按样品」左栏检验类完全同源（DE_INSP_TREE），名称 / 顺序 / 数量一致
+      return DE_INSP_TREE.map(g => g.cat);
     });
     const deTypeFiltered = computed(()=>{
       const kw = deTypeKw.value.trim();
-      if(!kw) return deTypeList.value;
-      return deTypeList.value.filter(n=> n.includes(kw));
+      const list = DE_INSP_TREE.map(g => ({ name: g.cat, en: g.catEn || '' }));
+      if(!kw) return list;
+      return list.filter(x => x.name.includes(kw));
     });
     function toggleDeType(name){
       deTypeActive.value = deTypeActive.value===name ? '' : name;
       pageNum.value = 1;
       selectedIds.value = [];
     }
+    /* ── 数据录入-按类型：左栏检验类与「数据录入-按样品」共用 DE_INSP_TREE；
+       行数据「检验类名称」取值为这 5 类之一 → 点击左栏即按该字段精确筛选。 */
     function resetDeTypeState(){
       dePanelCollapsed.value = false;
       deTypeKw.value = '';
@@ -15239,8 +16080,9 @@ const app = createApp({
       isDataLedgerMode.value = true;
       activeSampleRow.value = row;
       ensureInspSampleItems(row);
-      inspSampleActiveItemId.value = (row._inspItems && row._inspItems.length) ? row._inspItems[0].id : '';
-      inspSampleMethod.value = defaultInspSampleMethod();
+      inspSampleActiveCat.value = row._inspCategory || DE_INSP_TREE[0].cat;
+      inspSampleActiveItemId.value = inspSampleCatItems.value.length ? inspSampleCatItems.value[0].id : '';
+      inspSampleMethod.value = inspSampleMethodForCat(inspSampleActiveCat.value);
       inspSamplePublicTestTimes.value = '1次';
       inspSampleTestCount.value = 2;
       inspSampleFullscreen.value = false;
@@ -15304,6 +16146,41 @@ const app = createApp({
     const inspSamplePublicTestTimes = ref('1次');
     const inspSampleTestCount = ref(2);
     const inspSampleActiveItemId = ref('');
+    /* 色谱识别取数结果：未匹配峰（台账「定性结构」为空的峰），弹窗底部单独列出 */
+    const inspUnmatchedPeaks = ref([]);
+    const inspUnmatchedPeakSource = ref('');
+    /* 检验项目类（左栏，2026-10-26 按放行标准表配置）：驱动中栏检验项目与右栏录入卡片的过滤。
+       2026-10-27：行数据带「检验类名称」且命中配置类时（数据录入-按类型），左栏只显示该条数据对应的检验项类。 */
+    const inspSampleActiveCat = ref(DE_INSP_TREE[0].cat);
+    function deRowCategoryOf(row){
+      const cat = String((row && row['检验类名称']) || '').trim();
+      return DE_INSP_TREE.some(g => g.cat === cat) ? cat : '';
+    }
+    const inspSampleCategories = computed(() => {
+      const rowCat = deRowCategoryOf(activeSampleRow.value);
+      const groups = rowCat ? DE_INSP_TREE.filter(g => g.cat === rowCat) : DE_INSP_TREE;
+      return groups.map(g => ({ name: g.cat, en: g.catEn || '', count: g.items.length }));
+    });
+    const inspSampleCatItems = computed(() => {
+      const row = activeSampleRow.value;
+      if(!row) return [];
+      const cat = inspSampleActiveCat.value || DE_INSP_TREE[0].cat;
+      const fallback = DE_INSP_TREE[0].cat;
+      return (row._inspItems || []).filter(it => (it.cat || fallback) === cat);
+    });
+    function selectInspSampleCat(name){
+      if(!name) return;
+      inspSampleActiveCat.value = name;
+      const row = activeSampleRow.value;
+      if(row) row._inspCategory = name;
+      // 检验方法跟随检验项目类（外观→目视、含量→HPLC、DSC→DSC、金属离子→ICP-MS、卤素→IC）
+      inspSampleMethod.value = inspSampleMethodForCat(name);
+      // 切换检验类后，上一次取数的未匹配峰不再适用
+      inspUnmatchedPeaks.value = [];
+      inspUnmatchedPeakSource.value = '';
+      const first = inspSampleCatItems.value[0];
+      inspSampleActiveItemId.value = first ? first.id : '';
+    }
     // 检验方法下拉：主数据取数（方法类型决定「获取采集数据」的通道）
     const inspSampleMethodOptions = computed(() => {
       storeTick.value;
@@ -15328,33 +16205,161 @@ const app = createApp({
       const hit = inspSampleMethodOptions.value.find(m => m.type === '色谱识别') || inspSampleMethodOptions.value[0];
       return hit ? hit.value : '';
     }
-    // 获取采集数据：按检验方法类型分流取数通道（通用方法→仪器数采；色谱识别→图谱识别结果）
+    /* 检验项目类 ↔ 检验方法 绑定（2026-10-27）：类别配置里的 method 即方法主数据中的「方法名称」，
+       方法主数据缺失时回退到启用方法的第一条，保证下拉不为空。 */
+    function inspSampleMethodForCat(catName){
+      const group = DE_INSP_TREE.find(g => g.cat === catName) || DE_INSP_TREE[0];
+      const opts = inspSampleMethodOptions.value;
+      if(group && group.method){
+        const hit = opts.find(m => m.value === group.method);
+        if(hit) return hit.value;
+      }
+      return opts.length ? opts[0].value : '';
+    }
+    // 获取采集数据：按检验方法类型分流取数通道（通用方法→仪器数采；色谱识别→GC/LC 台账取数）
+    /* ── 色谱识别取数：从 GC / LC 台账按「已定性名称」匹配（2026-10-27）────────────────
+       台账行只存「批号 + 各典型保留时间的数值」（_rt: {TR: {t: 保留时间, a: 峰面积%}}），
+       定性名称来自漂移规则的「定性结构」（是否主峰同源）。台账未建模绝对峰面积与峰高，
+       此处按峰面积% 等比派生（area = pct × 120.5、height = pct × 2.8），真实接口应直接返回。 */
+    function chromRtMetaMapOf(kind){
+      const want = kind === 'LC' ? 'LC' : 'GC';
+      const map = {};
+      (((MOCK['drift-rule'] || {}).main) || []).forEach(r=>{
+        if(String(r['启用状态'] || '启用') !== '启用') return;
+        if(String(r['规则分类'] || '').trim().toUpperCase() !== want) return;
+        (Array.isArray(r._impurities) ? r._impurities : []).forEach(x=>{
+          const tr = driftNum(x && x['典型保留时间']);
+          if(tr == null) return;
+          const key = tr.toFixed(3);
+          const st = String((x && x['定性结构']) || '').trim();
+          const main = String((x && x['是否主峰']) || '') === '是';
+          if(!map[key]) map[key] = { structure: st, isMain: main };
+          else {
+            if(!map[key].structure && st) map[key].structure = st;
+            if(main) map[key].isMain = true;
+          }
+        });
+      });
+      return map;
+    }
+    // 按检验方法判定台账（液相/HPLC → LC 台账；其余色谱 → GC 台账），并用 批号 → 物料名称 → 首行 依次找行
+    function fetchChromLedgerPeaks(row, methodName){
+      const isLC = /液相|HPLC|LC/i.test(String(methodName || ''));
+      const kind = isLC ? 'LC' : 'GC';
+      const bag = MOCK[kind === 'LC' ? 'chrom-ledger-lc' : 'chrom-ledger-gc'] || {};
+      const tab = String(activeTab.value || '');
+      const list = (bag[tab] || []).filter(r => r && r._rt);
+      if(!list.length) return null;
+      const batch = String((row && (row['报检批号'] || row['批号'])) || '').trim();
+      const matName = String((row && row['物料名称']) || '').trim();
+      let hit = batch ? list.find(r => String(r['批号'] || '').trim() === batch) : null;
+      if(!hit && matName) hit = list.find(r => String(r['物料名称'] || '').trim() === matName);
+      if(!hit) hit = list[0];
+      const meta = chromRtMetaMapOf(kind);
+      const peaks = Object.keys(hit._rt || {})
+        .sort((a, b) => Number(a) - Number(b))
+        .map((trKey, idx) => {
+          const cell = hit._rt[trKey] || {};
+          const pct = parseFloat(cell.a);
+          const trNum = parseFloat(cell.t != null && cell.t !== '' ? cell.t : trKey);
+          const k = (Math.round(Number(trKey) * 1000) / 1000).toFixed(3);
+          const m = meta[k] || {};
+          const safePct = isNaN(pct) ? 0 : pct;
+          return {
+            seq: idx + 1,
+            tr: isNaN(trNum) ? String(trKey) : trNum.toFixed(3),
+            pct: safePct,
+            area: +(safePct * 10000).toFixed(1),
+            height: +(safePct * 260).toFixed(2),
+            structure: m.structure || '',
+            isMain: !!m.isMain
+          };
+        });
+      return { kind, ledgerRow: hit, peaks };
+    }
+    // 峰面积% 文本：微量峰（<0.01）保留 4 位小数，避免显示成 0.00
+    function dePeakPctText(p){
+      const v = Number(p && p.pct) || 0;
+      return (v !== 0 && Math.abs(v) < 0.01) ? v.toFixed(4) : v.toFixed(2);
+    }
+    // 匹配口径：① 定性结构 = 检验项目名称（含互相包含）→ 命中；② 主峰兜底（含量/纯度/主成分类项目取面积最大的已定性主峰）
+    function pickLedgerPeakForItem(item, peaks){
+      const name = String((item && item.name) || '').trim();
+      if(!name || !peaks || !peaks.length) return null;
+      const exact = peaks.find(p => p.structure && (p.structure === name || p.structure.indexOf(name) >= 0 || name.indexOf(p.structure) >= 0));
+      if(exact) return exact;
+      if(/含量|纯度|主成分|purity/i.test(name)){
+        const mains = peaks.filter(p => p.isMain && p.structure);
+        if(mains.length) return mains.slice().sort((a, b) => b.pct - a.pct)[0];
+      }
+      return null;
+    }
+    // 把峰数据按「参数名称」写入样本参数各列（保留时间 / 峰面积 / 峰面积% / 峰高），再走结果联动
+    function fillItemParamsFromPeak(item, peak){
+      if(!item || !peak) return 0;
+      const rows = inspSampleParamRowsOf(item);
+      let filled = 0;
+      rows.forEach(p => {
+        const nm = String(p.name || '');
+        let v = null;
+        if(nm.indexOf('保留时间') >= 0) v = peak.tr;
+        else if(nm.indexOf('峰面积%') >= 0) v = dePeakPctText(peak);
+        else if(nm.indexOf('峰面积') >= 0) v = String(peak.area);
+        else if(nm.indexOf('峰高') >= 0) v = String(peak.height);
+        else if(p.single) v = dePeakPctText(peak);
+        if(v == null) return;
+        for(let i = 1; i <= inspSampleTestCount.value; i++) item[p.field + i] = v;
+        filled++;
+      });
+      if(item.paramMode === 'hplc') onHplcParamCellChange(item);
+      else if(item.paramMode === 'result') onResultParamCellChange(item);
+      else onParamCellChange(item);
+      return filled;
+    }
     function onFetchGatherData() {
       const row = activeSampleRow.value;
       if (!row) return;
       const type = inspSampleMethodType.value;
       if (!type) { ElMessage.warning('请先选择检验方法'); return; }
-      const items = (row._inspItems || []).filter(it => it.type !== '定性');
+      // 按当前检验项目类取数：每类绑定各自的检验方法，避免「在某类点取数却改写其他类结果」
+      const activeCat = inspSampleActiveCat.value || DE_INSP_TREE[0].cat;
+      const items = (row._inspItems || [])
+        .filter(it => it.type !== '定性' && (it.cat || DE_INSP_TREE[0].cat) === activeCat);
       if (!items.length) { ElMessage.info('当前样品无可取数的定量检验项'); return; }
       if (type === '色谱识别') {
+        // 2026-10-27：色谱识别 → 从 GC / LC 台账取数（不再用模拟色谱参数）
+        const ledger = fetchChromLedgerPeaks(row, inspSampleMethod.value);
+        if (!ledger || !ledger.peaks.length) {
+          inspUnmatchedPeaks.value = [];
+          inspUnmatchedPeakSource.value = '';
+          ElMessage.warning('未找到可用的 ' + (ledger && ledger.kind === 'LC' ? 'LC' : 'GC') + ' 台账数据（请确认批号或物料与台账一致）');
+          return;
+        }
         let cnt = 0;
-        items.forEach((it, idx) => {
-          const base = 82 + idx * 9.6;
-          for (let n = 1; n <= inspSampleTestCount.value; n++) {
-            it['_paramA1_' + n] = (base + n * 0.4).toFixed(1);
-            it['_paramP1_' + n] = (100.1 + n * 0.1).toFixed(1);
-            it['_paramT1_' + n] = (23.5 + n * 0.1).toFixed(1);
-          }
-          onParamCellChange(it);
+        items.forEach(it => {
+          const peak = pickLedgerPeakForItem(it, ledger.peaks);
+          if (!peak) return;
+          fillItemParamsFromPeak(it, peak);
           cnt++;
         });
-        ElMessage.success('已从「图谱识别」结果取数（' + inspSampleMethod.value + '）：回填 ' + cnt + ' 项色谱参数并自动计算');
+        // 未匹配 = 台账中「定性结构」为空的峰，统一列在弹窗最下方
+        inspUnmatchedPeaks.value = ledger.peaks.filter(p => !p.structure);
+        inspUnmatchedPeakSource.value = (ledger.kind === 'LC' ? 'LC 台账' : 'GC 台账')
+          + ' · 批号 ' + String(ledger.ledgerRow['批号'] || '—');
+        const unm = inspUnmatchedPeaks.value.length;
+        if (cnt) {
+          ElMessage.success('已从 ' + (ledger.kind === 'LC' ? 'LC' : 'GC') + ' 台账取数：匹配 ' + cnt + ' 项检验参数，未匹配峰 ' + unm + ' 条已列在下方');
+        } else {
+          ElMessage.info('台账中未匹配到当前检验项目（' + inspUnmatchedPeakSource.value + '），未定性峰 ' + unm + ' 条已列在下方');
+        }
       } else {
         items.forEach((it, idx) => {
           const usl = parseFloat(it.usl);
           const ratio = 0.62 + (idx % 3) * 0.07;
           const v = Number.isFinite(usl) ? usl * ratio : 0.5 + idx * 0.13;
-          it.val = v.toFixed(3);
+          it.val = v.toFixed((it.paramMode === 'result') ? (Number(it.decimals) || 0) : 3);
+          if (it.paramMode === 'result' && !Number(it.decimals)) it.val = String(Math.round(v));
+          if (it.paramMode === 'result') it._sres1 = it.val;
           onItemValChange(it);
         });
         ElMessage.success('已从「仪器数采（IOT）」取数（' + inspSampleMethod.value + '）：回填 ' + items.length + ' 项实测值');
@@ -15365,6 +16370,66 @@ const app = createApp({
       { code: 'P1', name: '载气压力', formula: '—', field: '_paramP1_' },
       { code: 'T1', name: '环境温度', formula: '—', field: '_paramT1_' }
     ];
+    /* 样本参数行（2026-10-27）：金属离子含量 / 卤素含量只保留一个「结果值」参数；
+       含量（HPLC）用「保留时间 / 峰面积 / 峰面积%」；
+       其余检验类（外观 / DSC）沿用色谱三参数，互不影响。 */
+    const DE_RESULT_PARAM_ROW = [{ code: '', name: '结果值', formula: '', field: '_sres', single: true }];
+    function inspSampleParamRowsOf(item){
+      if(item && item.paramMode === 'result') return DE_RESULT_PARAM_ROW;
+      if(item && Array.isArray(item.paramRows) && item.paramRows.length) return item.paramRows;
+      return inspSampleParamRows;
+    }
+    // 含量（HPLC）：峰面积%（sync 行）多测取平均 → 检验结果（面积归一化纯度），再走双向判定
+    function onHplcParamCellChange(item){
+      if(!item) return;
+      const row = (item.paramRows || []).find(r => r.sync);
+      if(!row) return;
+      const vals = [];
+      for(let i = 1; i <= inspSampleTestCount.value; i++){
+        const raw = item[row.field + i];
+        if(raw === null || raw === undefined || String(raw).trim() === '') continue;
+        const n = parseFloat(raw);
+        if(!isNaN(n)) vals.push(n);
+      }
+      if(!vals.length){
+        item.val = null;
+        item.result = 'NA';
+        item.deviationResult = '';
+        return;
+      }
+      const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+      const d = Number.isFinite(Number(item.decimals)) ? Number(item.decimals) : 2;
+      item.val = avg.toFixed(d);
+      onItemValChange(item);
+    }
+    // 样本参数单元格输入统一入口：按检验项目类的参数口径分流
+    function onInspSampleParamCellChange(item, param){
+      if(!item || !param) return;
+      if(param.single){ onResultParamCellChange(item); return; }
+      if(item.paramMode === 'hplc'){ onHplcParamCellChange(item); return; }
+      onParamCellChange(item);
+    }
+    // 结果值多测：按「样本测试次数」逐次录入，检验结果取已填值的平均值（小数位随检验项目）
+    function onResultParamCellChange(item){
+      if(!item) return;
+      const vals = [];
+      for(let i = 1; i <= inspSampleTestCount.value; i++){
+        const raw = item['_sres' + i];
+        if(raw === null || raw === undefined || String(raw).trim() === '') continue;
+        const n = parseFloat(raw);
+        if(!isNaN(n)) vals.push(n);
+      }
+      if(!vals.length){
+        item.val = null;
+        item.result = 'NA';
+        item.deviationResult = '';
+        return;
+      }
+      const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+      const d = Number(item.decimals) || 0;
+      item.val = d ? avg.toFixed(d) : String(Math.round(avg));
+      onItemValChange(item);
+    }
     // ── 快速录入（按样品）：左检验类 + 右分组录入区 ─────────────────────────
     const QE_CAT_LIST = ['QC', '修正', '物理指标类', '稳定性考察类', '计算大类'];
     const qePublicParams = [{ code: 'w1', name: '含量w1,%', formula: '—' }];
@@ -15378,7 +16443,7 @@ const app = createApp({
     const qeFullscreen = ref(false);
     const qeMethod = ref('滴定检验2');
     const qeInstrument = ref('');
-    const qeActiveCat = ref('物理指标类');
+    const qeActiveCat = ref(DE_INSP_TREE[0].cat);
     const qeCollapsed = ref({});
     const qePubVals = ref({});
     const qeInstrumentOptions = computed(() => {
@@ -15389,24 +16454,32 @@ const app = createApp({
       const row = activeSampleRow.value;
       if(!row) return [];
       const all = row._inspItems || [];
-      if(qeActiveCat.value !== '物理指标类') return [];
-      return all;
+      const fallback = DE_INSP_TREE[0].cat;
+      const cat = qeActiveCat.value || fallback;
+      return all.filter(it => (it.cat || fallback) === cat);
     });
     const qeDoneCount = computed(() => qeItems.value.filter(it => {
       const hasVal = it.val !== null && it.val !== undefined && String(it.val).trim() !== '';
       return hasVal && !!it.result && it.result !== 'NA';
     }).length);
-    const qeCategories = computed(() => QE_CAT_LIST.map(name => {
-      let state = '';
-      if(name === '物理指标类'){
-        const total = qeItems.value.length;
-        if(total && qeDoneCount.value === total) state = 'done';
-        else if(total) state = 'doing';
-      } else if(name === 'QC'){
-        state = 'done';
-      }
-      return { name, state };
-    }));
+    // 检验类列表与数据录入弹窗共用同一份配置（DE_INSP_TREE）；行带「检验类名称」时只显示该类
+    const qeCategories = computed(() => {
+      const rowCat = deRowCategoryOf(activeSampleRow.value);
+      const groups = rowCat ? DE_INSP_TREE.filter(g => g.cat === rowCat) : DE_INSP_TREE;
+      return groups.map(g => {
+        const fallback = DE_INSP_TREE[0].cat;
+        const items = ((activeSampleRow.value && activeSampleRow.value._inspItems) || [])
+          .filter(it => (it.cat || fallback) === g.cat);
+        const done = items.filter(it => {
+          const hasVal = it.val !== null && it.val !== undefined && String(it.val).trim() !== '';
+          return hasVal && !!it.result && it.result !== 'NA';
+        }).length;
+        let state = '';
+        if(items.length && done === items.length) state = 'done';
+        else if(items.length) state = 'doing';
+        return { name: g.cat, en: g.catEn || '', state };
+      });
+    });
     const qeAllCollapsed = computed(() => qeItems.value.length > 0 && qeItems.value.every(it => !!qeCollapsed.value[it.id]));
     const qeSubTestColWidth = computed(() => {
       const n = Math.max(1, Number(inspSampleTestCount.value) || 1);
@@ -15438,7 +16511,7 @@ const app = createApp({
     function qeInit(){
       const row = activeSampleRow.value || {};
       qeFullscreen.value = false;
-      qeActiveCat.value = '物理指标类';
+      qeActiveCat.value = deRowCategoryOf(row) || DE_INSP_TREE[0].cat;
       qeMethod.value = row._qeMethod || '滴定检验2';
       qeInstrument.value = row._qeInstrument || '';
       qeCollapsed.value = {};
@@ -15529,6 +16602,91 @@ const app = createApp({
     function inspectAttachMissing(items){
       return (items || []).filter(it => !it.files || !it.files.length);
     }
+
+    /* ================= 报检单「附件」字段（选填） =================
+       口径（2026-10-28 定稿）：
+       · 上传位置唯一 —— 报检单 新增/编辑弹窗，位于「报检备注」之前，13 个报检类型共用同一字段；
+       · 落库字段 —— 报检单行 `报检附件`（文件对象数组），编辑回填，复制不带走原单附件；
+       · 下游同步 —— 待取样任务 / 样品接收 / 样品任务分配 / 数据录入 / 复核 / 样品检验台账
+         一律按「报检单号」实时回查报检单，只读展示，不在下游行内复制，改附件必须回报检单；
+       · 列表列统一渲染为「N 个」入口，点击弹只读附件清单。 */
+    const inspOrderAttachViewVisible = ref(false);
+    const inspOrderAttachViewRow = ref(null);
+    const inspOrderAttachViewTitle = computed(()=>{
+      const no = inspOrderAttachViewRow.value ? (inspOrderAttachViewRow.value['报检单号'] || '') : '';
+      return no ? ('报检单附件 · ' + no) : '报检单附件';
+    });
+    /* 报检单号 → 附件数组（跨 13 个类型聚合，首条命中即生效） */
+    const inspOrderAttachMap = computed(()=>{
+      storeTick.value;
+      const map = new Map();
+      const bag = MOCK['insp-order'] || {};
+      Object.keys(bag).forEach(tabName=>{
+        const list = bag[tabName];
+        if(!Array.isArray(list)) return;
+        list.forEach(r=>{
+          if(!r) return;
+          const files = Array.isArray(r['报检附件']) ? r['报检附件'] : [];
+          const no = String(r['报检单号'] || '').trim();
+          if(!no || !files.length || map.has(no)) return;
+          map.set(no, files);
+        });
+      });
+      return map;
+    });
+    function inspOrderAttachFiles(row){
+      if(!row) return [];
+      const own = row['报检附件'];
+      if(Array.isArray(own) && own.length) return own;
+      const no = String(row['报检单号'] || '').trim();
+      if(!no) return [];
+      return inspOrderAttachMap.value.get(no) || [];
+    }
+    function inspOrderAttachCount(row){
+      return inspOrderAttachFiles(row).length;
+    }
+    function inspOrderAttachNames(row){
+      return inspOrderAttachFiles(row).map(f => String(f && f.name || '').trim()).filter(Boolean).join('、');
+    }
+    function openInspOrderAttachView(row){
+      if(!inspOrderAttachCount(row)) return;
+      inspOrderAttachViewRow.value = row;
+      inspOrderAttachViewVisible.value = true;
+    }
+    const inspOrderAttachViewFiles = computed(()=> inspOrderAttachFiles(inspOrderAttachViewRow.value));
+    function triggerInspOrderAttachUpload(){
+      const el = document.getElementById('insp-order-attach-input');
+      if(el) el.click();
+    }
+    function onInspOrderAttachChange(e){
+      const files = Array.from(e.target.files || []);
+      if(!files.length) return;
+      if(!Array.isArray(inspOrderForm.attachments)) inspOrderForm.attachments = [];
+      files.forEach(f => {
+        const ext = (f.name.split('.').pop() || '').toLowerCase();
+        if(ATTACH_ALLOWED_EXT.indexOf(ext) < 0){
+          ElMessage.warning('「' + f.name + '」类型不支持，仅支持 ' + ATTACH_ALLOWED_EXT.join('/'));
+          return;
+        }
+        if(f.size > ATTACH_MAX_SIZE){
+          ElMessage.warning('「' + f.name + '」超过 10MB，请压缩后重试');
+          return;
+        }
+        inspOrderForm.attachments.push({
+          id: 'ioatt-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+          name: f.name,
+          size: f.size,
+          sizeText: formatAttachSize(f.size),
+          ext: ext,
+          time: new Date().toLocaleString(),
+          source: '报检单上传'
+        });
+      });
+      e.target.value = '';
+    }
+    function removeInspOrderFormAttach(f){
+      inspOrderForm.attachments = (inspOrderForm.attachments || []).filter(x => x.id !== f.id);
+    }
     function inspSampleResultText(item){
       if(!item || item.val === null || item.val === undefined || item.val === '') return '/';
       return item.val;
@@ -15539,22 +16697,27 @@ const app = createApp({
       if(item.val !== null && item.val !== undefined && item.val !== '' && item.result && item.result !== 'NA') return 'is-ok';
       return '';
     }
-    const inspSampleCatCheckClass = computed(() => {
-      const items = (activeSampleRow.value && activeSampleRow.value._inspItems) || [];
+    function inspSampleCatCheckClass(catName){
+      const row = activeSampleRow.value;
+      const fallback = DE_INSP_TREE[0].cat;
+      const items = ((row && row._inspItems) || []).filter(it => (it.cat || fallback) === catName);
       if(!items.length) return '';
       if(items.some(it => it.result === '不合格')) return 'is-bad';
       if(items.every(it => it.val !== null && it.val !== undefined && it.val !== '' && it.result && it.result !== 'NA')) return 'is-ok';
       return '';
-    });
+    }
     function inspSampleItemTip(item){
       if(!item) return '';
-      if(item.type === '定性') return item.spec || '定性判定项';
+      if(item.spec) return (item.type === '定性' ? '放行标准：' : '放行标准：') + item.spec;
+      if(item.type === '定性') return '定性判定项';
       if(item.usl != null && item.usl !== '') return '规格上限 ≤ ' + item.usl + ' ' + (item.unit || '');
       return '未设定规格限';
     }
-    // 卡片头部「指标」文本：按 USL/LSL/UCL/LCL/UWL/LWL 顺序拼接，空值跳过
+    // 卡片头部「指标」文本：优先展示放行标准原文（如 ≤500(ppb)、Tm: 288.5±2.0°C (onset)），
+    // 无原文时按 USL/LSL/UCL/LCL/UWL/LWL 顺序拼接，空值跳过
     function inspSampleSpecText(item){
       if(!item) return '—';
+      if(item.spec) return String(item.spec);
       const pairs = [
         ['USL', '≤', item.usl], ['LSL', '≥', item.lsl],
         ['UCL', '≤', item.ucl], ['LCL', '≥', item.lcl],
@@ -15577,55 +16740,116 @@ const app = createApp({
       const failOpts = ['不合格','可见杂质','可见悬浮杂质','破损','标识缺失','结块受潮','可见团聚粗粒','轻微浑浊','标识模糊','包装破损'];
       item.result = failOpts.indexOf(item.val) >= 0 ? '不合格' : '合格';
     }
+    /* ===== 检验项目配置化（2026-10-26）：按放行标准表重建行内检验项目 ===== */
+    // 行 id 派生的稳定系数（0.05 ~ 0.74），保证同一样品每次进入弹窗看到同一组数值
+    function deInspSeedFactor(seed){
+      const s = String(seed || '');
+      let h = 0;
+      for(let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 9973;
+      return 0.05 + (h % 70) / 100;
+    }
+    // 示例实测值：仅在「旧数据已有录入痕迹」的行上预填，避免已完成样品显示全空
+    function deInspSampleValue(cfgItem, row){
+      const f = deInspSeedFactor(String((row && (row.id || row['样品编号'] || '')) || '') + '|' + cfgItem.name);
+      if(cfgItem.name === '含量（HPLC）') return (99.92 + f * 0.07).toFixed(2);
+      if(cfgItem.name === 'DSC') return (287.9 + f * 1.2).toFixed(1);
+      if(cfgItem.unit === 'ppb') return String(8 + Math.round(f * 90));   // 8~98 ppb，远低于 500 限
+      if(cfgItem.unit === 'ppm') return (0.05 + f * 0.55).toFixed(1);
+      return '';
+    }
+    function rebuildInspSampleItemsFromCfg(row){
+      if(!row) return [];
+      const oldList = Array.isArray(row._inspItems) ? row._inspItems : [];
+      const oldMap = {};
+      oldList.forEach(it => { if(it && it.name && !oldMap[it.name]) oldMap[it.name] = it; });
+      // 已有录入痕迹（历史值）→ 预填示例实测值，避免已完成样品显示全空
+      const hasRecorded = oldList.some(it => it && it.val !== null && it.val !== undefined && String(it.val).trim() !== '');
+      const rowBad = String(row.inspectResultName || row['检验结论'] || '') === '不合格';
+      const list = [];
+      DE_INSP_TREE.forEach((group, gi) => {
+        group.items.forEach((cfgItem, ii) => {
+          const old = oldMap[cfgItem.name] || {};
+          const item = {
+            id: 'DE-' + (gi + 1) + '-' + (ii + 1),
+            cat: group.cat,
+            name: cfgItem.name,
+            type: cfgItem.type || '定量',
+            unit: cfgItem.unit || '',
+            spec: cfgItem.spec || '',
+            usl: cfgItem.usl !== undefined ? cfgItem.usl : null,
+            lsl: cfgItem.lsl !== undefined ? cfgItem.lsl : null,
+            target: cfgItem.target !== undefined ? cfgItem.target : null,
+            // 样本参数口径：'result' = 只录「结果值」（金属离子 / 卤素）；'hplc' = 保留时间/峰面积/峰面积%；空 = 色谱三参数
+            paramMode: group.paramMode || '',
+            paramRows: group.paramRows ? group.paramRows.map(r => Object.assign({}, r)) : null,
+            decimals: cfgItem.decimals !== undefined ? cfgItem.decimals : (cfgItem.unit === 'ppb' ? 0 : 1),
+            val: (old.val !== undefined && old.val !== null) ? old.val : null,
+            result: old.result || 'NA',
+            deviationResult: old.deviationResult || old.dev || '',
+            remark: old.remark || '',
+            operateTime: old.operateTime || '',
+            files: Array.isArray(old.files) ? old.files : []
+          };
+          if(item.type === '定性'){
+            item.options = (cfgItem.options || ['合格', '不合格']).slice();
+            item.passValues = (cfgItem.passValues || []).slice();
+          }
+          if((item.val === null || item.val === '') && hasRecorded){
+            if(item.type === '定性'){
+              item.val = item.options[0];
+              item.result = (item.passValues.indexOf(item.val) >= 0) ? '合格' : '不合格';
+            } else {
+              item.val = deInspSampleValue(cfgItem, row);
+              // 结果值口径：第 1 次测量回填到样本参数首列，与「检验结果」保持一致
+              if(item.paramMode === 'result') item._sres1 = item.val;
+              // 含量（HPLC）：保留时间/峰面积按行派生，峰面积% 与检验结果一致
+              if(item.paramMode === 'hplc'){
+                const f = deInspSeedFactor(String((row && (row.id || row['样品编号'] || '')) || '') + '|hplc');
+                item['_paramRT_1'] = (3.1 + f).toFixed(2);
+                item['_paramA_1'] = (1200 + Math.round(f * 400)).toFixed(1);
+                item['_paramAP_1'] = item.val;
+              }
+              if(item.val !== '') onItemValChange(item);
+            }
+          }
+          list.push(item);
+        });
+      });
+      // SUM（除K、Ca、Fe）= 参与汇总的各金属元素实测值之和
+      const sumItem = list.find(it => it.name === 'SUM（除K、Ca、Fe）');
+      if(sumItem && hasRecorded){
+        const excl = ['K', 'Ca', 'Fe'];
+        let total = 0, cnt = 0;
+        list.forEach(it => {
+          if(it.cat !== '金属离子含量' || it === sumItem || excl.indexOf(it.name) >= 0) return;
+          const n = parseFloat(it.val);
+          if(!isNaN(n)){ total += n; cnt++; }
+        });
+        if(cnt){ sumItem.val = String(Math.round(total)); onItemValChange(sumItem); }
+      }
+      // 与列表结论自洽：判定「不合格」的样品保留一个超标金属项，便于演示超差判定
+      if(hasRecorded && rowBad){
+        const fe = list.find(it => it.name === 'Fe');
+        if(fe){ fe.val = '582'; onItemValChange(fe); }
+      }
+      row._inspItems = list;
+      row._deInspCfg = DE_INSP_CFG_VER;
+      if(!row._inspCategory || !DE_INSP_TREE.some(g => g.cat === row._inspCategory)){
+        row._inspCategory = DE_INSP_TREE[0].cat;
+      }
+      return list;
+    }
     function ensureInspSampleItems(row){
       if(!row) return [];
-      const scheme = String(row['检验方案'] || row.inspectionSchemeName || '');
-      const schemeQuals = schemeQualMetricCols('', scheme);
-      if(!Array.isArray(row._inspItems) || !row._inspItems.length){
-        const ration = (row.rationItems || []).filter(it => it && it.type !== '定性');
-        row._inspItems = ration.map((it, idx) => ({
-          id: 'item-' + idx,
-          name: it.name,
-          unit: it.unit,
-          val: it.val == null ? null : it.val,
-          result: it.result || 'NA',
-          deviationResult: it.dev || '',
-          usl: it.usl, lsl: it.lsl, ucl: it.ucl, lcl: it.lcl, target: it.target,
-          type: '定量',
-          remark: it.remark || ''
-        }));
+      // 检验项目由 DE_INSP_TREE 托管：结构版本不匹配时整体重建（同名前次录入值予以保留）
+      if(row._deInspCfg !== DE_INSP_CFG_VER) rebuildInspSampleItemsFromCfg(row);
+      if(!Array.isArray(row._inspItems)) row._inspItems = [];
+      // 行自带「检验类名称」（数据录入-按类型）时，当前检验类跟随该字段
+      const rowCat = deRowCategoryOf(row);
+      if(rowCat) row._inspCategory = rowCat;
+      else if(!row._inspCategory || !DE_INSP_TREE.some(g => g.cat === row._inspCategory)){
+        row._inspCategory = DE_INSP_TREE[0].cat;
       }
-      row._inspItems.forEach(it => {
-        if(it.type !== '定性' && (it.result == null || it.result === '')) it.result = 'NA';
-        if(it.type === '定性' && (!it.options || !it.options.length)){
-          const col = schemeQuals.find(c => c.name === it.name);
-          it.options = (col && col.options) || ['合格', '不合格'];
-          if(!it.spec) it.spec = (col && col.spec) || it.req || '';
-        }
-      });
-      const names = new Set(row._inspItems.map(it => it.name));
-      const fromRow = Array.isArray(row.qualitativeItems) ? row.qualitativeItems : [];
-      const qualSrc = fromRow.length ? fromRow : schemeQuals.map(c => ({
-        name: c.name, code: c.itemCode, spec: c.spec, val: '', result: 'NA', options: c.options
-      }));
-      qualSrc.forEach((q, idx) => {
-        const name = q.name || q.inspectionItemName;
-        if(!name || names.has(name)) return;
-        const col = schemeQuals.find(c => c.name === name) || {};
-        row._inspItems.push({
-          id: q.id || ('qual-' + (q.code || idx)),
-          name,
-          type: '定性',
-          unit: q.unit || '',
-          val: q.val || '',
-          result: (q.result && q.result !== '待判定' && q.result !== '—') ? q.result : 'NA',
-          spec: q.spec || q.req || col.spec || '',
-          options: q.options || col.options || ['合格', '不合格'],
-          remark: q.remark || ''
-        });
-        names.add(name);
-      });
-      if(!row._inspCategory) row._inspCategory = 'SPC气相杂质类';
       return row._inspItems;
     }
     // ──────────────────────────────────────────────────────────────────────
@@ -15647,6 +16871,64 @@ const app = createApp({
         return true;
       });
     });
+
+    /* ── 报检单详情 · 留样信息（只读，2026-10-23） ─────────────────────────────
+       ① 展示开关：质检取样环节「是否留样」= 否 → 整区隐藏；= 是 → 展示；
+          历史/种子数据无该标记时，按「是否已有留样记录」兜底判断（不补造字段）。
+       ② 数据源：MOCK['lab-receive'].main 中「报检单单号 = 当前报检单号」的留样记录，
+          与「实验室管理 / 样品接收」是同一条记录 —— 接收/驳回改的是同一个对象，
+          故详情页状态天然同步（computed 依赖 storeTick，实验室侧操作后自动刷新）。
+       ③ 只读：无新增/编辑/操作列，仅表头 + 表体 + 记录数。 */
+    function findPendingSampleRowByOrderNo(orderNo){
+      const no = String(orderNo || '');
+      if (!no) return null;
+      const bag = MOCK['pending-sample'] || {};
+      for (const tab of Object.keys(bag)) {
+        const rows = Array.isArray(bag[tab]) ? bag[tab] : [];
+        const hit = rows.find(r => String(r['报检单号'] || '') === no);
+        if (hit) return hit;
+      }
+      return null;
+    }
+    const inspOrderRetainRows = computed(() => {
+      storeTick.value; // 实验室侧接收/驳回后重算
+      const row = activeInspOrderRow.value;
+      const no = String((row && (row['报检单号'] || row['单号'])) || '');
+      if (!no) return [];
+      return (((MOCK['lab-receive'] || {}).main) || [])
+        .filter(r => String(r['报检单单号'] || '') === no && String(r['条码来源'] || '留样') === '留样')
+        .slice()
+        .sort((a, b) => String(b['创建时间'] || '').localeCompare(String(a['创建时间'] || ''))
+          || String(b['条码号'] || '').localeCompare(String(a['条码号'] || '')));
+    });
+    const inspOrderRetainVisible = computed(() => {
+      storeTick.value;
+      const row = activeInspOrderRow.value;
+      if (!row) return false;
+      const no = String(row['报检单号'] || row['单号'] || '');
+      if (!no) return false;
+      const pend = findPendingSampleRowByOrderNo(no);
+      const flag = String(row['是否留样'] || (pend && pend['是否留样']) || '');
+      if (flag === '否') return false;
+      if (flag === '是') return true;
+      return inspOrderRetainRows.value.length > 0;
+    });
+    /* 取样提交时把「是否留样」写回报检单（详情页据此决定是否渲染留样信息区域） */
+    function syncInspOrderRetainFlag(orderNo, flag, count){
+      const no = String(orderNo || '');
+      if (!no) return;
+      const bag = MOCK['insp-order'] || {};
+      Object.keys(bag).forEach(tab => {
+        const rows = Array.isArray(bag[tab]) ? bag[tab] : [];
+        rows.forEach(r => {
+          if (String(r['报检单号'] || r['单号'] || '') !== no) return;
+          r['是否留样'] = flag;
+          r['留样数'] = count;
+        });
+      });
+      const pend = findPendingSampleRowByOrderNo(no);
+      if (pend) { pend['是否留样'] = flag; pend['留样数'] = count; }
+    }
 
     const sampleOriginGroups = computed(() => {
       const d = activeSampleDetail.value;
@@ -15801,7 +17083,9 @@ const app = createApp({
       // 抽样方案两字段仅 purchase-incoming / customer-recycle / customer-return 使用，打开新增时按类型赋值
       samplingSchemeName: '',
       samplingTypeName: '',
-      willSampleCount: 5
+      willSampleCount: 5,
+      // 附件（选填）：全类型共用，落库字段「报检附件」，下游按报检单号只读同步
+      attachments: []
     });
 
     /* 检验班组：多选工具函数与候选项（台账为准，内置常用班组 + 历史值兜底） */
@@ -15962,6 +17246,8 @@ const app = createApp({
         inspOrderForm.customerName = (tab === 'customer-recycle' || tab === 'customer-return') ? '芯陶科技' : '';
         inspOrderForm.inspectionTeamNames = [(tab === 'external' || tab === 'small-sample') ? '成品检验班组' : ((tab === 'made-product') ? '卡盘过程检验班' : '来料检验班组')];
         inspOrderForm.remark = INSP_ORDER_TYPE_REMARKS[tab] || '';
+        // 新增：附件不预填（选填）
+        inspOrderForm.attachments = [];
         inspOrderForm.sourceExperiment = '';
         inspOrderForm.projectName = '';
         inspOrderForm.rdRemark = '';
@@ -16002,6 +17288,10 @@ const app = createApp({
         const teamList = teamListOf(row['检验班组']);
         inspOrderForm.inspectionTeamNames = teamList.length ? teamList : ['来料检验班组'];
         inspOrderForm.remark = (row['报检备注'] && row['报检备注'] !== '—') ? row['报检备注'] : ((row['备注'] && row['备注'] !== '—') ? row['备注'] : (INSP_ORDER_TYPE_REMARKS[tab] || ''));
+        // 附件：编辑回填原单附件；复制为新单据时不带走原单资料（附件归属原报检单）
+        inspOrderForm.attachments = (mode === 'edit' && Array.isArray(row['报检附件']))
+          ? row['报检附件'].map(f => Object.assign({}, f))
+          : [];
         inspOrderForm.sourceExperiment = row['来源实验'] || '';
         inspOrderForm.projectName = row['所属项目'] || '';
         inspOrderForm.rdRemark = row['备注'] || '';
@@ -16131,6 +17421,8 @@ const app = createApp({
         "所属项目": inspOrderForm.projectName || "—",
         "备注": inspOrderForm.rdRemark || "—",
         "报检备注": inspOrderForm.remark || "—",
+        // 附件（选填）：数组随单据落库，下游各流转模块按报检单号只读同步
+        "报检附件": (Array.isArray(inspOrderForm.attachments) ? inspOrderForm.attachments : []).map(f => Object.assign({}, f)),
         "报检人": "当前化验员",
         "报检时间": nowStr,
         "复核人": "—",
@@ -18307,10 +19599,12 @@ const app = createApp({
 
     // GC/LC 台账：分类（类型）按 tab 独立维护——左栏只加载当前 tab 的分类
     function scopedDictTypes(id, tab){
-      const list = (((MOCK[id] || {}).types) || []);
-      if(id !== 'chrom-ledger-gc' && id !== 'chrom-ledger-lc') return list.slice();
-      const t = String(tab || '').trim();
-      return list.filter(x=> String(x.tab || '').trim() === t);
+      // GC/LC 台账：分类不再取台账自有 types，改为按漂移规则实时派生（物料 × 色谱柱型号）
+      if(id === 'chrom-ledger-gc' || id === 'chrom-ledger-lc'){
+        storeTick.value;
+        return chromLedgerDerivedTypes(id, tab);
+      }
+      return (((MOCK[id] || {}).types) || []).slice();
     }
     function demoCarrierDispatcher(){ return '王调度'; }
     function demoCarrierName(){
@@ -18751,6 +20045,13 @@ const app = createApp({
         const cur = String(formModel['色谱柱型号']||'').trim();
         if(cur && cur!=='—' && !names.includes(cur)) names.unshift(cur);
         return names;
+      }
+      if(pageId.value==='judge-rule' && f.name==='使用检验类型'){
+        // 选项 ＝ 报检单页签类型（决定该规则驱动的台账页签）
+        const labels = chromLedgerTabDefs().map(t=> t.label);
+        const cur = Array.isArray(formModel['使用检验类型']) ? formModel['使用检验类型'] : splitDun(formModel['使用检验类型']);
+        (cur||[]).forEach(n=>{ if(n && !labels.includes(n)) labels.push(n); });
+        return labels;
       }
       if(pageId.value==='drift-rule' && f.name==='使用检验类型'){
         const tabs = driftInspTypeOptions();
@@ -22977,8 +24278,11 @@ const app = createApp({
         // 物料编码：源文件已带出物料时锁定；源文件无物料信息时允许手动选择
         if(f.name==='物料编码') return !!String(formModel._matFromFile||'').trim();
       }
-      if(pageId.value==='lab-sample' && formModel['数据源']==='物料列表' && f && ['样品名称','样品规格','样品种类'].includes(f.name)) return true;
+      // 样品列表：选物料后名称/规格跟随物料锁定；样品种类始终可编辑（可带出也可手改，不置灰）
+      if(pageId.value==='lab-sample' && formModel['数据源']==='物料列表' && f && ['样品名称','样品规格'].includes(f.name)) return true;
       if(pageId.value==='lab-archive' && formMode.value==='edit' && f && f.name==='样品编码') return true;
+      // 样品档案：规格 / 种类 / 计量单位 一律由所选样品带出，不允许手改（样品名称仍可改）
+      if(pageId.value==='lab-archive' && f && ['样品规格','样品种类','计量单位'].includes(f.name)) return true;
       if(pageId.value==='lg-ship') return true;
       if(pageId.value==='sampling-point' && f && f.name==='所属车间') return true;
       if(pageId.value==='gather-item' && f && f.name==='采集平台') return true;
@@ -24141,7 +25445,13 @@ const app = createApp({
       if(page.value?.layout==='dict-split'){
         const isTagSplitPage = pageId.value==='tag-data-source' || pageId.value==='tag-config' || pageId.value==='instrument-ledger' || pageId.value==='chromatography-column' || pageId.value==='report-data-source' || pageId.value==='template-file' || isChromLedgerPage();
         if(isDictLeafType(dictTypeId.value)){
-          list = rows.filter(r=> r.typeId===dictTypeId.value);
+          const _curType = (dictTypes.value || []).find(t=> t.id === dictTypeId.value);
+          if(isChromLedgerPage() && _curType && _curType.物料名称){
+            // 分类由漂移规则派生，行数据无型号字段 → 按物料名称匹配该分类下的台账行
+            list = rows.filter(r=> String(r['物料名称'] || '') === String(_curType.物料名称));
+          } else {
+            list = rows.filter(r=> r.typeId===dictTypeId.value);
+          }
         } else if(isTagSplitPage){
           // 基础标签页 / 仪器台账：未选中类型时不按类型过滤，默认展示全部数据
           list = rows;
@@ -24150,8 +25460,15 @@ const app = createApp({
         }
       }
       if(isChromLedgerPage()){
-        // 色谱台账查询：批号模糊 + 是否存在新杂 / 杂质偏差结论（状态）精确
-        list = applyContainsExactQuery(list, query, ['批号'], ['是否存在新杂','杂质偏差结论']);
+        // 页签全量保留；当前页签若没有被任何「启用 + 规则分类=GC/LC」的判异规则引用，则该页签留空数据
+        const _curTab = String((tabView.value || {}).name || '');
+        const _tabsWithRule = chromLedgerPageTabs().map(t=> t.name);
+        if(_curTab && !_tabsWithRule.includes(_curTab)){
+          list = [];
+        } else {
+          // 色谱台账查询：批号模糊 + 是否存在新杂 / 杂质偏差结论（状态）精确
+          list = applyContainsExactQuery(list, query, ['批号'], ['是否存在新杂','杂质偏差结论']);
+        }
       }
       if(pageId.value==='instrument-ledger'){
         // 默认按创建时间倒序；未选中类型时展示所有类型数据
@@ -24253,7 +25570,7 @@ const app = createApp({
         const contains = (tabView.value||{}).name==='expired'
           ? ['条码号','样品编码','样品名称']
           : ['条码号','样品编码','样品名称','批号'];
-        const exact = (tabView.value||{}).name==='expired' ? [] : ['状态','使用状态'];
+        const exact = (tabView.value||{}).name==='expired' ? [] : ['状态'];
         list = applyContainsExactQuery(list, query, contains, exact);
         list.sort((a,b)=>{
           const t = String(b['创建时间']||'').localeCompare(String(a['创建时间']||''));
@@ -24718,10 +26035,10 @@ const app = createApp({
         list = list.slice().sort((a,b)=> String(b['最新操作时间']||'').localeCompare(String(a['最新操作时间']||'')));
       }
       if(pageId.value==='data-entry-type'){
-        // 左侧检验类栏 + 顶部查询 + 快捷搜索三层过滤叠加
+        // 左侧检验类（与按样品页同一份配置）+ 顶部查询 + 快捷搜索三层过滤叠加；列表仍为样品行与原有字段
         list = applyContainsExactQuery(list, query, ['样品编号','样品来源','物料名称','检验类名称'], []);
         if(deTypeActive.value){
-          list = list.filter(r=> String(r['检验类名称']||'').trim()===deTypeActive.value);
+          list = list.filter(r=> String(r['检验类名称']||'').trim() === deTypeActive.value);
         }
         const kw = String(deQuickKw.value||'').trim();
         if(deQuickSearch.value && kw){
@@ -25067,6 +26384,10 @@ const app = createApp({
           cols.push({ field:c.field, title:c.title, width:w, minWidth:w, maxWidth:Math.max(w, colMaxWidth(c.title||c.field)), fixed:c.fixed||null, slots:{ default:'chrom_model' } });
         } else if(c.slot==='insp_attach' || c.slot==='manual_attach'){
           cols.push({ field:c.field, title:c.title, width:(c.width||100), minWidth:(c.width||100), slots:{ default:c.slot } });
+        } else if(c.slot==='insp_attach_link'){
+          // 报检单附件：固定窄列（内容为「N 个」入口），不参与内容撑宽，避免挤掉相邻业务列
+          const w = Number(c.width) || 90;
+          cols.push({ field:c.field, title:c.title, width:w, minWidth:w, maxWidth:Math.max(w, 120), slots:{ default:'insp_attach_link' } });
         } else if(c.slot==='prod_pick_lots'){
           const labeled = sampleRows.map(r => Object.assign({}, r, { [c.field]: formatProdPickLotsText(r) }));
           const fitW = Math.min(colMaxWidth(c.title||c.field), Math.max(c.width||220, fitColWidth(c.field, c.title, labeled)));
@@ -25087,25 +26408,12 @@ const app = createApp({
           }
           cols.push(col);
           if(isChromLedgerPage() && c.field==='批号'){
-            (CHROM_LEDGER_RT_LIST||[]).forEach(rt=>{
-              cols.push({ field:'_rt_'+rt, title: rt, width:112, minWidth:112, slots:{ default:'rt_cell' } });
+            // 每个典型保留时间一列；表头单元格两行：上行＝典型保留时间，下行＝对应定性结构
+            (chromLedgerRtList()||[]).forEach(rt=>{
+              cols.push({ field:'_rt_'+rt, title: rt, width:132, minWidth:120,
+                slots:{ header:'rt_head', default:'rt_cell' } });
             });
           }
-        }
-      }
-      // GC/LC 台账：表头从第 3 列（首个保留时间列 1.142）起增加一行空白占位行；
-      // 勾选列 / 序号 / 批号 / 操作列跨两行合并，原有列的名称、顺序、宽度完全不变
-      // 注：vxe 要求「分组表头里不能混入冻结列」，所以左侧三列必须留在分组之外
-      if(isChromLedgerPage() && cols.length > 4){
-        const head = cols.slice(0, 3);
-        const act = cols.filter(c=> c.field==='_actions');
-        const mid = cols.slice(3).filter(c=> c.field!=='_actions');
-        if(mid.length && head.length === 3 && !head.some(c=> c.fixed && c.fixed !== 'left')){
-          head.forEach(c=> { c.rowspan = 2; });
-          act.forEach(c=> { c.rowspan = 2; });
-          // 分组列与子列的 fixed 必须显式一致（vxe 分组表头校验：冻结列要按组设置），否则控制台报 groupFixed
-          mid.forEach(c=> { c.fixed = null; });
-          return [...head, { title:'', fixed:null, children: mid }, ...act];
         }
       }
       return cols;
@@ -25217,7 +26525,7 @@ const app = createApp({
     function onSelectMenu(index){
       mobileMenuOpen.value = false;
       if(index === 'msa-grr'){
-        msaFrameSrc.value = 'msa/index.html';
+        msaFrameSrc.value = 'msa/index.html?v=1.59.0-msa-field-sync';
         return;
       }
       msaFrameSrc.value = '';
@@ -25878,10 +27186,7 @@ const app = createApp({
       }
       if(pageId.value==='judge-rule'){
         formLineRows.value = [];
-        resetJudgeForm();
         if(formMode.value==='add'){
-          formModel['纯度下限'] = '99.99';
-          formModel['纯度计算口径'] = '面积归一化法';
           formSwitch['启用状态'] = true;
         }
       }
@@ -26588,6 +27893,12 @@ const app = createApp({
       const should = Number(row['应取样件数']) || (had + pending);
       row['已取样件数'] = had + added;
       row['待取样件数'] = Math.max(0, should - row['已取样件数']);
+      // 「是否留样」随取样提交落库：报检单详情的留样信息区域按此开关渲染
+      const retainFlag = sampleTakeForm.retain === '是' ? '是' : '否';
+      const retainCount = retainFlag === '是' ? sampleRetainRows.value.length : 0;
+      row['是否留样'] = retainFlag;
+      row['留样数'] = retainCount;
+      syncInspOrderRetainFlag(row['报检单号'], retainFlag, retainCount);
       delete row._sampleDraft;
       bumpStore();
       sampleTakeVisible.value = false;
@@ -26723,8 +28034,7 @@ const app = createApp({
         const copy = Object.assign({}, r, {
           id: 'la-from-receive-' + r.id,
           库存数量: '',
-          条码来源: '留样',
-          使用状态: r['使用状态'] || '在用'
+          条码来源: '留样'
         });
         delete copy['接收人'];
         delete copy['接收时间'];
@@ -26737,20 +28047,258 @@ const app = createApp({
       ElMessage.success('已接收 ' + rows.length + ' 条留样，并写入样品档案');
     }
 
+    /* ── 样品接收：留样新增 / 标签打印 / 驳回（2026-10-23） ─────────────────────
+       上游口径：待取样任务（MOCK['pending-sample'] 各 tab）中「已取样件数 > 0」的报检单，
+       按报检单号去重；留样新增按该单据信息生成 lab-receive 行（状态「待接收」），
+       命中样品主数据 lab-sample 时覆盖 样品编码/名称/规格/种类/计量单位/有效期，
+       未命中则按上游物料信息兜底（与待取样弹窗「留样」口径一致）。 */
+    const labRetainAddVisible = ref(false);
+    const labRetainForm = reactive({ orderKey: '', count: 1, takeDate: '', remark: '', printAfter: false });
+    const labLabelVisible = ref(false);
+    const labLabelRows = ref([]);
+
+    function labRetainAllRecords(){
+      const bag = MOCK['pending-sample'] || {};
+      const out = [];
+      Object.keys(bag).forEach(tab => {
+        const rows = Array.isArray(bag[tab]) ? bag[tab] : [];
+        rows.forEach(r => {
+          if (!r || !r['报检单号']) return;
+          const taken = Number(r['已取样件数'] || 0);
+          if (!(taken > 0)) return;
+          out.push(Object.assign({ _tab: tab }, r));
+        });
+      });
+      return out;
+    }
+    const labRetainUpstreamOptions = computed(() => {
+      storeTick.value; // 上游/留样数据变动后重算
+      const seen = new Set();
+      const opts = [];
+      labRetainAllRecords().forEach(r => {
+        const key = String(r['报检单号']);
+        if (seen.has(key)) return;
+        seen.add(key);
+        opts.push({
+          key: key,
+          label: key + ' / ' + (r['物料名称'] || '—') + ' / 批号 ' + (r['报检批号'] || '—') + '（已取样 ' + (r['已取样件数'] || 0) + ' 件）'
+        });
+      });
+      return opts;
+    });
+    const labRetainOrder = computed(() => {
+      storeTick.value;
+      const k = String(labRetainForm.orderKey || '');
+      if (!k) return null;
+      return labRetainAllRecords().find(r => String(r['报检单号']) === k) || null;
+    });
+    function labRetainRetainedCount(orderNo){
+      if (!orderNo) return 0;
+      const same = r => String((r && r['报检单单号']) || '') === String(orderNo);
+      // 已驳回的留样不占用可留样件数（退回上游后可重新留样）
+      const inReceive = (((MOCK['lab-receive'] || {}).main) || []).filter(r => same(r) && r['状态'] !== '已驳回');
+      const inArchive = (((MOCK['lab-archive'] || {}).main) || []).filter(r => same(r) && String(r['条码来源'] || '') === '留样');
+      return inReceive.length + inArchive.length;
+    }
+    const labRetainAvailable = computed(() => {
+      const o = labRetainOrder.value;
+      if (!o) return 0;
+      return Math.max(0, Number(o['已取样件数'] || 0) - labRetainRetainedCount(o['报检单号']));
+    });
+    const labRetainNoMaster = computed(() => !!labRetainOrder.value && !matchLabSampleMaster(labRetainOrder.value));
+    function todayStamp(){
+      const d = new Date();
+      const p = x => String(x).padStart(2, '0');
+      return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+    }
+    function openLabRetainAdd(){
+      labRetainForm.orderKey = '';
+      labRetainForm.count = 1;
+      labRetainForm.remark = '';
+      labRetainForm.printAfter = false;
+      labRetainForm.takeDate = todayStamp();
+      labRetainAddVisible.value = true;
+    }
+    function onLabRetainOrderChange(){
+      // 换单据后件数回到 1，上限由可留样件数约束
+      labRetainForm.count = 1;
+    }
+    function confirmLabRetainAdd(){
+      const order = labRetainOrder.value;
+      if (!order) { ElMessage.warning('请选择上游单据'); return; }
+      const count = Number(labRetainForm.count || 0);
+      if (!Number.isInteger(count) || count <= 0) { ElMessage.warning('留样件数需为正整数'); return; }
+      const avail = labRetainAvailable.value;
+      if (avail <= 0) { ElMessage.warning('该单据已取样件数均已留样，无法继续新增'); return; }
+      if (count > avail) { ElMessage.warning('留样件数不得超过可留样件数（' + avail + '）'); return; }
+      const master = matchLabSampleMaster(order);
+      const bag = MOCK['lab-receive'] = MOCK['lab-receive'] || {};
+      const list = bag.main = bag.main || [];
+      const now = (typeof nowStamp === 'function') ? nowStamp() : new Date().toISOString().replace('T', ' ').slice(0, 19);
+      const day = labRetainForm.takeDate || todayStamp();
+      const validityNum = master ? String(master['有效期'] || '') : '';
+      const validityUnit = master ? (master['有效期单位'] || '天') : '天';
+      const barcodes = [];
+      for (let i = 0; i < count; i += 1) barcodes.push(nextRetainBarcode(barcodes.map(c => ({ 条码号: c }))));
+      const created = barcodes.map(barcode => ({
+        id: 'lr-add-' + Date.now() + '-' + barcode,
+        条码号: barcode,
+        样品编码: (master && master['样品编码']) || order['物料编码'] || '',
+        样品名称: (master && master['样品名称']) || order['物料名称'] || '',
+        样品规格: (master && master['样品规格']) || order['物料规格'] || '',
+        样品种类: (master && master['样品种类']) || order['物料种类'] || '',
+        建档数量: '1',
+        库存数量: '',
+        条码来源: '留样',
+        有效期: validityNum,
+        有效期单位: validityUnit,
+        有效期展示: labValidityText(validityNum, validityUnit),
+        失效日期: labExpireDate(day, validityNum, validityUnit),
+        取样日期: day,
+        计量单位: (master && master['计量单位']) || '',
+        批号: order['报检批号'] || '',
+        来源单号: '',
+        报检单单号: order['报检单号'] || '',
+        使用状态: '在用',
+        状态: '待接收',
+        存放仓库: '',
+        存放库位: '',
+        备注: String(labRetainForm.remark || '').trim() || '样品接收-留样新增',
+        创建人: '超级管理员',
+        创建时间: now
+      }));
+      created.forEach(row => list.unshift(row));
+      const printAfter = !!labRetainForm.printAfter;
+      labRetainAddVisible.value = false;
+      bumpStore();
+      ElMessage.success('已新增 ' + count + ' 条留样（待接收），可在列表中继续接收或打印标签');
+      if (printAfter) openLabLabelPrint(created.slice());
+    }
+    function openLabLabelPrint(rows){
+      const list = (rows || []).filter(Boolean);
+      if (!list.length) { ElMessage.warning('请先勾选需要打印标签的样品'); return; }
+      labLabelRows.value = list.map(r => ({
+        条码号: r['条码号'] || '',
+        样品名称: r['样品名称'] || '',
+        样品规格: r['样品规格'] || '',
+        批号: r['批号'] || '',
+        取样日期: r['取样日期'] || '',
+        报检单单号: r['报检单单号'] || '',
+        份数: 1
+      }));
+      labLabelVisible.value = true;
+    }
+    function confirmLabLabelPrint(){
+      const n = labLabelRows.value.length;
+      if (!n) { ElMessage.warning('没有可打印的标签'); return; }
+      labLabelVisible.value = false;
+      ElMessage.success('已发送 ' + n + ' 张留样标签至标签打印机（演示，不写入业务数据）');
+    }
+    /* ── 样品档案：标签打印（模板取「基础标签配置」启用项，2026-10-28） ─────────── */
+    const labArchiveLabelVisible = ref(false);
+    const labArchiveLabelTemplate = ref('');
+    const labArchiveLabelRows = ref([]);
+    const labArchiveLabelTemplates = computed(()=>{
+      storeTick.value;                                   // 基础标签配置改动后同步刷新
+      const rows = (((MOCK['tag-config'] || {}).main) || []);
+      /* 只取「样品标签」类型的启用模板：样品档案不跨类型借用仪器/试剂等标签 */
+      return rows
+        .filter(r => r
+          && r['启用状态'] === '启用'
+          && String(r['基础标签模板名称'] || '').trim()
+          && String(r['基础标签类型'] || '').trim() === '样品标签')
+        .map(r => ({
+          名称: String(r['基础标签模板名称']).trim(),
+          类型: String(r['基础标签类型'] || '').trim() || '—'
+        }));
+    });
+    function openLabArchiveLabelPrint(rows){
+      const list = (rows || []).filter(Boolean);
+      labArchiveLabelRows.value = list.map(r => ({
+        条码号: r['条码号'] || '',
+        样品编码: r['样品编码'] || '',
+        样品名称: r['样品名称'] || '',
+        样品规格: r['样品规格'] || '',
+        批号: r['批号'] || '',
+        失效日期: r['失效日期'] || ''
+      }));
+      const tpls = labArchiveLabelTemplates.value;
+      if (!labArchiveLabelTemplate.value || !tpls.some(t => t.名称 === labArchiveLabelTemplate.value)) {
+        const pref = tpls.find(t => t.类型.indexOf('样品') >= 0) || tpls[0];
+        labArchiveLabelTemplate.value = pref ? pref.名称 : '';
+      }
+      labArchiveLabelVisible.value = true;
+    }
+    function confirmLabArchiveLabelPrint(){
+      if (!labArchiveLabelTemplate.value) { ElMessage.warning('请先选择标签模板'); return; }
+      const n = labArchiveLabelRows.value.length;
+      if (!n) { ElMessage.warning('请先在列表勾选需要打印标签的条码'); return; }
+      labArchiveLabelVisible.value = false;
+      ElMessage.success('已按模板「' + labArchiveLabelTemplate.value + '」发送 ' + n + ' 张标签至标签打印机（演示，不写入业务数据）');
+    }
+    /* 过期处理：对已过期样品批量报废。勾选优先；未勾选时按当前全部过期件处理（2026-10-28） */
+    function handleLabArchiveExpireDispose(){
+      const all = ((MOCK['lab-archive'] || {}).main) || [];
+      const expiredRows = all.filter(r => r && String(r['状态'] || '') !== '报废' && labArchiveState(r) === '过期');
+      if (!expiredRows.length) { ElMessage.warning('当前没有已过期且未报废的样品'); return; }
+      const ids = new Set(selectedIds.value || []);
+      const picked = expiredRows.filter(r => ids.has(r.id));
+      const targets = picked.length ? picked : expiredRows;
+      ElementPlus.ElMessageBox.confirm(
+        '是否对已选择样品进行报废处理？',
+        '过期处理 · 样品报废',
+        { confirmButtonText: '确认报废', cancelButtonText: '取消', type: 'warning' }
+      ).then(() => {
+        targets.forEach(r => { r['状态'] = '报废'; });
+        selectedIds.value = [];
+        bumpStore();
+        ElMessage.success('已将 ' + targets.length + ' 条过期样品置为「报废」');
+      }).catch(() => {});
+    }
+    function onLabReceiveReject(row){
+      if (!row) { ElMessage.warning('请选择需要驳回的样品'); return; }
+      if (row['状态'] !== '待接收') { ElMessage.warning('仅「待接收」样品可驳回'); return; }
+      ElementPlus.ElMessageBox.prompt('请填写驳回原因（随样品记录留痕）', '样品驳回 · ' + (row['条码号'] || ''), {
+        confirmButtonText: '确定驳回', cancelButtonText: '取消', inputType: 'textarea',
+        inputPlaceholder: '如：包装破损 / 数量不符 / 条码与实物不一致',
+        inputValidator: v => {
+          const t = String(v || '').trim();
+          if (!t) return '驳回原因不能为空';
+          if (t.length > 200) return '驳回原因不超过 200 字';
+          return true;
+        }
+      }).then(({ value }) => {
+        row['状态'] = '已驳回';
+        row['驳回原因'] = String(value).trim();
+        row['驳回人'] = '超级管理员';
+        row['驳回时间'] = (typeof nowStamp === 'function') ? nowStamp() : new Date().toISOString().replace('T', ' ').slice(0, 19);
+        selectedIds.value = (selectedIds.value || []).filter(id => id !== row.id);
+        bumpStore();
+        ElMessage.success('已驳回该留样，记录已退回上游取样环节');
+      }).catch(() => {});
+    }
+
     function onToolbar(btn){
       if(pageId.value==='data-entry-type'){
         if(btn.name==='直接提交'){
           const set = new Set(selectedIds.value||[]);
           if(!set.size){ ElMessage.warning('请先勾选需要提交的检验任务'); return; }
-          const rows = (tableData.value||[]).filter(r=> set.has(r.id) && r['检验类状态']!=='已完成');
-          if(!rows.length){ ElMessage.info('所选检验任务均已提交完成，无需重复提交'); return; }
-          ElementPlus.ElMessageBox.confirm(`确认提交所选 ${rows.length} 条检验任务？提交后该检验类结束录入。`, '直接提交', {
+          // 按样品行去重后提交（同一检验类多行只算一次）
+          const targets = [];
+          (tableData.value||[]).forEach(r=>{
+            if(!set.has(r.id)) return;
+            const src = r._sampleRow || r;
+            if(src['检验类状态']==='已完成') return;
+            if(targets.indexOf(src) < 0) targets.push(src);
+          });
+          if(!targets.length){ ElMessage.info('所选检验任务均已提交完成，无需重复提交'); return; }
+          ElementPlus.ElMessageBox.confirm(`确认提交所选 ${targets.length} 条检验任务？提交后该检验类结束录入。`, '直接提交', {
             type:'warning', confirmButtonText:'提交', cancelButtonText:'取消'
           }).then(()=>{
-            rows.forEach(r=>{ r['检验类状态'] = '已完成'; });
+            targets.forEach(r=>{ r['检验类状态'] = '已完成'; });
             selectedIds.value = [];
             bumpStore();
-            ElMessage.success(`已提交 ${rows.length} 条检验任务`);
+            ElMessage.success(`已提交 ${targets.length} 条检验任务`);
           }).catch(()=>{});
           return;
         }
@@ -26890,6 +28438,20 @@ const app = createApp({
           return;
         }
         openPendingSampleDialog(sel[0]);
+        return;
+      }
+      if(pageId.value==='lab-receive' && btn.name==='标签打印'){
+        const sel = (selectedIds.value||[]).map(id => tableData.value.find(r => r.id===id)).filter(Boolean);
+        openLabLabelPrint(sel);
+        return;
+      }
+      if(pageId.value==='lab-archive' && btn.name==='标签打印'){
+        const sel = (selectedIds.value||[]).map(id => tableData.value.find(r => r.id===id)).filter(Boolean);
+        openLabArchiveLabelPrint(sel);
+        return;
+      }
+      if(pageId.value==='lab-receive' && btn.name==='留样新增'){
+        openLabRetainAdd();
         return;
       }
       if(pageId.value==='lab-receive' && btn.name==='批量接收'){
@@ -27127,7 +28689,7 @@ const app = createApp({
         ElMessage.warning('请先选择' + dictSplitTypeLabel.value); return;
       }
       if(btn.name==='过期处理' && pageId.value==='lab-archive'){
-        ElMessage.info('过期处理规则以后续确认为准');
+        handleLabArchiveExpireDispose();
         return;
       }
       if(btn.name==='新增' || btn.name==='新增方案' || btn.name==='方案配置' || btn.name==='添加仓库' || btn.name==='添加物料'){
@@ -28204,7 +29766,12 @@ const app = createApp({
         item.deviationResult = '';
         return;
       }
-      if(item.usl !== null && item.usl !== undefined && num > item.usl){
+      // 判定口径：上限 USL（≤）与下限 LSL（≥）双向判定，任一越限即不合格（支持 ≥99.9%、Tm 288.5±2.0°C 等规格）
+      const usl = (item.usl === null || item.usl === undefined || item.usl === '') ? null : parseFloat(item.usl);
+      const lsl = (item.lsl === null || item.lsl === undefined || item.lsl === '') ? null : parseFloat(item.lsl);
+      const overUsl = (usl !== null && !isNaN(usl) && num > usl);
+      const underLsl = (lsl !== null && !isNaN(lsl) && num < lsl);
+      if(overUsl || underLsl){
         item.result = '不合格';
         item.deviationResult = '超差偏异';
       } else {
@@ -28255,6 +29822,10 @@ const app = createApp({
           delete it['_paramA1_' + i];
           delete it['_paramP1_' + i];
           delete it['_paramT1_' + i];
+          delete it['_paramRT_' + i];
+          delete it['_paramA_' + i];
+          delete it['_paramAP_' + i];
+          delete it['_sres' + i];
         }
         it.val = null;
         it.result = 'NA';
@@ -28305,13 +29876,19 @@ const app = createApp({
       const cls = String(src['检验类名称']||'').trim();
       let n = 0;
       const bag = MOCK['sample-assign'] || {};
-      Object.keys(bag).forEach(tab=>{
-        (bag[tab]||[]).forEach(r=>{
-          if(String(r['样品编号']||'').trim() !== no) return;
-          if(cls && String(r['检验类名称']||'').trim() !== cls) return;
-          if(r['录入状态'] !== '已完成'){ r['录入状态'] = '已完成'; n++; }
+      const mark = (matchCls)=>{
+        Object.keys(bag).forEach(tab=>{
+          (bag[tab]||[]).forEach(r=>{
+            if(String(r['样品编号']||'').trim() !== no) return;
+            if(matchCls && cls && String(r['检验类名称']||'').trim() !== cls) return;
+            if(r['录入状态'] !== '已完成'){ r['录入状态'] = '已完成'; n++; }
+          });
         });
-      });
+      };
+      // ① 先按「样品编号 + 检验类名称」精确匹配
+      mark(true);
+      // ② 检验类命名口径不一致时（如数据录入-按类型用检验项目类名、任务分配用业务类名）退化为按样品编号回写
+      if(!n && cls) mark(false);
       return n;
     }
     function closeInspEntryDialogs(){
@@ -29820,6 +31397,10 @@ const app = createApp({
         openPendingSampleDialog(row);
         return;
       }
+      if(pageId.value==='lab-receive' && op.name==='驳回'){
+        onLabReceiveReject(row);
+        return;
+      }
       if(pageId.value==='lab-receive' && op.name==='接收'){
         openLabReceive([row]);
         return;
@@ -29920,8 +31501,9 @@ const app = createApp({
         if(op.name==='数据录入'){
           activeSampleRow.value = row;
           ensureInspSampleItems(row);
-          inspSampleActiveItemId.value = (row._inspItems && row._inspItems.length) ? row._inspItems[0].id : '';
-          inspSampleMethod.value = defaultInspSampleMethod();
+          inspSampleActiveCat.value = row._inspCategory || DE_INSP_TREE[0].cat;
+          inspSampleActiveItemId.value = inspSampleCatItems.value.length ? inspSampleCatItems.value[0].id : '';
+          inspSampleMethod.value = inspSampleMethodForCat(inspSampleActiveCat.value);
           inspSamplePublicTestTimes.value = '1次';
           inspSampleTestCount.value = 2;
           inspSampleFullscreen.value = false;
@@ -29944,13 +31526,20 @@ const app = createApp({
           return;
         }
       }
-      // ── data-entry-type row actions（复用数据录入弹窗与附件能力） ──────
+      // ── data-entry-type row actions（列表为样品行，沿用原字段与交互） ──────
       if(pageId.value==='data-entry-type'){
+        const src = row;
+        // 行内「检验类名称」即 5 类之一 → 弹窗直接定位到该检验类；异常值回退到左栏选中类 / 第一类
+        const rowCat = String((row && row['检验类名称']) || '').trim();
+        const pickedCat = DE_INSP_TREE.some(g => g.cat === rowCat)
+          ? rowCat
+          : (deTypeActive.value && DE_INSP_TREE.some(g => g.cat === deTypeActive.value) ? deTypeActive.value : '');
         if(op.name==='数据录入' || op.name==='进入检验数据录入'){
-          activeSampleRow.value = row;
-          ensureInspSampleItems(row);
-          inspSampleActiveItemId.value = (row._inspItems && row._inspItems.length) ? row._inspItems[0].id : '';
-          inspSampleMethod.value = defaultInspSampleMethod();
+          activeSampleRow.value = src;
+          ensureInspSampleItems(src);
+          inspSampleActiveCat.value = pickedCat || DE_INSP_TREE[0].cat;
+          inspSampleActiveItemId.value = inspSampleCatItems.value.length ? inspSampleCatItems.value[0].id : '';
+          inspSampleMethod.value = inspSampleMethodForCat(inspSampleActiveCat.value);
           inspSamplePublicTestTimes.value = '1次';
           inspSampleTestCount.value = 2;
           inspSampleFullscreen.value = false;
@@ -29958,8 +31547,8 @@ const app = createApp({
           return;
         }
         if(op.name==='快速录入'){
-          activeSampleRow.value = row;
-          ensureInspSampleItems(row);
+          activeSampleRow.value = src;
+          ensureInspSampleItems(src);
           inspSampleMethod.value = defaultInspSampleMethod();
           inspSamplePublicTestTimes.value = '1次';
           inspSampleTestCount.value = 2;
@@ -29968,11 +31557,11 @@ const app = createApp({
           return;
         }
         if(op.name==='直接提交'){
-          if(row['检验类状态']==='已完成'){
+          if(src['检验类状态']==='已完成'){
             ElMessage.info('该检验类已提交完成，无需重复提交');
             return;
           }
-          row['检验类状态'] = '已完成';
+          src['检验类状态'] = '已完成';
           bumpStore();
           ElMessage.success('该检验类已直接提交完成');
           return;
@@ -30662,14 +32251,6 @@ const app = createApp({
         }
         if(pageId.value==='spectrum'){
           resetSpectrumCalc();
-        }
-        if(pageId.value==='judge-rule'){
-          resetJudgeForm();
-          if(row._impurities && row._impurities.length){
-            judgeImpurityRows.value = row._impurities.map(x=>({...x}));
-          }
-          const _pv = String(row['纯度下限']||'').replace(/[^0-9.]/g, '');
-          if(_pv) formModel['纯度下限'] = _pv;
         }
         return;
       }
@@ -33287,16 +34868,9 @@ const app = createApp({
       if(pageId.value==='judge-rule'){
         if(!formModel['规则编码']){ ElMessage.warning('请填写规则编码'); return; }
         if(!formModel['规则名称']){ ElMessage.warning('请填写规则名称'); return; }
-        if(!formModel['检验类型']){ ElMessage.warning('请选择检验类型'); return; }
+        if(!formModel['规则分类']){ ElMessage.warning('请选择规则分类（GC / LC）'); return; }
+        if(!formModel['使用检验类型'] || (Array.isArray(formModel['使用检验类型']) && !formModel['使用检验类型'].length)){ ElMessage.warning('请选择使用检验类型'); return; }
         if(!formModel['适用物料'] || (Array.isArray(formModel['适用物料']) && !formModel['适用物料'].length)){ ElMessage.warning('请选择适用物料'); return; }
-        if(!formModel['纯度下限']){ ElMessage.warning('请填写纯度下限'); return; }
-        if(!formModel['标准品版本']){ ElMessage.warning('请填写标准品版本'); return; }
-        if(!formModel['色谱柱第一批']){ ElMessage.warning('请填写色谱柱第一批'); return; }
-        if(!formModel['流动相']){ ElMessage.warning('请填写流动相'); return; }
-        const _purity = Number(formModel['纯度下限']);
-        if(isNaN(_purity) || _purity<=0 || _purity>100){ ElMessage.warning('纯度下限须为 (0,100] 之间数值'); return; }
-        const _imps = judgeImpurityRows.value.filter(r=> r['杂质名称']);
-        if(!_imps.length){ ElMessage.warning('请至少维护 1 项杂质项目'); return; }
         const bag = MOCK['judge-rule'] = MOCK['judge-rule'] || {};
         const list = bag.main = bag.main || [];
         const isAdd = formMode.value==='add' || formMode.value==='copy';
@@ -33304,14 +34878,11 @@ const app = createApp({
         const payload = {
           规则编码: formModel['规则编码'],
           规则名称: formModel['规则名称'],
-          检验类型: formModel['检验类型'],
+          规则分类: formModel['规则分类'],
+          使用检验类型: joinDun(formModel['使用检验类型']),
           适用物料: joinDun(formModel['适用物料']),
-          纯度下限: '≥ ' + formModel['纯度下限'] + '%',
-          标准品界定: formModel['标准品版本'] + ' · ' + formModel['色谱柱第一批'] + ' · ' + formModel['流动相'],
-          杂质个数: _imps.length,
           启用状态: formSwitch['启用状态']===false ? '禁用' : '启用',
-          备注: formModel['备注'] || '—',
-          _impurities: _imps.map(x=>({ 杂质名称:x['杂质名称'], 是否已知:x['是否已知']==='是'?'是':'否', 典型保留时间:x['典型保留时间']||'—', 定性结构:x['定性结构']||'—', '标准品实测值S':x['标准品实测值S']||'—' }))
+          备注: formModel['备注'] || '—'
         };
         if(isAdd){
           payload.id = 'jr-' + Date.now();
@@ -34328,8 +35899,7 @@ const app = createApp({
             取样日期: formModel['取样日期'] || '',
             失效日期: formModel['失效日期'] || '',
             建档数量: qtyRaw,
-            批号: formModel['批号'] || '',
-            使用状态: formModel['使用状态'] || '在用'
+            批号: formModel['批号'] || ''
           };
           next.状态 = cur['状态']==='报废' ? '报废' : labArchiveState(next);
           Object.assign(cur, next);
@@ -37218,11 +38788,15 @@ const app = createApp({
               有效范围下限: rl==null ? (tr==null ? '' : driftFmt4(tr + lo)) : driftFmt4(rl),
               有效范围上限: rh==null ? (tr==null ? '' : driftFmt4(tr + hi)) : driftFmt4(rh),
               定性结构: r.定性结构 || '',
+              标准结果值: String(r.标准结果值 == null ? '' : r.标准结果值).trim(),
               UCL: r.UCL || '',
               LCL: r.LCL || ''
             };
           })
           .filter(x=> x && x.典型保留时间);
+        // 标准结果值选填；一旦填写必须是数字（后续识别据此计算色谱判异规则）
+        const badStd = imps.find(x=> String(x.标准结果值||'').trim() !== '' && !Number.isFinite(Number(x.标准结果值)));
+        if(badStd){ ElMessage.warning('典型保留时间 ' + (badStd.典型保留时间||'—') + ' 的「标准结果值」需为数字'); return; }
         const badRange = imps.find(x=> Number(x.有效范围下限) > Number(x.有效范围上限));
         if(badRange){ ElMessage.warning('典型保留时间 ' + badRange.典型保留时间 + ' 的有效取值范围下限不得大于上限'); return; }
         if(imps.filter(x=> x.是否主峰==='是').length > 1){ ElMessage.warning('已知杂质项目仅可设置一个主峰'); return; }
@@ -37259,9 +38833,20 @@ const app = createApp({
           if(!cur){ ElMessage.warning('未找到待编辑规则'); return; }
           Object.assign(cur, payload, { id: cur.id, 创建人: cur['创建人'], 创建时间: cur['创建时间'] });
         }
+        // 保存成功后按规则字段同步 GC / LC 台账的分类与表头列
+        const _savedRule = (isAdd ? list[0] : list.find(r=> r.id === formModel._editId)) || payload;
+        const _sync = syncChromLedgerByRule(_savedRule);
         formVisible.value = false;
         bumpStore();
-        ElMessage.success(isAdd ? '漂移规则已新增' : '漂移规则已保存');
+        const _base = isAdd ? '漂移规则已新增' : '漂移规则已保存';
+        if(_sync.pageId && (_sync.added + _sync.updated + _sync.removed) > 0){
+          const _pn = _sync.pageId === 'chrom-ledger-gc' ? 'GC台账' : 'LC台账';
+          ElMessage.success(_base + '；已按规则更新' + _pn + '分类（派生展示，本次涉及 '
+            + (_sync.added + _sync.updated) + ' 项' + (_sync.removed ? '，清理 ' + _sync.removed : '') + '）');
+        } else {
+          ElMessage.success(_base);
+        }
+        if(_sync.note) ElMessage.warning('台账同步提示：' + _sync.note);
         return;
       }
       formVisible.value=false;
@@ -40455,6 +42040,7 @@ const app = createApp({
       ElMessage, menu, activeMenu, defaultOpeneds, page, pageId, activeTab, pageTabs, tabView, currentTabLabel, breadcrumb,
       isSpcQueryPage, spcTypeDefs, spcActiveTabUnknown, spcChartEmptyText,
       announceUnread, announceOpen, openAnnounce, onAnnounceClosed, announceTab, announceKw, announceTerminal, announceProgressKw, announceProgressSide, announceProgressDev, announceNotes, announceProgressSummary, announceLatest, announceHeadline, announceUpdateCount, filteredAnnounceUpdates, filteredAnnounceProgress, dismissAnnounce,
+      changeLogOpen, changeLogRows, changeLogRangeText, changeLogRawCount, visibleChangeLogItems, isChangeLogExpanded, toggleChangeLogRow, changeLogShowWhereInColumn,
       remarksOpen, remarksNote, remarksTitle, remarksTabDefs, remarksActiveTab, remarksBodyRef, remarksRenderedHtml, remarksToc, remarksTocActive, onRemarksTabClick, onRemarksTocClick, toggleRemarks, closeRemarks,
       dePanelCollapsed, deTypeKw, deTypeActive, deTypeList, deTypeFiltered, toggleDeType, resetDeTypeState,
       deQuickSearch, deQuickKw, deColumnOptions, deGridColumns, dynCellText, dynIsTagField, deHiddenCols, toggleDeColumn, dePageSelectedCount, deDense, deFullscreen, deExport, deRefresh,
@@ -40462,8 +42048,8 @@ const app = createApp({
       formVisible, msaFrameSrc, formMode, formDialogTitle, formDialogWidth, formSwitch, formModel, poMatPool, formLineSelected, dispatchAuditVisible, dispatchAuditRow, dispatchAuditForm, splitVisible, splitRow, splitForm, splitLines, splitLineSelected, splitNeedsOrder, splitShowPreDoc, splitShowSoShipPreDocs, splitShowSoPreoutPrepDoc, splitPreDocRequired, splitShowPo, onSplitOrderTypeChange, openSplitPicker, settleVisible, settleRows, settleForm, totalSettleQty, totalSettleFee, openSettleModal, onSettleOk, secondaryAssignVisible, secondaryAssignRow, secondaryAssignForm, resetSecondaryAssignForm, onSecondaryAssignOk, assignVisible, assignRow, assignForm, assignCarriers, assignVehicles, assignTrailers, activeFormFields, activeFormLineFields, formLineEmptyText, formLineRows, authSchemeRows, authItemRows, onAuthSchemeRow,
       sampFormTab, sampRuleRows, sampRuleSelected, sampMix, sampFormTrialN, sampFormTrial, sampFormTrialErr, sampFamilyLabel, sampRuleAlert, addSampRuleRow, removeSampRuleRow, removeSampRuleSelected, onSampRuleSelChange, onSampRuleRightChange, toggleSampRuleMode, onSampRuleRowsChange, runSampFormTrial, onSampMatClear,
       driftFormTab, driftImpurityRows, driftNewUCL, driftNewLCL, driftFilterMin, driftFilterMax, driftMatRows, driftColRows, addDriftImpurity, removeDriftImpurity, addDriftMat, removeDriftMat, addDriftCol, removeDriftCol, driftMatOptions, onDriftMatPick, driftColTypeOptions, driftInspTypeOptions, resetDriftForm, onDriftImpurityTrInput, onDriftImpurityRangeInput, onDriftDeltaChange, onDriftDeltaLowerInput, onDriftDeltaUpperInput, syncDriftImpurityRange, driftRowRange, spectrumPeaks, spectrumCalcDone, spectrumNoRule, spectrumNoteVisible, spectrumCols, spectrumNoteGroups, specTagStyle, runSpectrumCalc, recalcSpectrum, resetSpectrumCalc, specFilePickVisible, specFilePickId, specFileKw, specFileStatus, specFilePreviewVisible, specFilePreviewRow, spectrumFileRows, spectrumFileById, spectrumFileStatusOf, spectrumFilePickRows, openSpectrumFilePick, onSpectrumFileRowPick, previewSpectrumFile, confirmSpectrumFilePick, applySpectrumSourceFile, spectrumColumnCodeOptions, spectrumDriftRuleRows, spectrumDriftNameOptions, syncSpectrumDriftName, onSpectrumInspTypeChange, onSpectrumMaterialChange, onSpectrumColumnModelChange, spectrumRuleByName, spectrumRuleCategoryPlaceholder, syncSpectrumRuleCategory, spectrumSourcePeaks, specPreviewPeaks, specPreviewPolyline,
-      judgeImpurityRows, addJudgeImpurity, removeJudgeImpurity, resetJudgeForm, subRules, formatSubRuleText, judgeTargetLabel, subRuleEditVisible, subRuleEditId, subRuleEditForm, openSubRuleEdit, saveSubRuleEdit, moveSubRule, removeSubRule, resetSubRules, judgeDemoVisible, judgeDemoRule, judgeDemoPeaks, JUDGE_DEMO_STD, judgeDemoResult, openJudgeDemo, loadJudgeDemoBad,
-      CHROM_LEDGER_RT_LIST, chromLedgerDim, CHROM_LEDGER_DIMS, chromLedgerCell, chromLedgerEditVisible, chromLedgerEditForm, openChromLedgerEdit, saveChromLedgerEdit, chromCategoryVisible, chromCategoryForm, chromCategoryMatOptions, openChromCategoryForm, onChromCategoryMaterial, saveChromCategory,
+      subRules, formatSubRuleText, judgeTargetLabel, subRuleEditVisible, subRuleEditId, subRuleEditForm, openSubRuleEdit, saveSubRuleEdit, moveSubRule, removeSubRule, resetSubRules, judgeDemoVisible, judgeDemoRule, judgeDemoPeaks, JUDGE_DEMO_STD, judgeDemoResult, openJudgeDemo, loadJudgeDemoBad,
+      CHROM_LEDGER_RT_LIST, chromLedgerDim, CHROM_LEDGER_DIMS, chromLedgerCell, chromLedgerRowRtPairs, chromLedgerRtStructureMap, chromLedgerPairsCellHeight, chromLedgerEditVisible, chromLedgerEditForm, openChromLedgerEdit, saveChromLedgerEdit, chromCategoryVisible, chromCategoryForm, chromCategoryMatOptions, openChromCategoryForm, onChromCategoryMaterial, saveChromCategory,
       qsNodes, qsNodeSelected, qsDragFrom, qsNodeVisible, qsNodeForm, qsNodeTitle, openQsNode, removeQsNodes, moveQsNode, saveQsNode, onQsLineChange, onQsGatherChange, onQsInspSchemeChange, onQsProcessTypeChange, onQsMaterialChange, qsPreviewVisible, qsPreviewTitle, qsPreviewRows, qsLineOptions, qsWorkshopOptions, qsMaterialOptions, qsSamplingOptions, qsInspItems, qsInspSchemeOptions, qsGatherItems, qsGatherItemOptions,
       sovKw, sovCollapsed, sovSelectedId, sovFilteredGroups, sovSelected, sovTitle, sovRows, selectSovScheme, onSovSearch, sovItemNames, navigateSovProcess,
       SGR_ZERO_OPTS, SGR_ROUND_OPTS, SGR_FETCH_OPTS, sgrTab, sgrSchemes, sgrSchemeSelected, sgrPickVisible, sgrPickQuery, sgrPickRows, sgrPickSelected, openSgrSchemePicker, confirmSgrSchemePicker, removeSgrScheme, removeSgrSchemes, onSgrXbarMode,
@@ -40495,7 +42081,7 @@ const app = createApp({
       visibleTypeFormFields, dictTypeOptions,
       onSelectMenu, onTabChange, onQuery, onResetQuery, onToolbar, onRowOp,
       sampleTakeVisible, sampleTakeTab, sampleTakeForm, sampleTakeMasterCells, sampleTakeTeamOptions, sampleTakeSchemeOptions, sampleTakeRows, sampleTakeSheet, sampleTakeSelected, sampleTakeItemSelected, sampleTakePlanCount, sampleTakeTempCount, sampleTakePickerVisible, sampleTakePickerTitle, sampleTakePickerKw, sampleTakePickerRows, itemPickerRows, openSampleTakePicker, onSampleTakePickerSelect, confirmSampleTakePicker, confirmItemPicker, onSampleTakeItemSelection, deleteSampleTakeItems,
-      onSampleTakeSchemeChange, generateSampleTakeRows, printSampleTakeLabels, refreshSampleTakeCodes, deleteSampleTakeRows, onSampleTakeSelection, retainSampleTake, formatSampleTakeTeam, sampleRetainRows, sampleRetainSelected, generateSampleRetainRows, printSampleRetainLabels, refreshSampleRetainCodes, deleteSampleRetainRows, onSampleRetainSelection, cancelSampleTake, saveSampleTake, confirmSampleTake, labReceiveVisible, labReceiveIds, labReceiveForm, labReceiveWhOptions, labReceiveLocOptions, onLabReceiveWhChange, confirmLabReceive, onFormLineAction, onFormBarcodeAction, onFormOk, onFormFooter, onQcInspectSave, onSplitOk, onDispatchAuditOk, onAssignOk, onAssignVehicleChange, tagClass, displayTagValue, isExpireOverdue, formatMatUomRatioDisplay, isDateTimeField, colMinWidth, formLineColMinWidth, fitColWidth, colMaxWidth, isFormFieldVisible, isFormFieldRequired, ratioFieldKey, isBatchFieldRequired, dispatchNeedsOrderNo, isFormFieldLocked, isFormLineFieldLocked, isFormPickerDisabled, formPickerPlaceholder, onFormPickerClear, isDetailLineRowActionVisible, visibleRowOps, rowOpsInline, rowOpsMore, onRowOpMore, rowOpsColWidth, canEditTankArch, onTankArchDetailEdit, onBizLink, isBizLinkField, isDetailTagField, detailFieldLabel, detailDisplayValue, maskIdCard, removeFormLine, clonePoInFormLineForNewLot, refreshPoInFormLineNos, removeMatMediumPick, matInfoText, formFieldOptions, formLineSelectOptions, prodRetBatchOptions, countWhLotOptions, isProdFormLotField, isCountManageRow, resolveWhBizType, isWaybillPage, isChromLedgerPage, usesErpLineNoCol, isPoNoticePage, isProdIssuePage, isDirectXferPage, isProdWhPage, prodAppMeta, isLoadPage, loadPageMeta, loadWhBizMeta, isWhLineClosePage, isOsPoPage, isWhNoticePage, isCsRecvPage, isBcSerialPage, isBcLineFormPage, onBcFormLineBarcodeEnter, syncSerialSplitRemain, syncSerialMergeRemain, isCsRetPage, isCsWhPage, demoCarrierName, demoCarrierDispatcher,
+      onSampleTakeSchemeChange, generateSampleTakeRows, printSampleTakeLabels, refreshSampleTakeCodes, deleteSampleTakeRows, onSampleTakeSelection, retainSampleTake, formatSampleTakeTeam, sampleRetainRows, sampleRetainSelected, generateSampleRetainRows, printSampleRetainLabels, refreshSampleRetainCodes, deleteSampleRetainRows, onSampleRetainSelection, cancelSampleTake, saveSampleTake, confirmSampleTake, labReceiveVisible, labReceiveIds, labReceiveForm, labReceiveWhOptions, labReceiveLocOptions, onLabReceiveWhChange, confirmLabReceive, labRetainAddVisible, labRetainForm, labRetainUpstreamOptions, labRetainOrder, labRetainAvailable, labRetainNoMaster, openLabRetainAdd, onLabRetainOrderChange, confirmLabRetainAdd, labLabelVisible, labLabelRows, openLabLabelPrint, confirmLabLabelPrint, labArchiveLabelVisible, labArchiveLabelTemplate, labArchiveLabelTemplates, labArchiveLabelRows, openLabArchiveLabelPrint, confirmLabArchiveLabelPrint, handleLabArchiveExpireDispose, onLabReceiveReject, onFormLineAction, onFormBarcodeAction, onFormOk, onFormFooter, onQcInspectSave, onSplitOk, onDispatchAuditOk, onAssignOk, onAssignVehicleChange, tagClass, displayTagValue, isExpireOverdue, formatMatUomRatioDisplay, isDateTimeField, colMinWidth, formLineColMinWidth, fitColWidth, colMaxWidth, isFormFieldVisible, isFormFieldRequired, ratioFieldKey, isBatchFieldRequired, dispatchNeedsOrderNo, isFormFieldLocked, isFormLineFieldLocked, isFormPickerDisabled, formPickerPlaceholder, onFormPickerClear, isDetailLineRowActionVisible, visibleRowOps, rowOpsInline, rowOpsMore, onRowOpMore, rowOpsColWidth, canEditTankArch, onTankArchDetailEdit, onBizLink, isBizLinkField, isDetailTagField, detailFieldLabel, detailDisplayValue, maskIdCard, removeFormLine, clonePoInFormLineForNewLot, refreshPoInFormLineNos, removeMatMediumPick, matInfoText, formFieldOptions, formLineSelectOptions, prodRetBatchOptions, countWhLotOptions, isProdFormLotField, isCountManageRow, resolveWhBizType, isWaybillPage, isChromLedgerPage, usesErpLineNoCol, isPoNoticePage, isProdIssuePage, isDirectXferPage, isProdWhPage, prodAppMeta, isLoadPage, loadPageMeta, loadWhBizMeta, isWhLineClosePage, isOsPoPage, isWhNoticePage, isCsRecvPage, isBcSerialPage, isBcLineFormPage, onBcFormLineBarcodeEnter, syncSerialSplitRemain, syncSerialMergeRemain, isCsRetPage, isCsWhPage, demoCarrierName, demoCarrierDispatcher,
       selectDictType, toggleDictTypeNode, openDictTypeForm, onDictTypeFormOk, removeDictType, onRemoveUnusedDictTypes, addrPopoverField,
       rcAuditVisible, rcAuditRow, rcAuditForm, saveReportAudit,
       riIssueVisible, riIssueForm, riIssueLines, riSourceNos, riTemplateOptions, isRiBatchAllValues, riBatchAllValuesLines, onRiSourceChange, onRiTemplateChange, saveIssueCOA,
@@ -40515,18 +42101,19 @@ const app = createApp({
       addKpiGrade, delKpiGrades, addKpiProject, delKpiProjects, addKpiIndicator, delKpiIndicators, moveKpiProject, moveKpiIndicator, onKpiCfgOk, openKpiScore, onKpiScoreOk, kpiProjectScore, onKpiVendorDelete,
       isDataLedgerMode, qcLedgerDetailVisible, qcLedgerDetailRow, qcLedgerDetailTab, qcLedgerDetailHeaderCols, qcLedgerQuantRows, qcLedgerQualRows, qcLedgerQuantSelected, qcLedgerQualSelected, qcLedgerOriginReady, qcLedgerOriginView, qcLedgerDash, qcLedgerParamValue, isQcLedgerDetailTagCol, qcLedgerDetailTagType, onQcLedgerDetailTabChange, qcLedgerCompareVisible, qcLedgerCompareRows, qcLedgerCompareFilter, filteredCompareRows, compareMetricColumns, getCompareItem, getCompareValue, getCompareValueStyle, exportCompareExcel, qcLedgerCloseVisible, qcLedgerCloseRows, qcLedgerCloseExplain, qcLedgerLogVisible, qcLedgerLogRow, qcLedgerEditVisible, qcLedgerEditForm, qcLedgerEditItems, openQcLedgerDetail, openQcLedgerCompare, openQcLedgerClose, confirmQcLedgerClose, openQcLedgerLog, openQcLedgerEdit, addQcLedgerTempItem, removeQcLedgerTempItem, saveQcLedgerEdit, openQcLedgerModify, onDataLedgerEndEntry, isRowOpDisabled,
       inspAttachDialogVisible, manualAttachDialogVisible, attachDialogRow, inspAttachRows, openInspAttachDialog, openManualAttachDialog, triggerManualAttachUpload, onManualAttachChange, viewManualAttach, removeManualAttach,
+      inspOrderAttachViewVisible, inspOrderAttachViewRow, inspOrderAttachViewTitle, inspOrderAttachViewFiles, inspOrderAttachFiles, inspOrderAttachCount, inspOrderAttachNames, openInspOrderAttachView, triggerInspOrderAttachUpload, onInspOrderAttachChange, removeInspOrderFormAttach,
       qcLedgerBatchAddVisible, qcLedgerBatchAddTitle, qcLedgerBatchOrders, qcLedgerImportVisible, qcLedgerActiveScheme, qcLedgerImportStrategy, addBatchOrder, copyBatchOrder, removeBatchOrder, clearAllBatchOrders, collapseAllOrders, getTotalBatchSampleCount, onOrderSchemeChange, onOrderMaterialChange, onOrderCountChange, generateOrderSampleRows, addSingleOrderSampleRow, removeOrderSampleRow, clearOrderSampleRows, calcOrderSampleRowResult, isMetricCellFailed, getMetricConclusion, getMetricDeviation, isMetricCellDeviation, fillQcBatchAddDemoData, openQcLedgerBatchAdd, openQcLedgerImport, getImportSchemeFlatHeadersText, downloadFlatTemplate, triggerSimulateImport, simulateImportMultiOrders, submitQcLedgerBatchAdd,
       openQcFieldPicker,
       workshopSelectOptions, prodLineSelectNames, onInspLinePicked, onInspWorkshopChange, fillGatherSchemeLine,
       COMMON_MATERIAL_OPTIONS, inspOrderModalVisible, inspOrderMode, inspOrderEditId, inspOrderCloseModalVisible, inspOrderCloseRows, inspOrderCloseExplain, inspSampleDataEntryVisible, inspSampleQuickEntryVisible, inspSampleEndEntryVisible,
       inspSampleAbnormalReportVisible, activeSampleRow, inspSampleShowAll, inspSampleFullscreen, toggleInspSampleFullscreen, scrollToInspItem, inspSampleMethod,
-      inspSamplePublicTestTimes, inspSampleTestCount, inspSampleActiveItemId, inspSampleHasParams, inspSampleMethodOptions, inspSampleMethodType, inspSampleGatherBtnText, inspSampleGatherTip, onFetchGatherData, inspSampleParamRows, inspSampleResultText, inspSampleItemCheckClass, inspSampleCatCheckClass, inspSampleItemTip, inspSampleSpecText, onQualValChange, onParamCellChange, onItemValChange, fillSampleDemoValues, clearSampleValues, onInspSampleSave,
+      inspSamplePublicTestTimes, inspSampleTestCount, inspSampleActiveItemId, inspSampleActiveCat, inspSampleCategories, inspSampleCatItems, selectInspSampleCat, inspSampleHasParams, inspSampleMethodOptions, inspSampleMethodType, inspSampleGatherBtnText, inspSampleGatherTip, onFetchGatherData, inspSampleParamRows, inspSampleParamRowsOf, onResultParamCellChange, onHplcParamCellChange, onInspSampleParamCellChange, inspUnmatchedPeaks, inspUnmatchedPeakSource, dePeakPctText, inspSampleResultText, inspSampleItemCheckClass, inspSampleCatCheckClass, inspSampleItemTip, inspSampleSpecText, onQualValChange, onParamCellChange, onItemValChange, fillSampleDemoValues, clearSampleValues, onInspSampleSave,
       qeFullscreen, qeMethod, qeInstrument, qeActiveCat, qeCollapsed, qePubVals, qePublicParams, qeSampleParams, qeMethodOptions, qeUnitOptions, qeInstrumentOptions,
       qeItems, qeDoneCount, qeCategories, qeAllCollapsed, qeSubTestColWidth, qeSubBlankWidth, qeInfoFields, qeSpecLines, qeInit, qeSyncMeta, qeSelectCat, qeToggleItem, qeToggleAll, qeToggleFullscreen, qeFetchSpectrum,
       onInspSampleDataEntrySubmit, onInspSampleEndEntryConfirm,
       triggerAttachUpload, onAttachChange, viewAttach, removeAttach,
       inspOrderDetailModalVisible, activeInspOrderRow, inspOrderForm, inspOrderModalTitle, externalUnitOptions, supplierOptions, onInspOrderSupplierChange, inspOrderTeamOptions, teamTextOf, onInspOrderMaterialChange, onInspOrderCountChange, openInspOrderForm, submitInspOrderForm, openInspOrderCloseModal, submitInspOrderClose, openInspOrderDetail,
-      selectedSamples, dataCompareVisible, sampleInspectDetailVisible, activeSampleDetail, sampleActiveTab, onSampleSelectChange, openDataCompare, exportSampleList, openSampleInspectDetail, sampleFilterStatus, sampleFilterResult, filteredSamples, sampleOriginGroups, sampleInspectFullscreen, dataCompareTableData,
+      selectedSamples, dataCompareVisible, sampleInspectDetailVisible, activeSampleDetail, sampleActiveTab, onSampleSelectChange, openDataCompare, exportSampleList, openSampleInspectDetail, sampleFilterStatus, sampleFilterResult, filteredSamples, inspOrderRetainRows, inspOrderRetainVisible, sampleOriginGroups, sampleInspectFullscreen, dataCompareTableData,
       reviewOrderReviewVisible, reviewOrderActiveRow, reviewOrderSamples, reviewOrderReviewForm, openReviewOrderReview, openReviewSampleDetail, onReviewOrderReviewOk,
       inspSchemeModalVisible, inspSchemeMode, inspSchemeEditId, inspSchemeActiveSubTab, inspSchemeLogVisible, activeSchemeRow, inspSchemeLogList, inspSchemeForm, currentSchemeTypeName, inspSchemeModalTitle, openInspSchemeForm, openInspSchemeLog, addSchemeQuantitativeItem, addSchemeQualitativeItem, addSchemeObject, submitInspSchemeForm,
       inspReceiveVisible, inspReceiveRow, inspReceiveSchemeCode, inspReceiveSchemeOptions, inspReceiveSheet, inspReceiveItemSelected, inspReceivePlanCount, inspReceiveTempCount, inspReceiveNoMatch, openInspReceive, onInspReceiveSchemeChange, onInspReceiveItemSelection, deleteInspReceiveItems, openInspReceivePicker, submitInspReceive,

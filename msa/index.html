@@ -95,7 +95,7 @@
               <th style="width:110px">仪器编号</th>
               <th style="width:96px">检测项目</th>
               <th style="width:140px">评价人</th>
-              <th style="width:96px">检验项目数量</th>
+              <th style="width:96px">样品数量</th>
               <th style="width:90px">评价人数量</th>
               <th style="width:80px">试验次数</th>
               <th style="width:100px">测量日期</th>
@@ -320,10 +320,6 @@
           <div class="ro" id="eqSpec">—</div>
         </div>
         <div class="field">
-          <label>仪器量程</label>
-          <div class="ro" id="eqRange">—</div>
-        </div>
-        <div class="field">
           <label>仪器类型</label>
           <div class="ro" id="eqType">—</div>
         </div>
@@ -332,7 +328,7 @@
           <input id="partName" />
         </div>
         <div class="field">
-          <label><i class="req">*</i>检验项目数量 n</label>
+          <label><i class="req">*</i>样品数量 n</label>
           <select id="nSel">
             <option>2</option><option>3</option><option>4</option><option>5</option>
             <option>6</option><option>7</option><option>8</option><option>9</option>
@@ -704,7 +700,6 @@ function applyEq(row) {
   document.getElementById('eqName').title = (row.code ? row.code + ' · ' : '') + (row.name || '');
   document.getElementById('eqNum').textContent = row.code || '—';
   document.getElementById('eqSpec').textContent = row.spec || '—';
-  document.getElementById('eqRange').textContent = row.range || '—';
   document.getElementById('eqType').textContent = row.type || '—';
   if (!document.getElementById('partName').value.trim()) {
     document.getElementById('partName').value = '轴套 φ20';
@@ -715,7 +710,6 @@ function clearEq() {
   document.getElementById('eqNameText').textContent = '请选择仪器';
   document.getElementById('eqNum').textContent = '—';
   document.getElementById('eqSpec').textContent = '—';
-  document.getElementById('eqRange').textContent = '—';
   document.getElementById('eqType').textContent = '—';
 }
 
@@ -971,7 +965,6 @@ function openReport(a) {
     + '&eqName=' + encodeURIComponent(p.eqName)
     + '&eqNum=' + encodeURIComponent(p.eqNum)
     + '&spec=' + encodeURIComponent(eq.spec || '')
-    + '&range=' + encodeURIComponent(eq.range || '')
     + '&date=' + encodeURIComponent(p.date)
     + '&verdict=' + encodeURIComponent(planVerdict())
     + '&n=' + p.n + '&r=' + p.r;

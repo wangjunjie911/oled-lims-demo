@@ -49,10 +49,10 @@
       <div class="form-grid">
         <div class="field"><label>计划编号</label><div class="ro" id="planNo">GRR-20260827-003</div></div>
         <div class="field"><label>仪器</label><div class="ro" id="eqText">外径千分尺 / EQ-MIC-008</div></div>
-        <div class="field"><label>规格 / 量程</label><div class="ro" id="specText">0–25 mm / 0.001 mm</div></div>
+        <div class="field"><label>仪器规格</label><div class="ro" id="specText">0–25 mm / 0.001 mm</div></div>
         <div class="field"><label>检测项目</label><div class="ro" id="partText">销轴</div></div>
         <div class="field"><label>测量人员</label><div class="ro" id="opNames">王工 / 李工 / 赵工</div></div>
-        <div class="field"><label>检验项目数量</label><div class="ro" id="nText">10</div></div>
+        <div class="field"><label>样品数量</label><div class="ro" id="nText">10</div></div>
         <div class="field"><label>测量人员数量</label><div class="ro" id="opCount">3</div></div>
         <div class="field"><label>试验次数</label><div class="ro" id="rText">3</div></div>
         <div class="field"><label>分析日期</label><div class="ro" id="dateText">2026-08-27</div></div>
@@ -234,7 +234,6 @@ function goList() {
   if (sub) sub.textContent = plan + ' · ' + eqName + ' ' + eqNum + ' · ' + part;
   var set = function (id, v) { var el = document.getElementById(id); if (el) el.textContent = v; };
   var spec = q.get('spec') || '';
-  var range = q.get('range') || '';
   var date = q.get('date') || '2026-08-27';
   var verdict = q.get('verdict') || '可接受';
   function verdictTagHtml(v) {
@@ -248,9 +247,7 @@ function goList() {
   }
   set('planNo', plan); set('eqText', eqName + ' / ' + eqNum); set('partText', part);
   set('nText', n); set('rText', r); set('dateText', date);
-  var specText = spec || '—';
-  if (range && spec.indexOf(range) === -1) specText += ' / ' + range;
-  set('specText', specText);
+  set('specText', spec || '—');
   set('makerText', '张明 · ' + date);
 
   var store = {};
