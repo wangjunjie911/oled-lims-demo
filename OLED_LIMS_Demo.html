@@ -230,7 +230,6 @@ body.remarks-open .demo-scope-tip{display:none}
 .changelog__txt{color:#595959;line-height:1.55;word-break:break-word;min-width:0}
 .changelog__item{display:flex;gap:6px}
 .changelog__item + .changelog__item{margin-top:4px;padding-top:4px;border-top:1px dotted #EDEDED}
-.changelog__item-date{flex-shrink:0;color:#A6A6A6;font-size:11px;line-height:1.7;font-variant-numeric:tabular-nums}
 .changelog__item-txt{min-width:0}
 .changelog__item-where{font-style:normal;font-weight:600;color:#004098;margin-right:6px}
 .changelog__more{margin-top:4px;padding:0;border:0;background:transparent;color:#004098;font-size:11px;line-height:1.6;cursor:pointer}
@@ -700,6 +699,10 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
 }
 .sa-detail-dialog .sa-detail-head{align-items:center}
 .sa-detail-tip{margin-top:8px;font-size:12px;line-height:1.6;color:#86909C}
+/* 样品任务分配·分配记录：头部信息行对齐 + 「分配对象」单行省略展示 */
+.sa-log-dialog .sa-detail-head{align-items:center}
+.sa-log-target{display:block;line-height:1.5;word-break:break-word}
+.sa-log-none{color:#C0C4CC}
 /* 已完成行的「取消分配」置灰：保留可读但不抢视觉 */
 .sa-detail-dialog .el-table .el-button.is-disabled,
 .sa-detail-dialog .el-table .el-button.is-disabled:hover{
@@ -783,6 +786,15 @@ body:has(.el-dialog.chrom-form-fullscreen.is-fullscreen) .remarks-toggle{visibil
 .demo-dialog--biz .demo-data-table td.el-table__cell .cell:has(.el-date-editor){
   overflow:visible;text-overflow:clip;
 }
+/* 仪器台账·变更日志：仅「变更内容」列允许多行完整展示，其余字段列单行省略 + tooltip（保证行高稳定、可横向滚动） */
+.demo-dialog--biz .demo-data-table.il-change-log td.el-table__cell{height:auto;padding-top:6px;padding-bottom:6px}
+.demo-dialog--biz .demo-data-table.il-change-log td.el-table__cell.il-log-detail-col .cell{white-space:normal;overflow:visible;text-overflow:clip;word-break:break-word;line-height:20px}
+/* 字段列超出容器：横向滚动条常显（mac 原生 overlay 滚动条静置会隐藏，这里改用经典滚动条样式），
+   避免「列被切一半却看不出可滚」的可用性问题 */
+.il-change-log .el-scrollbar__wrap{scrollbar-width:thin}
+.il-change-log .el-scrollbar__wrap::-webkit-scrollbar{height:10px;background:rgba(148,163,184,.12)}
+.il-change-log .el-scrollbar__wrap::-webkit-scrollbar-thumb{background:rgba(100,116,139,.45);border-radius:6px}
+.il-change-log .el-scrollbar__wrap::-webkit-scrollbar-track{background:rgba(148,163,184,.14);border-radius:6px}
 .demo-form-section__title{display:flex;align-items:center;margin:24px 0 16px;font-size:14px;font-weight:600;color:var(--color-btn-primary);line-height:1}
 .demo-form-section__title::before,.demo-form-section__title::after{content:'';flex:1;height:1px;background:var(--color-border)}
 .demo-form-section__title>span{padding:0 16px;background:var(--color-bg-card);white-space:nowrap}
@@ -816,6 +828,21 @@ body:has(.el-dialog.chrom-form-fullscreen.is-fullscreen) .remarks-toggle{visibil
 .lab-retain__hint{font-size:12px;color:#86909C;line-height:1.5;margin-top:2px}
 .lab-retain__warn{margin-top:8px;padding:6px 10px;font-size:12px;line-height:1.5;color:#8C6D1F;background:#FFFBE6;border-left:3px solid #FAAD14;border-radius:2px}
 .lab-retain__empty{margin-top:8px;padding:16px;text-align:center;font-size:13px;color:#86909C;background:#FAFBFC;border:1px dashed var(--color-border);border-radius:4px}
+.lab-retain-dialog .el-dialog__body{max-height:min(84vh,820px);overflow:auto}
+/* 矮屏（笔记本 1366×768 / 1280×800）：压缩表单纵向间距，保证明细表 3~4 行完整可见 */
+@media (max-height:820px){
+  .lab-retain-dialog .el-form-item{margin-bottom:12px}
+  .lab-retain__info{gap:6px 16px;padding:10px 14px}
+  .lab-retain__lines{margin-top:12px}
+  .lab-retain__lines-title{margin-bottom:8px}
+  .lab-retain__lines-ops{margin-bottom:8px}
+}
+.lab-retain__lines{margin-top:16px}
+.lab-retain__lines-title{font-size:14px;font-weight:600;color:#1F2329;margin-bottom:10px;line-height:1}
+.lab-retain__lines-ops{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.lab-retain__lines-ops .el-button+.el-button{margin-left:0}
+.lab-retain__lines .demo-table-scroll{width:100%;max-width:100%;overflow-x:auto}
+.lab-retain__lines .el-table .cell{padding:0 8px}
 .lab-label__bar{display:flex;align-items:center;gap:12px;margin-bottom:10px;font-size:13px;color:#4E5969}
 .lab-label__count{margin-left:auto;font-size:13px;color:#1D2129}
 /* 样品档案 · 标签打印：模板下拉两段式（模板名 + 类型）与来源提示 */
@@ -1414,6 +1441,11 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
 .demo-vxe-grid .rt-head{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:1px;line-height:1.25;width:100%}
 .demo-vxe-grid .rt-head__tr{font-weight:600;color:var(--color-text-main);font-size:13px}
 .demo-vxe-grid .rt-head__st{font-size:11px;font-weight:400;color:var(--color-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+/* 色谱识别取数 · 台账记录信息：三行表头（典型保留时间 / 已定性名称 / 取值口径），单元格固定三段取值 */
+.chrom-pick-table .rt-head{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;line-height:1.25;width:100%}
+.chrom-pick-table .rt-head__tr{font-weight:600;color:var(--color-text-main);font-size:13px}
+.chrom-pick-table .rt-head__st{font-size:11px;font-weight:400;color:var(--color-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.chrom-pick-table .rt-head__dim{font-size:11px;color:#86909c;white-space:nowrap;border-top:1px dashed #dfe2e8;margin-top:2px;padding-top:2px;letter-spacing:.2px}
 .page-panel--dict.is-chrom-ledger{display:grid;grid-template-columns:300px minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr);grid-template-areas:"tabs tabs" "query query" "aside list";align-items:stretch;gap:0;background:#fff}
 .page-panel--dict.is-chrom-ledger>.dict-main{display:contents!important}
 .page-panel--dict.is-chrom-ledger .page-tabs{grid-area:tabs}
@@ -1772,6 +1804,14 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
 .sa-assign-block__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 16px}
 .sa-field__label{font-size:13px;color:#4E5969;line-height:22px;margin-bottom:2px}
 .sa-field__label i{color:#F53F3F;font-style:normal;margin-right:2px}
+/* 检验人支持多选：字段名后挂「多选」标记，tag 单行不撑高 */
+.sa-field__multi{margin-left:6px;padding:0 4px;border:1px solid #B7D0EC;border-radius:2px;background:#F2F7FC;color:#004098;font-size:11px;line-height:16px;vertical-align:1px}
+.sa-assign-block__grid .el-select__tags,
+.sa-assign-block__grid .el-select__selection{flex-wrap:nowrap;overflow:hidden}
+.sa-assign-block__grid .el-select__tags .el-tag,
+.sa-assign-block__grid .el-select__selection .el-tag{margin:2px 4px 2px 0;max-width:96px}
+.sa-assign-block__grid .el-select__tags .el-tag__content,
+.sa-assign-block__grid .el-select__selection .el-tag__content{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* 检验人：自动带出口径提示 / 设备未维护责任人告警 */
 .sa-field__hint{font-size:12px;line-height:18px;margin-top:4px;color:#86909C}
 .sa-field__hint--warn{color:#D4380D}
@@ -1968,7 +2008,7 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
           <button type="button" class="sync-chip" @click="resetDemoStore" title="清空 PC/APP 联动缓存，恢复初始 Mock">重置</button>
           <el-popover v-model:visible="changeLogOpen" placement="bottom-end" :width="700" trigger="click" :show-arrow="false" popper-class="changelog-popper" :teleported="true">
             <template #reference>
-              <button type="button" class="changelog-chip" :class="{ on: changeLogOpen }" :title="'查看修改记录（' + changeLogRows.length + ' 个模块 / ' + changeLogRawCount + ' 项改动）'">
+              <button type="button" class="changelog-chip" :class="{ on: changeLogOpen }" :title="'查看修改记录（按日期+模块合并 ' + changeLogRows.length + ' 条 / 共 ' + changeLogRawCount + ' 项改动）'">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
                 <span>修改记录</span>
                 <span class="changelog-chip__num">{{ changeLogRows.length }}</span>
@@ -1980,14 +2020,14 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
                   <span class="changelog__title">修改记录</span>
                   <span v-if="changeLogRangeText" class="changelog__range">{{ changeLogRangeText }}</span>
                 </div>
-                <span class="changelog__total">共 <b>{{ changeLogRows.length }}</b> 条<span v-if="changeLogRawCount" class="changelog__total-sub">同模块已合并 · {{ changeLogRawCount }} 项改动</span></span>
+                <span class="changelog__total">共 <b>{{ changeLogRows.length }}</b> 条<span v-if="changeLogRawCount" class="changelog__total-sub">同日同模块已合并 · 共 {{ changeLogRawCount }} 项改动</span></span>
               </div>
               <template v-if="changeLogRows.length">
                 <div class="changelog__row changelog__row--hd">
                   <span>序号</span><span>时间</span><span>模块</span><span>修改内容</span>
                 </div>
                 <div class="changelog__body">
-                  <div v-for="row in changeLogRows" :key="row.module" class="changelog__row">
+                  <div v-for="row in changeLogRows" :key="row.key" class="changelog__row">
                     <span class="changelog__seq">{{ row.seq }}</span>
                     <span class="changelog__date">{{ row.date }}</span>
                     <span class="changelog__mod">
@@ -1996,13 +2036,12 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
                     </span>
                     <div class="changelog__txt">
                       <div v-for="(it, ii) in visibleChangeLogItems(row)" :key="ii" class="changelog__item">
-                        <span v-if="row.count > 1" class="changelog__item-date">{{ it.date }}</span>
                         <span class="changelog__item-txt">
-                          <em v-if="row.count > 1 && it.where && isChangeLogExpanded(row.module)" class="changelog__item-where">{{ it.where }}</em>{{ it.text }}
+                          <em v-if="row.count > 1 && it.where && isChangeLogExpanded(row.key)" class="changelog__item-where">{{ it.where }}</em>{{ it.text }}
                         </span>
                       </div>
-                      <button v-if="row.count > 1" type="button" class="changelog__more" @click="toggleChangeLogRow(row.module)">
-                        {{ isChangeLogExpanded(row.module) ? '收起' : '展开全部 ' + row.count + ' 项' }}
+                      <button v-if="row.count > 1" type="button" class="changelog__more" @click="toggleChangeLogRow(row.key)">
+                        {{ isChangeLogExpanded(row.key) ? '收起' : '展开全部 ' + row.count + ' 项' }}
                       </button>
                     </div>
                   </div>
@@ -2012,7 +2051,7 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
                 <div class="changelog__empty-title">该时间范围内暂无修改记录</div>
                 <div class="changelog__empty-sub">当前没有记录到改动。历史版本说明可在右侧「公告铃铛」中查看。</div>
               </div>
-              <div v-if="changeLogRows.length" class="changelog__ft">同一模块的改动合并为一行，时间取该模块最新一次；模块下方为该次改动的具体页面 / 操作，行内默认显示最新项，展开后逐条显示各自位置与日期。序号按最新时间先后连续递增。</div>
+              <div v-if="changeLogRows.length" class="changelog__ft">按「日期 + 模块」汇总：同一日期同一模块合并为一行，按日期倒序排列，最新修改在最上方；模块下方为该次改动的具体页面 / 操作，行内默认显示最新项，展开后逐条显示各自位置。</div>
             </div>
           </el-popover>
           <button type="button" class="announce-bell" :class="{ unread: announceUnread }" @click="openAnnounce" :title="'版本公告 ' + announceLatest">
@@ -2593,7 +2632,7 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
               <div class="list-toolbar__actions">
                 <span v-if="isChromLedgerPage()" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:#4E5969;margin-right:4px">
                   维度：
-                  <el-select v-model="chromLedgerDim" style="width:150px">
+                  <el-select v-model="chromLedgerDim" style="width:212px">
                     <el-option v-for="d in CHROM_LEDGER_DIMS" :key="d" :label="d" :value="d"></el-option>
                   </el-select>
                 </span>
@@ -2655,7 +2694,7 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
             <div class="list-body">
               <div v-if="page.layout==='dict-split' && !dictTypeId && pageId==='dict'" class="dict-empty-tip">请先在左侧选择{{ dictSplitTypeLabel }}</div>
               <template v-else>
-              <demo-vxe-grid :data="pagedData" :columns="pageId==='data-entry-type' ? deGridColumns : vxeColumns" :selected-ids="selectedIds" :cell-height="pageId==='data-entry-type' && deDense ? 30 : (pageId==='chromatography-column' ? 52 : 40)" @update:selected-ids="selectedIds=$event">
+              <demo-vxe-grid :data="pagedData" :empty-text="(tabView && tabView.emptyText) || '暂无数据'" :columns="pageId==='data-entry-type' ? deGridColumns : vxeColumns" :selected-ids="selectedIds" :cell-height="pageId==='data-entry-type' && deDense ? 30 : (pageId==='chromatography-column' ? 52 : 40)" @update:selected-ids="selectedIds=$event">
                 <template #rt_head="{ column }">
                   <div class="rt-head">
                     <div class="rt-head__tr">{{ column.title }}</div>
@@ -2708,7 +2747,7 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
                   <span>{{ maskIdCard(row[column.field]) }}</span>
                 </template>
                 <template #rt_cell="{ row, column }">
-                  <span :style="row['杂质偏差结论']==='异常' ? 'color:#FF4D4F;font-weight:600' : ''">{{ chromLedgerCell(row, column.title) }}</span>
+                  <span :title="chromLedgerCell(row, column.title)" :style="row['杂质偏差结论']==='异常' ? 'color:#FF4D4F;font-weight:600' : ''">{{ chromLedgerCell(row, column.title) }}</span>
                 </template>
                 <template #chrom_model="{ row }">
                   <div class="chrom-model-cell" :title="(row['色谱柱型号']||'—') + ' · ' + chromModelMetaText(row['色谱柱型号'])">
@@ -2795,9 +2834,9 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
         </div>
         <div class="sa-assign-block__grid">
           <div class="sa-field">
-            <div class="sa-field__label"><i>*</i>检验班组</div>
-            <el-select v-model="b['检验班组']" placeholder="请选择检验班组" style="width:100%">
-              <el-option v-for="t in SAMPLE_ASSIGN_TEAMS" :key="b.key+'-'+t" :label="t" :value="t"></el-option>
+            <div class="sa-field__label"><i>*</i>检验班组<span class="sa-field__multi">多选</span></div>
+            <el-select v-model="b['检验班组']" placeholder="请选择检验班组，可多选" multiple filterable collapse-tags collapse-tags-tooltip :max-collapse-tags="2" style="width:100%">
+              <el-option v-for="t in sampleAssignTeamOptions(b['检验班组'])" :key="b.key+'-'+t" :label="t" :value="t"></el-option>
             </el-select>
           </div>
           <div class="sa-field">
@@ -2807,13 +2846,14 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
             </el-select>
           </div>
           <div class="sa-field">
-            <div class="sa-field__label"><i>*</i>检验人</div>
-            <el-select v-model="b['检验人']" placeholder="选择检验设备后自动带出" filterable allow-create default-first-option style="width:100%">
+            <div class="sa-field__label"><i>*</i>检验人<span class="sa-field__multi">多选</span></div>
+            <el-select v-model="b['检验人']" placeholder="选择检验设备后自动带出，可多选" filterable multiple allow-create default-first-option collapse-tags collapse-tags-tooltip :max-collapse-tags="2" style="width:100%">
               <el-option v-for="u in sampleAssignInspectorOptions(b['检验人'])" :key="b.key+'-ins-'+u" :label="u" :value="u"></el-option>
             </el-select>
-            <div class="sa-field__hint sa-field__hint--warn" v-if="b._deviceNoOwner && !b['检验人']">该设备未维护责任人，请手动选择检验人</div>
+            <div class="sa-field__hint sa-field__hint--warn" v-if="b._deviceNoOwner && !saInspectorFilled(b)">该设备未维护责任人，请手动选择检验人</div>
             <div class="sa-field__hint sa-field__hint--warn" v-else-if="b._deviceNoOwner">该设备未维护责任人，当前检验人为手工指定</div>
-            <div class="sa-field__hint" v-else-if="saInspectorIsAuto(b)">已按设备责任人自动带出，可调整</div>
+            <div class="sa-field__hint" v-else-if="saInspectorIsAuto(b)">已按设备责任人自动带出，可增选调整</div>
+            <div class="sa-field__hint" v-else-if="saInspectorList(b['检验人']).length>1">已选 {{ saInspectorList(b['检验人']).length }} 名检验人，任务将同时指派</div>
           </div>
         </div>
         <div class="sa-assign-block__meta">分配人：{{ b['分配人'] || '保存后写入' }}　·　分配时间：{{ b['分配时间'] || '保存后写入' }}</div>
@@ -2847,8 +2887,9 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
       </el-table-column>
       <el-table-column label="检验类名称" min-width="130"><template #default="{ row }">{{ row['检验类名称'] || '—' }}</template></el-table-column>
       <el-table-column label="检验方案" min-width="110" show-overflow-tooltip><template #default="{ row }">{{ row['检验方案'] || '—' }}</template></el-table-column>
-      <el-table-column label="检验班组" width="100"><template #default="{ row }">{{ row['检验班组'] || '—' }}</template></el-table-column>
+      <el-table-column label="检验班组" width="130" show-overflow-tooltip><template #default="{ row }">{{ row['检验班组'] || '—' }}</template></el-table-column>
       <el-table-column label="检验设备" width="200" show-overflow-tooltip><template #default="{ row }">{{ row['检验设备'] || '—' }}</template></el-table-column>
+      <el-table-column label="检验人" width="130" show-overflow-tooltip><template #default="{ row }">{{ row['检验人'] || '—' }}</template></el-table-column>
       <el-table-column label="分配状态" width="96" align="center"><template #default="{ row }"><span class="tag" :class="tagClass(row['分配状态'] || '未分配')">{{ row['分配状态'] || '未分配' }}</span></template></el-table-column>
       <el-table-column label="分配人" width="80"><template #default="{ row }">{{ row['分配人'] || '—' }}</template></el-table-column>
       <el-table-column label="分配时间" width="146"><template #default="{ row }">{{ row['分配时间'] || '—' }}</template></el-table-column>
@@ -2867,6 +2908,54 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
     </div>
     <template #footer>
       <el-button type="primary" @click="saDetailVisible=false">关闭</el-button>
+    </template>
+  </el-dialog>
+
+  <!-- 样品任务分配：分配记录（该样品全部历史「分配 / 取消分配」操作，按操作时间倒序） -->
+  <el-dialog v-model="saLogVisible" class="demo-dialog--biz sa-log-dialog" title="分配记录" width="1100px" top="8vh" append-to-body>
+    <div class="sa-detail-head" v-if="saLogRow">
+      <span>样品编号 <b>{{ saLogRow['样品编号'] }}</b></span>
+      <span>物料名称 <b>{{ saLogRow['物料名称'] || '—' }}</b></span>
+      <span>报检单号 <b>{{ saLogRow['报检单号'] || '—' }}</b></span>
+      <span>记录数 <b>{{ saLogRows.length }}</b> 条</span>
+    </div>
+    <el-table :data="saLogRows" border size="small" max-height="440" row-key="id">
+      <template #empty>
+        <el-empty description="该样品暂无分配记录" :image-size="60">
+          <div class="sa-detail-tip" style="margin-top:0">尚未发生「分配 / 取消分配」操作，完成一次检验任务分配后此处将自动生成记录。</div>
+        </el-empty>
+      </template>
+      <el-table-column type="index" label="序号" width="52" align="center"></el-table-column>
+      <el-table-column label="操作类型" width="86" align="center">
+        <template #default="{ row }"><span class="tag" :class="saLogTagClass(row['操作类型'])">{{ row['操作类型'] }}</span></template>
+      </el-table-column>
+      <el-table-column label="检验类名称" width="150" show-overflow-tooltip>
+        <template #default="{ row }">{{ row['检验类名称'] || '—' }}</template>
+      </el-table-column>
+      <el-table-column label="分配对象" width="300">
+        <template #default="{ row }">
+          <span v-if="row['分配对象']" class="sa-log-target" :title="row['分配对象']">{{ row['分配对象'] }}</span>
+          <span v-else class="sa-log-none">—</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="取消原因" min-width="190" show-overflow-tooltip>
+        <template #default="{ row }">
+          <span v-if="row['操作类型']==='取消分配'">{{ row['取消原因'] || '—' }}</span>
+          <span v-else class="sa-log-none">—</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作人" width="80" align="center">
+        <template #default="{ row }">{{ row['操作人'] || '—' }}</template>
+      </el-table-column>
+      <el-table-column label="操作时间" width="150">
+        <template #default="{ row }">{{ row['操作时间'] || '—' }}</template>
+      </el-table-column>
+    </el-table>
+    <div class="sa-detail-tip">
+      记录范围：该样品全部检验类的分配与取消分配操作，按操作时间倒序排列；「分配对象」为本次落库的 检验班组 / 检验设备 / 检验人，取消分配时展示被清空的分配对象与取消原因。
+    </div>
+    <template #footer>
+      <el-button type="primary" @click="saLogVisible=false">关闭</el-button>
     </template>
   </el-dialog>
 
@@ -3103,9 +3192,9 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
               <el-input v-model="formModel[ratioFieldKey(f,'right')]" placeholder="输入，数字"></el-input>
             </div>
             <div v-else-if="f.type==='range2'" class="demo-uom-ratio">
-              <el-input v-model="formModel[ratioFieldKey(f,'left')]" :placeholder="f.leftPlaceholder || '下限，数字'" @input="pageId==='drift-rule' && onDriftDeltaLowerInput()"></el-input>
+              <el-input v-model="formModel[ratioFieldKey(f,'left')]" :placeholder="f.leftPlaceholder || '下限，数字'"></el-input>
               <span class="demo-uom-ratio__sep">~</span>
-              <el-input v-model="formModel[ratioFieldKey(f,'right')]" :placeholder="f.rightPlaceholder || '上限，数字'" @input="pageId==='drift-rule' && onDriftDeltaUpperInput()"></el-input>
+              <el-input v-model="formModel[ratioFieldKey(f,'right')]" :placeholder="f.rightPlaceholder || '上限，数字'"></el-input>
             </div>
               <el-date-picker v-else-if="f.type==='date' || f.type==='datetime'" v-model="formModel[f.name]" :type="isDateTimeField(f)?'datetime':'date'" :value-format="isDateTimeField(f)?'YYYY-MM-DD HH:mm':'YYYY-MM-DD'" :placeholder="isDateTimeField(f)?'选择日期时间':'选择日期'" style="width:100%" @change="(pageId==='serial-arch' && f.name==='生产日期' && refreshSerialExpire(formModel)) || (pageId==='lab-archive' && f.name==='取样日期' && refreshLabExpire())"></el-date-picker>
               <div v-else-if="f.type==='radio'">
@@ -3283,6 +3372,15 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
                 <el-table-column label="典型保留时间" width="120">
                   <template #default="{ row }"><el-input v-model="row.典型保留时间" placeholder="输入，数字" :disabled="formMode==='view'" @input="onDriftImpurityTrInput(row)"></el-input></template>
                 </el-table-column>
+                <el-table-column label="偏差范围" width="196">
+                  <template #default="{ row }">
+                    <div style="display:flex;align-items:center;gap:4px">
+                      <el-input v-model="row.有效范围下限" placeholder="下限" :disabled="formMode==='view'" @input="onDriftImpurityRangeInput(row)"></el-input>
+                      <span style="flex-shrink:0">~</span>
+                      <el-input v-model="row.有效范围上限" placeholder="上限" :disabled="formMode==='view'" @input="onDriftImpurityRangeInput(row)"></el-input>
+                    </div>
+                  </template>
+                </el-table-column>
                 <el-table-column label="定性结构" min-width="110"><template #default="{ row }"><el-input v-model="row.定性结构" placeholder="输入" :disabled="formMode==='view'"></el-input></template></el-table-column>
                 <el-table-column label="标准结果值" width="120"><template #default="{ row }"><el-input v-model="row.标准结果值" placeholder="数字" :disabled="formMode==='view'"></el-input></template></el-table-column>
                 <el-table-column label="UCL" width="96"><template #default="{ row }"><el-input v-model="row.UCL" placeholder="数字" :disabled="formMode==='view'"></el-input></template></el-table-column>
@@ -3367,7 +3465,10 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
                 </div>
               </template>
               <template #default="{ row }">
-                <el-select v-if="c.type==='select'" v-model="row[c.prop]" size="small" :disabled="formMode==='view'" style="width:100%">
+                <el-select v-if="c.type==='select-ref'" :model-value="row[c.prop]" size="small" :disabled="formMode==='view'" style="width:100%" @change="setSpectrumRefPeak">
+                  <el-option v-for="o in spectrumRefOptions" :key="o.value" :label="o.label" :value="o.value"></el-option>
+                </el-select>
+                <el-select v-else-if="c.type==='select'" v-model="row[c.prop]" size="small" :disabled="formMode==='view'" style="width:100%">
                   <el-option label="是" value="是"></el-option>
                   <el-option label="否" value="否"></el-option>
                 </el-select>
@@ -3377,7 +3478,7 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
               </template>
             </el-table-column>
           </el-table>
-          <el-empty v-else description="点击「识别 + 计算」生成谱峰识别结果（相对保留时间 = 谱图保留时间 × 主峰典型保留时间 ÷ 主峰谱图保留时间；相对保留时间未落在任一典型保留时间有效取值范围内的峰，不参与自动匹配）"></el-empty>
+          <el-empty v-else description="点击「识别 + 计算」生成谱峰识别结果（相对保留时间 = 谱图保留时间 × 参考峰典型保留时间 ÷ 参考峰谱图保留时间，参考峰默认主峰、可在结果表内切换；相对保留时间未落在任一典型保留时间有效取值范围内的峰，不参与自动匹配）"></el-empty>
           <div v-if="spectrumNoteVisible" class="spec-note" style="margin-top:12px">
             <div class="spec-note__head">信息注释</div>
             <div v-for="g in spectrumNoteGroups" :key="g.title" class="spec-note__grp">
@@ -4600,7 +4701,7 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
   </el-dialog>
 
   <!-- 详情 -->
-  <el-dialog v-model="detailVisible" class="demo-dialog--biz" :title="detailDialogTitle" :width="['lg-waybill','lg-waybill-carrier','lg-dispatch','lg-ship','lg-pickup','lg-sign','lg-kpi-plan','lg-kpi-record','wh-so-prep','wh-po-in','wh-po-ret','wh-os-issue','wh-os-ret-mat','wh-os-recv','wh-os-ret-goods','wh-prod-issue','wh-prod-ret','wh-prod-in','wh-other-in','wh-other-out','wh-so-preout','wh-so-ship','wh-so-ret','wh-direct-xfer','wh-load','tank-arch'].includes(pageId)?(pageId==='wh-so-prep'?'min(1280px, 98vw)':'min(1100px, 96vw)'):'min(960px, 96vw)'" top="6vh" align-center destroy-on-close append-to-body>
+  <el-dialog v-model="detailVisible" class="demo-dialog--biz" :title="detailDialogTitle" :width="['lg-waybill','lg-waybill-carrier','lg-dispatch','lg-ship','lg-pickup','lg-sign','lg-kpi-plan','lg-kpi-record','wh-so-prep','wh-po-in','wh-po-ret','wh-os-issue','wh-os-ret-mat','wh-os-recv','wh-os-ret-goods','wh-prod-issue','wh-prod-ret','wh-prod-in','wh-other-in','wh-other-out','wh-so-preout','wh-so-ship','wh-so-ret','wh-direct-xfer','wh-load','tank-arch','instrument-ledger'].includes(pageId)?(pageId==='wh-so-prep'?'min(1280px, 98vw)':(pageId==='instrument-ledger'?'min(1280px, 96vw)':'min(1100px, 96vw)')):'min(960px, 96vw)'" top="6vh" align-center destroy-on-close append-to-body>
     <template v-if="page">
       <template v-if="(page.detailSections||[]).length">
         <section class="demo-form-section" v-for="sec in page.detailSections" :key="sec.title">
@@ -4758,6 +4859,37 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
             <template #default="{ row }">
               <el-button v-if="pageId==='lg-kpi-plan' && detailRow['复核状态']!=='已复核'" link type="primary" @click="openKpiScore(row, false)">录入数据</el-button>
               <el-button v-else link type="primary" @click="openKpiScore(row, true)">查看详情</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </section>
+      <section class="demo-form-section" v-if="pageId==='instrument-ledger'">
+        <div class="list-toolbar" style="margin-bottom:8px">
+          <div class="list-toolbar__info">
+            <span class="list-toolbar__title">变更日志</span>
+            <span class="demo-readonly" style="margin-left:8px">共 {{ ilLogRows.length }} 条 · {{ ilLogSnapshotCols.length + 6 }} 列（可横向滑动）</span>
+          </div>
+        </div>
+        <p style="margin:0 0 10px;color:#64748b;font-size:12px;line-height:20px">一行 = 一次保存动作，按修改时间倒序。左侧为操作信息与字段级差异；自「{{ (ilLogSnapshotCols[0]||{}).label }}」起向右共 {{ ilLogSnapshotCols.length }} 列，是数据列表的全部字段（名称与顺序同列表），展示该次保存<strong>完成时</strong>的当时值而非当前值；缺失显示「—」。字段较多，横向滑动查看。</p>
+        <el-empty v-if="!ilLogRows.length" description="暂无变更记录（该仪器新增或修改后将在此留痕）" :image-size="64"></el-empty>
+        <!-- fit=false：字段列按设定宽度铺开、超出容器横向滚动，避免 20 列被压缩到视口内导致全列截断 -->
+        <el-table v-else class="demo-data-table demo-data-table--striped il-change-log" :data="ilLogRows" :fit="false" border stripe style="width:100%" max-height="300">
+          <!-- 固定列必须连续且靠左（EP 会把 fixed 列前移），故只固定 序号 / 修改时间 作为「哪一次变更」的锚点 -->
+          <el-table-column type="index" label="序号" width="60" fixed="left"></el-table-column>
+          <el-table-column prop="操作时间" label="修改时间" width="170" fixed="left"></el-table-column>
+          <el-table-column prop="操作人" label="修改人" width="100" show-overflow-tooltip></el-table-column>
+          <el-table-column label="变更类型" width="90">
+            <template #default="{ row }"><span class="tag" :class="tagClass(row['变更类型'])">{{ row['变更类型'] }}</span></template>
+          </el-table-column>
+          <el-table-column prop="变更项" label="变更字段" width="180" show-overflow-tooltip></el-table-column>
+          <el-table-column label="变更内容（修改前 → 修改后）" min-width="300" class-name="il-log-detail-col">
+            <template #default="{ row }">{{ row['变更明细'] || '—' }}</template>
+          </el-table-column>
+          <!-- 数据列表全部字段：字段名 / 顺序 / 宽度 / 标签样式均取自列表列配置，值为该次保存后的快照 -->
+          <el-table-column v-for="c in ilLogSnapshotCols" :key="'il-snap-'+c.field" :label="c.label" :width="c.width" show-overflow-tooltip>
+            <template #default="{ row }">
+              <span v-if="c.tag && ilLogCellText(row,c.field) !== '—'" class="tag" :class="tagClass(ilLogCellText(row,c.field))">{{ ilLogCellText(row,c.field) }}</span>
+              <span v-else class="demo-readonly">{{ ilLogCellText(row,c.field) }}</span>
             </template>
           </el-table-column>
         </el-table>
@@ -6051,13 +6183,6 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
           </el-form-item>
           <el-form-item label="检验方法名称" required>
             <el-input v-model="inspMethodForm.inspectionMethodName" placeholder="请输入检验方法名称（如 气相色谱纯度分析法）"></el-input>
-          </el-form-item>
-          <el-form-item label="方法类型" required>
-            <el-select v-model="inspMethodForm.methodType" placeholder="请选择方法类型" style="width:100%" clearable>
-              <el-option label="通用方法" value="通用方法"></el-option>
-              <el-option label="色谱识别" value="色谱识别"></el-option>
-            </el-select>
-            <div style="font-size:12px;color:#86909c;line-height:1.4;margin-top:4px">数据录入取数通道：通用方法 → 仪器数采；色谱识别 → 图谱识别</div>
           </el-form-item>
           <el-form-item label="启用状态" required>
             <el-radio-group v-model="inspMethodForm.enableStatus">
@@ -7655,18 +7780,6 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
                   <el-option v-for="m in inspSampleMethodOptions" :key="m.value" :label="m.label" :value="m.value"></el-option>
                 </el-select>
               </div>
-              <div class="spc-entry__bar-item">
-                <span>方法类型</span>
-                <span v-if="inspSampleMethodType" class="tag" :class="inspSampleMethodType==='色谱识别' ? 'tag-b' : 'tag-gr'">{{ inspSampleMethodType }}</span>
-                <span v-else style="color:#86909c">—</span>
-              </div>
-              <div class="spc-entry__bar-item">
-                <el-tooltip :content="inspSampleGatherTip" placement="top" :show-after="200">
-                  <span>
-                    <el-button size="small" type="primary" plain :disabled="!inspSampleMethodType" @click="onFetchGatherData">{{ inspSampleGatherBtnText }}</el-button>
-                  </span>
-                </el-tooltip>
-              </div>
               <div v-if="inspSampleHasParams" class="spc-entry__bar-item">
                 <span>公共测试次数</span>
                 <el-select v-model="inspSamplePublicTestTimes" placeholder="请选择" style="width:120px" clearable>
@@ -7676,7 +7789,38 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
               </div>
               <div class="spc-entry__bar-item">
                 <span>样本测试次数</span>
-                <el-input-number v-model="inspSampleTestCount" :min="1" :max="9" style="width:110px" controls-position="right"></el-input-number>
+                <el-tooltip content="按当前检验方案自动带出，可手动调整；必填，1~9 的整数" placement="top" :show-after="200">
+                  <el-input-number v-model="inspSampleTestCount" :min="1" :max="9" style="width:110px" controls-position="right" @change="onInspSampleTestCountChange"></el-input-number>
+                </el-tooltip>
+              </div>
+              <div class="spc-entry__bar-item">
+                <span>分析仪器</span>
+                <el-tooltip content="按任务分配结果自动带出，可手动修改；支持多选与按编码/名称搜索" placement="top" :show-after="200">
+                  <el-select v-model="inspSampleInstruments" multiple filterable collapse-tags :max-collapse-tags="1" placeholder="请选择" style="width:220px" @change="onInspSampleInstrumentsChange">
+                    <el-option v-for="o in inspInstrumentOptions" :key="o.value" :label="o.label" :value="o.value"></el-option>
+                  </el-select>
+                </el-tooltip>
+              </div>
+              <div class="spc-entry__bar-item">
+                <el-tooltip content="选择样品文件并自动识别谱峰，回填当前检验项目类的参数值" placement="top" :show-after="200">
+                  <span>
+                    <el-button size="small" type="primary" @click="openCollectDialog">采集数据</el-button>
+                  </span>
+                </el-tooltip>
+              </div>
+              <div class="spc-entry__bar-item">
+                <el-tooltip content="从图谱识别 / GC·LC 台账读取峰面积等色谱参数，并按方法公式计算" placement="top" :show-after="200">
+                  <span>
+                    <el-button size="small" type="primary" plain :disabled="!inspSampleMethod" @click="onFetchGatherData('chrom')">图谱识别取数</el-button>
+                  </span>
+                </el-tooltip>
+              </div>
+              <div class="spc-entry__bar-item">
+                <el-tooltip content="通过 IOT 仪器数采读取检验项实测值" placement="top" :show-after="200">
+                  <span>
+                    <el-button size="small" type="primary" plain :disabled="!inspSampleMethod" @click="onFetchGatherData('iot')">仪器数采取数</el-button>
+                  </span>
+                </el-tooltip>
               </div>
             </section>
 
@@ -7809,6 +7953,287 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
         <el-button :disabled="isDataLedgerMode" @click="onInspSampleSave">保存</el-button>
         <el-button type="primary" @click="onInspSampleDataEntrySubmit">提交</el-button>
         <el-button v-if="isDataLedgerMode" type="primary" @click="onDataLedgerEndEntry">结束录入</el-button>
+      </div>
+    </template>
+  </el-dialog>
+
+  <!-- ===== 采集数据 · 选择样品文件弹窗（2026-11-02） ===== -->
+  <el-dialog v-model="collectVisible" title="选择样品文件" width="min(1100px, 96vw)" top="5vh" align-center append-to-body destroy-on-close class="demo-dialog--biz">
+    <!-- 筛选区 -->
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:13px;color:#4e5969;white-space:nowrap">上传日期</span>
+        <el-select v-model="collectFilters.date" style="width:110px" size="small">
+          <el-option label="当天" value="当天"></el-option>
+          <el-option label="近3天" value="近3天"></el-option>
+          <el-option label="近7天" value="近7天"></el-option>
+          <el-option label="全部" value="全部"></el-option>
+        </el-select>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:13px;color:#4e5969;white-space:nowrap">文件</span>
+        <el-select v-model="collectFilters.fileRange" style="width:120px" size="small">
+          <el-option label="最新文件" value="最新文件"></el-option>
+          <el-option label="全部文件" value="全部文件"></el-option>
+        </el-select>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:13px;color:#4e5969;white-space:nowrap">文件名称</span>
+        <el-input v-model="collectFilters.fileName" placeholder="请输入文件名称" style="width:180px" size="small" clearable></el-input>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:13px;color:#4e5969;white-space:nowrap">样本编号</span>
+        <el-input v-model="collectFilters.sampleNum" placeholder="请输入样本编号" style="width:170px" size="small" clearable></el-input>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:13px;color:#4e5969;white-space:nowrap">批号</span>
+        <el-select v-model="collectFilters.batch" placeholder="请选择批号" style="width:140px" size="small" clearable filterable>
+          <el-option v-for="b in collectBatchOptions" :key="b" :label="b" :value="b"></el-option>
+        </el-select>
+      </div>
+    </div>
+    <!-- 样品文件信息 -->
+    <div style="font-size:13px;color:#4e5969;margin-bottom:6px">样品文件信息<span v-if="!collectFiles.length" style="color:#f53f3f">！</span></div>
+    <div style="border:1px solid #e5e6eb;border-radius:6px;min-height:120px;max-height:220px;overflow:auto;margin-bottom:12px">
+      <table v-if="collectFiles.length" style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead>
+          <tr style="background:#f7f8fa">
+            <th style="padding:8px 10px;text-align:left;font-weight:500;width:44px"></th>
+            <th style="padding:8px 10px;text-align:left;font-weight:500">文件名称</th>
+            <th style="padding:8px 10px;text-align:left;font-weight:500;width:110px">批号</th>
+            <th style="padding:8px 10px;text-align:left;font-weight:500;width:130px">样本编号</th>
+            <th style="padding:8px 10px;text-align:left;font-weight:500;width:110px">仪器编号</th>
+            <th style="padding:8px 10px;text-align:left;font-weight:500;width:140px">上传时间</th>
+            <th style="padding:8px 10px;text-align:left;font-weight:500;width:70px">峰数</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="f in collectFiles" :key="f.id" style="border-top:1px solid #f2f3f5;cursor:pointer" :style="{background: collectFileId===f.id ? '#e8f3ff' : ''}" @click="collectFileId=f.id">
+            <td style="padding:7px 10px"><el-radio :model-value="collectFileId" :value="f.id" @change="collectFileId=f.id"><span></span></el-radio></td>
+            <td style="padding:7px 10px">{{ f['文件名'] }}</td>
+            <td style="padding:7px 10px">{{ f['批号'] || '—' }}</td>
+            <td style="padding:7px 10px">{{ f['样本编号'] || '—' }}</td>
+            <td style="padding:7px 10px">{{ f['仪器编号'] || '—' }}</td>
+            <td style="padding:7px 10px">{{ f['上传时间'] || '—' }}</td>
+            <td style="padding:7px 10px">{{ (f._peaks || []).length }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div v-else style="padding:36px 0;text-align:center;color:#86909c;font-size:13px">暂无数据</div>
+    </div>
+    <!-- 识别操作 -->
+    <div style="display:flex;gap:10px;margin-bottom:12px">
+      <el-button size="small" type="primary" @click="collectAutoFill()">自动识别进行填充</el-button>
+      <el-button size="small" type="warning" @click="collectClearGrid">清空所有数据</el-button>
+    </div>
+    <!-- 参数 × 次数 网格 -->
+    <div style="display:flex;justify-content:flex-end;font-size:12px;color:#86909c;margin-bottom:4px">共 {{ collectGrid.length }} 个参数，{{ inspSampleTestCount }} 次测定</div>
+    <div style="border:1px solid #e5e6eb;border-radius:6px;overflow:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead>
+          <tr style="background:#f7f8fa">
+            <th style="padding:8px 10px;text-align:left;font-weight:500;width:140px">参数名称</th>
+            <th v-for="n in inspSampleTestCount" :key="'ch'+n" style="padding:8px 10px;text-align:center;font-weight:500">第{{ n }}次</th>
+            <th style="padding:8px 10px;text-align:center;font-weight:500;width:80px">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="g in collectGrid" :key="g.name" style="border-top:1px solid #f2f3f5">
+            <td style="padding:7px 10px">{{ g.name }}</td>
+            <td v-for="(v, i) in g.values" :key="g.name + i" style="padding:4px 6px;text-align:center">
+              <el-input v-model="g.values[i]" size="small" style="width:100px"></el-input>
+            </td>
+            <td style="padding:4px 6px;text-align:center">
+              <el-button size="small" text type="primary" @click="collectAutoFill(g.name)">填充</el-button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <template #footer>
+      <div style="display:flex;justify-content:flex-end;gap:10px">
+        <el-button type="primary" @click="onCollectSubmit">提交</el-button>
+        <el-button @click="onCollectCancel">取消</el-button>
+      </div>
+    </template>
+  </el-dialog>
+
+
+  <!-- ===== 仪器数采 · 选择采集仪器弹窗（2026-11-02） ===== -->
+  <el-dialog v-model="iotVisible" title="仪器数采 · 选择采集仪器" width="min(1100px, 96vw)" top="5vh" align-center append-to-body destroy-on-close class="demo-dialog--biz">
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:13px;color:#4e5969;white-space:nowrap">仪器编号</span>
+        <el-select v-model="iotFilters.instNum" placeholder="请选择" style="width:140px" size="small" clearable filterable>
+          <el-option v-for="o in iotInstruments" :key="o.id" :label="o['仪器编号']" :value="o['仪器编号']"></el-option>
+        </el-select>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:13px;color:#4e5969;white-space:nowrap">仪器名称</span>
+        <el-input v-model="iotFilters.instName" placeholder="请输入仪器名称" style="width:180px" size="small" clearable></el-input>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:13px;color:#4e5969;white-space:nowrap">仪器类型</span>
+        <el-select v-model="iotFilters.type" placeholder="请选择" style="width:150px" size="small" clearable>
+          <el-option v-for="t in iotTypeOptions" :key="t" :label="t" :value="t"></el-option>
+        </el-select>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:13px;color:#4e5969;white-space:nowrap">样本编号</span>
+        <el-input v-model="iotFilters.sampleNum" placeholder="请输入样本编号" style="width:170px" size="small" clearable></el-input>
+      </div>
+    </div>
+    <div style="font-size:13px;color:#4e5969;margin-bottom:6px">采集仪器信息<span v-if="!iotInstruments.length" style="color:#f53f3f">！</span></div>
+    <div style="border:1px solid #e5e6eb;border-radius:6px;min-height:120px;max-height:220px;overflow:auto;margin-bottom:12px">
+      <table v-if="iotInstruments.length" style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead>
+          <tr style="background:#f7f8fa">
+            <th style="padding:8px 10px;text-align:left;font-weight:500;width:44px"></th>
+            <th style="padding:8px 10px;text-align:left;font-weight:500;width:110px">仪器编号</th>
+            <th style="padding:8px 10px;text-align:left;font-weight:500">仪器名称</th>
+            <th style="padding:8px 10px;text-align:left;font-weight:500;width:150px">仪器类型</th>
+            <th style="padding:8px 10px;text-align:left;font-weight:500;width:130px">规格型号</th>
+            <th style="padding:8px 10px;text-align:left;font-weight:500;width:130px">存放位置</th>
+            <th style="padding:8px 10px;text-align:left;font-weight:500;width:110px">责任人</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="r in iotInstruments" :key="r.id" style="border-top:1px solid #f2f3f5;cursor:pointer" :style="{background: iotInstId===r.id ? '#e8f3ff' : ''}" @click="iotInstId=r.id">
+            <td style="padding:7px 10px"><el-radio :model-value="iotInstId" :value="r.id" @change="iotInstId=r.id"><span></span></el-radio></td>
+            <td style="padding:7px 10px">{{ r['仪器编号'] }}</td>
+            <td style="padding:7px 10px">{{ r['仪器名称'] }}</td>
+            <td style="padding:7px 10px">{{ r['仪器类型'] || '—' }}</td>
+            <td style="padding:7px 10px">{{ r['规格型号'] || '—' }}</td>
+            <td style="padding:7px 10px">{{ r['存放位置'] || '—' }}</td>
+            <td style="padding:7px 10px">{{ r['责任人'] || '—' }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div v-else style="padding:36px 0;text-align:center;color:#86909c;font-size:13px">暂无可用仪器</div>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:12px">
+      <el-button size="small" type="primary" @click="iotAutoFill()">自动读取实测值</el-button>
+      <el-button size="small" type="warning" @click="iotClearGrid">清空所有数据</el-button>
+    </div>
+    <div style="display:flex;justify-content:flex-end;font-size:12px;color:#86909c;margin-bottom:4px">共 {{ iotRows.length }} 个检验项，{{ inspSampleTestCount }} 次测定</div>
+    <div style="border:1px solid #e5e6eb;border-radius:6px;overflow:auto">
+      <table v-if="iotRows.length" style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead>
+          <tr style="background:#f7f8fa">
+            <th style="padding:8px 10px;text-align:left;font-weight:500;width:140px">检验项</th>
+            <th v-for="n in inspSampleTestCount" :key="'iot'+n" style="padding:8px 10px;text-align:center;font-weight:500">第{{ n }}次</th>
+            <th style="padding:8px 10px;text-align:center;font-weight:500;width:80px">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="g in iotRows" :key="g.itemId" style="border-top:1px solid #f2f3f5">
+            <td style="padding:7px 10px">{{ g.name }}</td>
+            <td v-for="(v, i) in g.values" :key="g.itemId + i" style="padding:4px 6px;text-align:center">
+              <el-input v-model="g.values[i]" size="small" style="width:100px"></el-input>
+            </td>
+            <td style="padding:4px 6px;text-align:center">
+              <el-button size="small" text type="primary" @click="iotAutoFill(g.name)">填充</el-button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div v-else style="padding:36px 0;text-align:center;color:#86909c;font-size:13px">当前检验项目类无可取数的定量检验项</div>
+    </div>
+    <template #footer>
+      <div style="display:flex;justify-content:flex-end;gap:10px">
+        <el-button type="primary" @click="onIotSubmit">提交</el-button>
+        <el-button @click="onIotCancel">取消</el-button>
+      </div>
+    </template>
+  </el-dialog>
+
+
+  <!-- ===== 图谱识别取数 · 选择台账记录弹窗（2026-11-02） ===== -->
+  <el-dialog v-model="chromVisible" title="图谱识别取数 · 选择台账记录" width="min(1240px, 96vw)" top="5vh" align-center append-to-body destroy-on-close class="demo-dialog--biz">
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:13px;color:#4e5969;white-space:nowrap">色谱类型</span>
+        <el-select v-model="chromFilters.kind" style="width:110px" size="small">
+          <el-option label="全部" value="全部"></el-option>
+          <el-option label="GC" value="GC"></el-option>
+          <el-option label="LC" value="LC"></el-option>
+        </el-select>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:13px;color:#4e5969;white-space:nowrap">批号</span>
+        <el-input v-model="chromFilters.batch" placeholder="请输入批号" style="width:170px" size="small" clearable></el-input>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:13px;color:#4e5969;white-space:nowrap">物料名称</span>
+        <el-input v-model="chromFilters.material" placeholder="请输入物料名称" style="width:180px" size="small" clearable></el-input>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:13px;color:#4e5969;white-space:nowrap">规则名称</span>
+        <el-input v-model="chromFilters.rule" placeholder="规则名称/编码" style="width:160px" size="small" clearable></el-input>
+      </div>
+    </div>
+    <div style="font-size:13px;color:#4e5969;margin-bottom:6px">台账记录信息<span v-if="!chromLedgerList.length" style="color:#f53f3f">！</span><span style="margin-left:8px;color:#86909c;font-size:12px">（表头三行：典型保留时间 / 已定性名称 / 取值口径「{{ CHROM_LEDGER_DIM_PAIRS }}」；单元格按同一口径固定展示「峰面积% / 峰面积 / 保留时间」三段，不随台账工具栏维度切换，横向滚动查看）</span></div>
+    <div style="border:1px solid #e5e6eb;border-radius:6px;min-height:120px;max-height:220px;overflow:auto;margin-bottom:12px">
+      <table v-if="chromLedgerList.length" class="chrom-pick-table" style="width:100%;border-collapse:collapse;font-size:13px;white-space:nowrap">
+        <thead>
+          <tr style="background:#f7f8fa">
+            <th style="padding:8px 10px;text-align:left;font-weight:500;width:44px;position:sticky;left:0;background:#f7f8fa"></th>
+            <th style="padding:8px 10px;text-align:left;font-weight:500;width:80px">色谱类型</th>
+            <th style="padding:8px 10px;text-align:left;font-weight:500;width:150px">批号</th>
+            <th v-for="rt in chromLedgerRtCols" :key="'h-rt-' + rt" style="padding:8px 10px;text-align:left;font-weight:500;min-width:210px">
+              <div class="rt-head">
+                <div class="rt-head__tr">{{ rt }}</div>
+                <div class="rt-head__st" :title="chromLedgerRtStructMap[rt] || '未匹配到已定性名称'">{{ chromLedgerRtStructMap[rt] || '—' }}</div>
+                <div class="rt-head__dim" :title="'单元格取值顺序：' + CHROM_LEDGER_DIM_PAIRS">{{ CHROM_LEDGER_DIM_PAIRS }}</div>
+              </div>
+            </th>
+            <th v-for="f in CHROM_LEDGER_PICK_STAT_FIELDS" :key="'h-st-' + f" style="padding:8px 10px;text-align:left;font-weight:500">{{ f }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="x in chromLedgerList" :key="x.key" style="border-top:1px solid #f2f3f5;cursor:pointer" :style="{background: chromLedgerKey===x.key ? '#e8f3ff' : ''}" @click="chromLedgerKey=x.key">
+            <td style="padding:7px 10px;position:sticky;left:0;background:inherit"><el-radio :model-value="chromLedgerKey" :value="x.key" @change="chromLedgerKey=x.key"><span></span></el-radio></td>
+            <td style="padding:7px 10px">{{ x.kind }}</td>
+            <td style="padding:7px 10px">{{ x.row['批号'] || '—' }}</td>
+            <td v-for="rt in chromLedgerRtCols" :key="x.key + '-rt-' + rt" style="padding:7px 10px;white-space:nowrap">{{ chromPickCellText(x.row, rt) }}</td>
+            <td v-for="f in CHROM_LEDGER_PICK_STAT_FIELDS" :key="x.key + '-st-' + f" style="padding:7px 10px">{{ ledgerCellText(x.row[f]) }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div v-else style="padding:36px 0;text-align:center;color:#86909c;font-size:13px">暂无数据</div>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:12px">
+      <el-button size="small" type="primary" @click="chromAutoFill()">自动读取实测值</el-button>
+      <el-button size="small" type="warning" @click="chromClearGrid">清空所有数据</el-button>
+    </div>
+    <div style="display:flex;justify-content:flex-end;font-size:12px;color:#86909c;margin-bottom:4px">共 {{ chromRows.length }} 个参数项，{{ inspSampleTestCount }} 次测定</div>
+    <div style="border:1px solid #e5e6eb;border-radius:6px;overflow:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead>
+          <tr style="background:#f7f8fa">
+            <th style="padding:8px 10px;text-align:left;font-weight:500;width:220px">参数名称</th>
+            <th v-for="n in inspSampleTestCount" :key="'chrom'+n" style="padding:8px 10px;text-align:center;font-weight:500">第{{ n }}次</th>
+            <th style="padding:8px 10px;text-align:center;font-weight:500;width:92px">次数下发</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="g in chromRows" :key="g.key" style="border-top:1px solid #f2f3f5">
+            <td style="padding:7px 10px" :title="g.tip">{{ g.name }}</td>
+            <td v-for="(v, i) in g.values" :key="g.key + i" style="padding:4px 6px;text-align:center">
+              <el-input v-model="g.values[i]" size="small" :disabled="!!g.filled" style="width:100px"></el-input>
+            </td>
+            <td style="padding:4px 6px;text-align:center">
+              <el-button size="small" text type="primary" @click="chromAutoFill(g.key)">填充</el-button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div v-if="!chromRows.length" style="padding:36px 0;text-align:center;color:#86909c;font-size:13px">当前检验项目类无可取数的定量检验项</div>
+    </div>
+    <template #footer>
+      <div style="display:flex;justify-content:flex-end;gap:10px">
+        <el-button type="primary" @click="onChromSubmit">提交</el-button>
+        <el-button @click="onChromCancel">取消</el-button>
       </div>
     </template>
   </el-dialog>
@@ -9021,7 +9446,7 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
   </el-dialog>
 
   <!-- 样品接收 · 留样新增：选择上游取样单据 → 自动带出样品信息 → 生成留样（状态 待接收） -->
-  <el-dialog v-model="labRetainAddVisible" class="demo-dialog--biz lab-retain-dialog" title="留样新增" width="min(880px, 96vw)" top="8vh" align-center destroy-on-close append-to-body :close-on-click-modal="false">
+  <el-dialog v-model="labRetainAddVisible" class="demo-dialog--biz lab-retain-dialog" title="留样新增" width="min(1040px, 96vw)" top="8vh" align-center destroy-on-close append-to-body :close-on-click-modal="false">
     <el-form label-width="96px">
       <el-form-item label="上游单据" required>
         <el-select v-model="labRetainForm.orderKey" filterable clearable placeholder="请选择已取样件的报检单" style="width:100%" @change="onLabRetainOrderChange">
@@ -9044,20 +9469,51 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
     <el-form v-if="labRetainOrder" label-width="96px" style="margin-top:12px">
       <div class="demo-form-grid">
         <el-form-item label="留样件数" required>
-          <el-input-number v-model="labRetainForm.count" :min="1" :max="Math.max(1, labRetainAvailable)" controls-position="right" style="width:100%"></el-input-number>
+          <el-input-number v-model="labRetainForm.count" :min="1" :max="Math.max(1, labRetainAvailable)" controls-position="right" style="width:100%" @change="onLabRetainCountChange"></el-input-number>
         </el-form-item>
-        <el-form-item label="可留样件数">
-          <el-input :model-value="String(labRetainAvailable) + ' 件'" disabled></el-input>
-        </el-form-item>
-        <el-form-item label="取样日期">
-          <el-input v-model="labRetainForm.takeDate" disabled></el-input>
-        </el-form-item>
-        <el-form-item label="创建后打印">
-          <el-checkbox v-model="labRetainForm.printAfter">立即打印标签</el-checkbox>
+        <el-form-item label="取样日期" required>
+          <el-date-picker v-model="labRetainForm.takeDate" type="date" value-format="YYYY-MM-DD" placeholder="请选择取样日期"
+            :disabled-date="d => d.getTime() > Date.now()" :clearable="false" style="width:100%"></el-date-picker>
         </el-form-item>
         <el-form-item label="备注" class="span-2">
           <el-input v-model="labRetainForm.remark" type="textarea" :rows="2" maxlength="100" show-word-limit placeholder="选填，写入留样记录备注"></el-input>
         </el-form-item>
+      </div>
+      <div class="lab-retain__lines">
+        <div class="lab-retain__lines-title">留样信息</div>
+        <div class="lab-retain__lines-ops">
+          <el-button type="primary" size="small" @click="generateRetainLines">生成样品</el-button>
+          <el-button size="small" @click="printRetainLines">打印标签</el-button>
+          <el-button size="small" @click="refreshRetainNo">刷新编号</el-button>
+          <el-button type="danger" plain size="small" :disabled="!labRetainSel.length" @click="removeRetainLines">批量删除</el-button>
+        </div>
+        <div class="demo-table-scroll">
+          <el-table class="demo-data-table demo-data-table--striped" :data="labRetainLines" border stripe style="width:100%" max-height="240"
+            empty-text="暂无样品行，点「生成样品」按留样件数生成" @selection-change="rows => labRetainSel = rows">
+            <el-table-column type="selection" width="48"></el-table-column>
+            <el-table-column type="index" label="序号" width="64"></el-table-column>
+            <el-table-column label="样品编号" min-width="172">
+              <template #header><span class="line-col-req">*</span>样品编号</template>
+              <template #default="{ row }"><el-input :model-value="row.样品编号" disabled></el-input></template>
+            </el-table-column>
+            <el-table-column label="样品来源" min-width="132">
+              <template #default="{ row }"><el-input v-model="row.样品来源" placeholder="输入"></el-input></template>
+            </el-table-column>
+            <el-table-column label="检验班组" min-width="152">
+              <template #default="{ row }"><el-input :model-value="row.检验班组" disabled placeholder="自动代入"></el-input></template>
+            </el-table-column>
+            <el-table-column label="取样备注" min-width="152">
+              <template #default="{ row }"><el-input :model-value="row.取样备注" disabled placeholder="自动代入"></el-input></template>
+            </el-table-column>
+            <el-table-column label="留样数量" min-width="122">
+              <template #header><span class="line-col-req">*</span>留样数量</template>
+              <template #default="{ row }"><el-input v-model="row.留样数量" placeholder="数字"></el-input></template>
+            </el-table-column>
+            <el-table-column label="留样单位" min-width="112">
+              <template #default="{ row }"><el-input :model-value="row.留样单位" disabled placeholder="自动代入"></el-input></template>
+            </el-table-column>
+          </el-table>
+        </div>
       </div>
       <div class="lab-retain__warn" v-if="labRetainNoMaster">未匹配到样品主数据（基础数据 / 样品档案），样品编码与有效期按上游物料信息带出，不影响创建。</div>
     </el-form>
@@ -10505,12 +10961,12 @@ body:has(.qe-dialog .qe-hd) .remarks-toggle{visibility:hidden!important}
 <script src="./js/demo-announcements.js?v=1.3-spc-compare"></script>
 <script src="./vendor/echarts/echarts.min.js"></script>
 <script src="./js/spc-single-demo.js?v=2.6.1-xtao-mock"></script>
-<script src="./js/page-configs.js?v=1.79.0-lab-archive-expired-no-add"></script>
-<script src="./js/mock-rows.js?v=2.54.0-type-cat"></script>
+<script src="./js/page-configs.js?v=2.85.1-lab-receive-processed-tab"></script>
+<script src="./js/mock-rows.js?v=3.58.0-collect-dialog"></script>
 <script src="./js/sampling-scheme-demo.js?v=1.0.3-n-lt-m"></script>
 <script src="./js/qc-spc-link.js?v=1.9.0-xtao-db"></script>
 <script src="./js/dict-catalog.js?v=1.4.0-unused-clean"></script>
-<script src="./js/page-prd-notes.js?v=1.68.0-lab-archive-batch-input"></script>
+<script src="./js/page-prd-notes.js?v=2.78.3-chrom-ledger-dim-nopct"></script>
 <script src="./js/remarks-markdown.js"></script>
 <script type="module" src="./js/remarks-mermaid-init.js"></script>
 <script src="./js/remarks-mermaid.js?v=1.4.0"></script>
@@ -10722,7 +11178,45 @@ const DEMO_CHANGE_LOG = [
   { date:'2026-10-28', module:'修改记录', where:'修改记录-列表条目', text:'按反馈删除 3 个模块的历史条目（图谱识别 / 漂移规则 / MSA，共 8 项），其余 10 个模块保留' },
   { date:'2026-10-28', module:'样品档案', where:'样品档案-新增/编辑弹窗-规格/种类/计量单位', text:'所选样品带出的「样品规格 / 样品种类 / 计量单位」改为不可修改（只读灰底），样品名称仍可编辑' },
   { date:'2026-10-28', module:'样品档案', where:'样品档案-新增/编辑弹窗-批号', text:'「批号」由字典下拉改为手输并设为必填：未填时「生成条码」与保存均拦截，生成条码时按填写的批号带入条码子行' },
-  { date:'2026-10-28', module:'样品档案', where:'样品档案-已过期-工具栏', text:'「已过期」Tab 删除「新增」按钮（现为 标签打印 / 批量删除 / 过期处理），建档入口仅保留在「样品档案」Tab' }
+  { date:'2026-10-28', module:'样品档案', where:'样品档案-已过期-工具栏', text:'「已过期」Tab 删除「新增」按钮（现为 标签打印 / 批量删除 / 过期处理），建档入口仅保留在「样品档案」Tab' },
+  { date:'2026-10-29', module:'样品任务分配', where:'样品任务分配-检验任务分配弹窗-检验人', text:'「检验人」由单选改为多选（字段名后挂「多选」标记）：可保留设备责任人自动带出并继续增选，多选后提示「已选 N 名检验人」，保存落库按「张伟、李静」文本口径同步写入「检验人 / 分析人」' },
+  { date:'2026-10-29', module:'样品任务分配', where:'样品任务分配-分配详情-检验人列', text:'「分配详情」弹窗在「检验设备」后新增「检验人」只读列，用于核验多选后的指派结果' },
+  { date:'2026-10-29', module:'样品任务分配', where:'样品任务分配-检验任务分配弹窗-检验班组', text:'「检验班组」改为多选：候选 = 内置班组 + 检验班组台账 + 历史分配值兜底，落库沿用报检单 teamTextOf 口径（「，」分隔、去重）；列表跨检验类拼接按班组逐项展开，查询条件支持命中任一班组' },
+  { date:'2026-10-29', module:'样品任务分配', where:'样品任务分配-工具栏-自动分配 / 批量分配', text:'按钮命名与主次对齐实际行为：原「自动匹配」更名「自动分配」，主按钮改为「批量分配」（需先勾选、范围可控）、「自动分配」降为次按钮（作用于当前列表全部并覆盖已分配行）；提示语同步改为「已按检验类自动分配 N 条检验任务」' },
+  { date:'2026-11-02', module:'漂移规则设置', where:'漂移规则设置-新增/编辑弹窗-已知杂质项目指标列表', text:'「定性结构」列前新增「偏差范围」列（下限 ~ 上限 双输入框）：默认按该行典型保留时间 ± 规则级偏差量自动带出并实时重算，支持手动修改；手工调整过的行不再被规则级偏差重算覆盖，未填典型保留时间时为空' },
+  { date:'2026-11-02', module:'漂移规则设置', where:'漂移规则设置-新增/编辑弹窗-表单', text:'删除规则级「偏差范围」字段（原 -0.002 ~ 0.002 双输入框）：各行「偏差范围（下限 ~ 上限）」改为唯一维护入口、纯手动输入，不再自动带出；保存校验与落库字段同步移除。列表「RRT&TR偏差范围」列保留，存量规则正常展示、新增规则该列为空' },
+  { date:'2026-11-02', module:'样品接收', where:'样品接收-列表列（状态）', text:'「状态」列前移到业务列最前（勾选 / 序号之后、条码号之前）并固定左侧，与样品档案列序保持一致' },
+  { date:'2026-11-02', module:'样品接收', where:'样品接收-使用状态下线', text:'列表删除「使用状态」列，查询条件「使用状态」一并移除（该页行固定为「在用」，筛选恒无效）；留样生成不再写入该字段，历史数据保留不展示' },
+  { date:'2026-11-02', module:'检验方法', where:'检验方法-查询区 / 列表 / 新增编辑弹窗', text:'彻底删除「方法类型」字段：查询区筛选项、列表列、新增/编辑弹窗表单项及必填校验、mock 数据、PRD 说明同步清除；数据录入「获取采集数据」取数通道改为按方法名称推断（名称含 色谱/GC/HPLC/GPC → 图谱识别取数，否则 → 仪器数采），录入页参数条的「方法类型」展示项一并移除' },
+  { date:'2026-11-02', module:'样品接收', where:'样品接收-留样新增弹窗-可留样件数', text:'删除只读「可留样件数」字段；可留样上限仍由该值约束（件数输入框 max 与超限提示），顶部信息块保留「已取样件数 / 已留样件数」两个口径值' },
+  { date:'2026-11-02', module:'样品接收', where:'样品接收-留样新增弹窗-取样日期', text:'「取样日期」由只读改为可编辑：日期选择器默认当天、必填、不可选未来日期；按所选日期重算失效日期并写入留样记录，提交前校验空值与未来日期' },
+  { date:'2026-11-02', module:'数据录入', where:'数据录入-录入弹窗-参数条', text:'取数按钮由「按方法名称推断的单按钮」改为「图谱识别取数 + 仪器数采取数」双按钮常驻，取数通道由录入人手动选择（图谱识别走 GC/LC 台账、仪器数采走 IOT），未选检验方法时两按钮均置灰；公共测试次数仍按名称推断显隐' },
+  { date:'2026-11-02', module:'样品接收', where:'样品接收-留样新增弹窗-留样信息', text:'「备注」下方新增「留样信息」明细：工具栏 生成样品 / 留样 / 打印标签 / 刷新编号 / 批量删除（无勾选禁用）；列 勾选、序号、*样品编号（系统生成 YP+yyMMdd+流水）、样品来源、检验班组、取样备注、*留样数量、留样单位。行数随「留样件数」增补/截断，删除行回写件数，提交按行逐条落库（样品来源/检验班组/留样数量/留样单位随行写入）' },
+  { date:'2026-11-02', module:'样品任务分配', where:'样品任务分配-行操作-分配记录', text:'13 个报检单类型页签的行操作均新增「分配记录」（分配 / 分配详情 之后，3 个按钮仍单行直显）：点击打开弹窗，按样品编号汇总该样品全部检验类的历史记录，列 序号 / 操作类型（分配·蓝、取消分配·橙）/ 检验类名称 / 分配对象（班组 ｜ 设备 ｜ 检验人）/ 取消原因 / 操作人 / 操作时间，按操作时间倒序；无记录时展示「该样品暂无分配记录」空态' },
+  { date:'2026-11-02', module:'样品任务分配', where:'样品任务分配-分配详情-行内取消分配', text:'「取消分配」二次确认改为带输入框，取消原因必填（未填拦截）；原因与被清空的分配对象一并写入该样品的分配记录，便于追溯' },
+  { date:'2026-11-02', module:'样品任务分配', where:'样品任务分配-分配记录-数据来源', text:'分配记录覆盖四个入口：检验任务分配保存（值无变化不重复记）、工具栏 自动分配 / 批量分配、分配详情行内取消分配；记录存独立 localStorage（键 oled-sample-assign-log-v1），首次打开时为 mock 中已分配的检验类补写一条历史基线记录' },
+  { date:'2026-11-02', module:'样品接收', where:'样品接收-留样新增弹窗-创建后打印 / 留样', text:'删除「创建后打印（立即打印标签）」整项与「留样信息」工具栏的「留样」按钮；打印改由工具栏「打印标签」单独触发，提交入口仅保留「确定新增」（创建后不再自动弹标签预览）' },
+  { date:'2026-11-02', module:'数据录入', where:'数据录入-录入弹窗-参数条', text:'参数条重排：「图谱识别取数 / 仪器数采取数」两按钮移至操作区最后；「样本测试次数」改为按当前检验方案自动带出（未配置默认 2），可手动调整，保存/提交校验非空且为 1~9 整数；新增「分析仪器」多选（按任务分配结果映射仪器台账带出、编码/名称格式、可按编码或名称搜索）；方案或分配变更自动刷新默认值且不覆盖手动修改' },
+  { date:'2026-11-02', module:'样品接收', where:'样品接收-页签 / 已处理列表', text:'新增「已处理」页签：汇总已接收与已驳回样品，状态列前置带色标区分，可按状态下拉（已接收 / 已驳回）筛选，按处理时间倒序；补充 处理人 / 处理时间 / 驳回原因 列，只读无操作（不配置工具栏与行操作）；数据源仍为同一批留样记录，按状态分流，待接收页签逻辑不变' },
+  { date:'2026-11-02', module:'数据录入', where:'数据录入-录入弹窗-参数条-采集数据', text:'新增「采集数据」按钮及「选择样品文件」弹窗全流程：上传日期/文件/文件名称/样本编号/批号五条件筛选图谱文件台账 → 单选文件 → 「自动识别进行填充」按峰面积降序把前 N 峰填入「参数 × 次数」网格（支持逐行填充与手动改值、清空所有数据）→ 提交按列回填当前检验项目类的定量检验项（未选文件 / 未识别 / 无定量项均有提示），取消关闭并提示未回填；图谱文件 mock 补「样本编号」字段' },
+  { date:'2026-11-02', module:'修改记录', where:'修改记录-汇总口径', text:'改为按「日期 + 模块」汇总：同日同模块合并为一行，日期倒序、最新修改在最上方；行内子项不再重复显示日期' },
+  { date:'2026-11-02', module:'GC/LC 台账', where:'GC/LC 台账-列表-典型保留时间列', text:'列表单元格只展示数值、不带 % 后缀：峰面积% 维度显示 0.0002（非 0.0002%），组合维度显示「0.0002 / 2 / 3.005」，单位由维度名称体现' },
+  { date:'2026-11-02', module:'GC/LC 台账', where:'GC/LC 台账-工具栏-维度', text:'维度下拉新增「峰面积%」（相对峰面积，带 % 后缀）；「峰面积」改为绝对峰面积（% × 10000，与「色谱识别取数」同口径）；原「峰面积&保留时间」改为「峰面积%&峰面积&保留时间」，按「峰面积% / 峰面积 / 保留时间」三段展示并加宽保留时间列到 210px，默认维度回到「峰面积%」保持首屏口径不变' },
+  { date:'2026-11-02', module:'图谱识别', where:'图谱识别-新增弹窗-谱图识别信息表', text:'「相对保留时间」前新增「参考峰」列（下拉，自动带出默认为主峰）：整表共用同一参考峰，切换后全表同步并自动重算相对保留时间；非主峰作参考峰时按主峰折算一次、命中某典型保留时间范围则改用该值；信息注释同步新增该字段并把后续字段序号顺延' },
+  { date:'2026-11-02', module:'数据录入', where:'数据录入-录入弹窗-参数条-仪器数采取数', text:'「仪器数采取数」原为点击后直接回填（无弹窗），补齐与「选择样品文件」对称的交互：点击弹出「仪器数采 · 选择采集仪器」，按仪器编号/名称/类型筛选仪器台账（在用且正常）、默认带出参数条已选分析仪器，单选后「自动读取实测值」按「检验项 × 次数」生成网格（可逐行填充、手动改值、清空），提交按最后一次测定值回填并触发判定联动；未选仪器 / 未取值 / 无定量项均有提示，取消提示未回填' },
+  { date:'2026-11-02', module:'数据录入', where:'数据录入-录入弹窗-图谱识别取数-台账记录信息-表头', text:'典型保留时间列表头改为两行：上行典型保留时间、下行「已定性名称」（取漂移规则 _impurities 的定性结构，按当前色谱类型筛选，无值时显示「—」并悬浮提示未匹配）' },
+  { date:'2026-11-02', module:'数据录入', where:'数据录入-录入弹窗-图谱识别取数-参数网格-次数下发（下发粒度）', text:'改为分次获取：点「填充」只下发当前这一行的 3 次测定值，不再按参数名称跨检验项批量带出；下发值仍为只读' },
+  { date:'2026-11-02', module:'数据录入', where:'数据录入-录入弹窗-图谱识别取数-参数网格-次数下发', text:'「填充」按钮所在列由「操作」改为「次数下发」：点击后按参数名称把当前检验类下所有检验项目的同一参数一并带出（如点「保留时间」即填所有检验项的保留时间），带出值置只读不可修改，「清空所有数据」可重新下发' },
+  { date:'2026-11-02', module:'数据录入', where:'数据录入-录入弹窗-图谱识别取数-参数网格-首列', text:'参数网格首列改为只显示参数名称（保留时间 / 峰面积 / 峰面积%），表头同步为「参数名称」；检验项全名收进悬浮提示' },
+  { date:'2026-11-02', module:'数据录入', where:'数据录入-录入弹窗-图谱识别取数-参数网格', text:'参数网格首列由「检验项 · 参数名称」改为「检验项目名-样本次数」（如 含量（HPLC）-3），参数名收进悬浮提示区分同检验项的多参数行' },
+  { date:'2026-11-02', module:'数据录入', where:'数据录入-录入弹窗-图谱识别取数-台账记录信息', text:'表头改为与 GC / LC 台账列表一致：色谱类型 → 批号 → 各典型保留时间（每个 TR 一列，取当前结果集 _rt 键并集按数值升序）→ 杂质个数 / 新杂个数 / 是否存在新杂 / 杂质偏差结论；下线原「保留时间」「峰面积%」两列聚合文本与全字段铺开，TR 列取数跟随台账工具栏维度口径' },
+  { date:'2026-11-02', module:'数据录入', where:'数据录入-录入弹窗-参数条-图谱识别取数', text:'「图谱识别取数」由点击直接取数改为与仪器数采一致的弹窗交互：弹出「图谱识别取数 · 选择台账记录」，按色谱类型/批号/物料名称/规则名称筛选 GC·LC 台账记录、默认按方法名带出色谱类型与当前样品批号，单选后「自动读取实测值」按峰面积% 降序填充「参数 × 次数」网格（可逐行填充、手动改值、清空），提交按列回填定量检验项参数（参数名不匹配时按定性结构/主峰兜底），取消提示未回填' },
+  { date:'2026-11-02', module:'数据录入', where:'数据录入-录入弹窗-图谱识别取数-台账记录信息/参数网格', text:'台账记录表改为带出全部字段（按台账行字段动态生成列，横向滚动查看，内部字段 _rt/id/typeId 除外，空值显示—）；参数网格由固定 4 参数改为「当前检验项目类定量检验项 × 各自参数行」动态生成（行名『检验项 · 参数名』），自动读取时逐行按检验项匹配峰、按参数名取峰参数（保留时间/峰面积/峰面积%/峰高/结果值），匹配不到该检验项峰时回退主峰，无对应峰参数的跳过并在提示中给出数量；提交按行精确回填到检验项对应参数列并触发判定联动' },
+  { date:'2026-11-02', module:'数据录入', where:'数据录入-录入弹窗-图谱识别取数-台账记录信息/未匹配峰', text:'修复保留时间未带出：① 台账记录表在「色谱类型」后新增「保留时间」「峰面积%」两列（由台账 _rt 展开为顿号分隔文本，随表头全部字段带出）；② 提交回填时同步写回录入页底部「未匹配峰」列表（序号/保留时间/峰面积/峰面积%/峰高 + 来源批号），此前改弹窗后该列表不再更新导致保留时间缺失' },
+  { date:'2026-11-02', module:'仪器台账', where:'仪器台账-行操作-详情-变更日志', text:'详情弹窗最下方新增「变更日志」只读列表：一行 = 一次保存动作，列 序号 / 修改时间 / 修改人 / 变更类型（新增·蓝、修改·橙）/ 变更字段 / 变更内容（修改前 → 修改后），按修改时间倒序；新增记「初始建档」摘要，修改按字段级差异逐字段留痕，字段值未变化的保存不生成记录；编辑保存同步回写系统信息的「修改人 / 修改时间」；日志存独立 localStorage（键 oled-instrument-change-log-v1），首次打开详情为存量 mock 仪器按仪器ID 幂等补一条「新增」基线' },
+  { date:'2026-11-02', module:'仪器台账', where:'仪器台账-行操作-详情-变更日志-字段快照列', text:'变更日志按数据列表字段补全：在「变更内容」右侧新增 14 列字段快照（仪器状态 → 创建时间），字段名 / 顺序 / 宽度 / 标签样式取自列表列配置（列表后续增列自动跟随），值为该次保存完成时的当时值而非当前值（每条记录额外存「快照」）；左侧 序号 / 修改时间 / 修改人 / 变更类型 固定列，变更内容列允许换行，字段较多时横向滚动；缺失值统一显示「—」（记录无快照 / 快照无该字段 / 值为空三种情况），非标量异常值字符串化后截断 120 字符；日志存储键升级为 oled-instrument-change-log-v2' },
+  { date:'2026-11-02', module:'数据录入', where:'数据录入-录入弹窗-图谱识别取数-台账记录信息-单元格', text:'三段取值全为空时合并显示单个「—」，不再输出「— / — / —」（该峰在本台账未取到任何值）' },
+  { date:'2026-11-02', module:'数据录入', where:'数据录入-录入弹窗-图谱识别取数-台账记录信息-取值口径', text:'每个典型保留时间列的表头由两行改为三行：典型保留时间 / 已定性名称 / 取值口径「峰面积%&峰面积&保留时间」（虚线分隔）；单元格值固定按同一口径展示「峰面积% / 峰面积 / 保留时间」三段（如 0.0002 / 2 / 3.005），不再跟随台账工具栏维度切换，取数时三个量可同屏对照；列宽下限 110→210px，表格横向滚动' },
 ];
 const INSP_SAMPLE_DEFECT_SEED_ROWS = JSON.parse(JSON.stringify((((window.WMS_MOCK_ROWS || {})['insp-sample'] || {})['finished-product'] || []).filter(r => String(r.id || '').startsWith('is-pm-dc-'))));
 const INSP_SCHEME_DEFECT_SEED_ROWS = JSON.parse(JSON.stringify((((window.WMS_MOCK_ROWS || {})['insp-scheme'] || {}).material || []).filter(r => r['方案编码'] === 'FA-DC-PRODUCT-V1')));
@@ -10730,10 +11224,10 @@ const MOCK = window.WMS_MOCK_ROWS || {};
 /* Mock 结构升级为「按报检类型分 Tab」后，旧 localStorage 缓存会反向覆盖新数据，按结构版本号自愈一次 */
 (function clearStaleMockCache(){
   try{
-    var MK = 'wms-demo-mock-v5-xtao-db', VK = 'wms-demo-mock-shape-ver';
-if(localStorage.getItem(VK) !== 'type-cat-20261027'){
+    var MK = 'wms-demo-mock-v5-xtao-db', VK = 'wms-demo-mock-shape-ver-20261102-lr-processed';
+if(localStorage.getItem(VK) !== 'collect-dialog-20261102'){
     localStorage.removeItem(MK);
-    localStorage.setItem(VK, 'type-cat-20261027');
+    localStorage.setItem(VK, 'collect-dialog-20261102');
   }
   }catch(e){ /* 隐私模式等场景忽略 */ }
 })();
@@ -10854,19 +11348,6 @@ if(STORE) STORE.hydrateMock(MOCK);
       changed = true;
     }
     if(r.typeId !== byName.get(model)){ r.typeId = byName.get(model); changed = true; }
-  });
-  if(changed && STORE && STORE.saveMockSilent) STORE.saveMockSilent(MOCK);
-})();
-(function normalizeInspMethodType(){
-  const bag = MOCK['insp-method'] || {};
-  const rows = bag.method || [];
-  if(!rows.length) return;
-  let changed = false;
-  rows.forEach(r=>{
-    const t = String(r['方法类型'] || '').trim();
-    if(t === '通用方法' || t === '色谱识别') return;
-    r['方法类型'] = /色谱|GC|HPLC|GPC/.test(String(r['方法名称'] || '')) ? '色谱识别' : '通用方法';
-    changed = true;
   });
   if(changed && STORE && STORE.saveMockSilent) STORE.saveMockSilent(MOCK);
 })();
@@ -11306,7 +11787,7 @@ const app = createApp({
       return tabs.map(t=> t.label).filter(Boolean);
     };
 
-    // 有效取值范围：下限 = 典型保留时间 − 偏差量，上限 = 典型保留时间 + 偏差量
+    // 行级「偏差范围（下限 ~ 上限）」由各杂质行直接维护（规则级偏差范围字段已删除）
     const DRIFT_DELTA_DEFAULT = { lo: -0.002, hi: 0.002 };
     const driftNum = (v) => {
       const t = String(v===undefined || v===null ? '' : v).trim();
@@ -11315,27 +11796,14 @@ const app = createApp({
       return Number.isFinite(n) ? n : null;
     };
     const driftFmt4 = (n) => (Math.round(n*10000)/10000).toFixed(4);
+    // 规则级偏差量来源已删除；保留兼容读取（历史 formModel 若仍带 偏差范围下限/上限 则可用），无来源返回 null
     function driftDelta(){
       let lo = driftNum(formModel['偏差范围下限']);
       let hi = driftNum(formModel['偏差范围上限']);
-      // 兜底：下限只接受「偏差量（正数）」语义，内部统一按负数参与计算；留空视为 0 偏差
+      if(lo==null && hi==null) return null;
       if(lo != null) lo = -Math.abs(lo);
       if(hi != null) hi = Math.abs(hi);
       return { lo: lo==null ? 0 : lo, hi: hi==null ? 0 : hi };
-    }
-    // 偏差范围：下限只需输入数字，系统自动补「-」参与计算（输入框显示值＝计算值）
-    function onDriftDeltaLowerInput(){
-      const raw = String(formModel['偏差范围下限']===undefined || formModel['偏差范围下限']===null ? '' : formModel['偏差范围下限']);
-      const digits = raw.replace(/[^0-9.]/g, '').replace(/\.{2,}/g, '.');
-      const next = digits === '' ? '' : '-' + digits;
-      if(next !== raw) formModel['偏差范围下限'] = next;
-      onDriftDeltaChange();
-    }
-    function onDriftDeltaUpperInput(){
-      const raw = String(formModel['偏差范围上限']===undefined || formModel['偏差范围上限']===null ? '' : formModel['偏差范围上限']);
-      const digits = raw.replace(/[^0-9.]/g, '').replace(/\.{2,}/g, '.');
-      if(digits !== raw) formModel['偏差范围上限'] = digits;
-      onDriftDeltaChange();
     }
     function driftRowRange(row){
       const lo = driftNum(row && row.有效范围下限);
@@ -11343,12 +11811,13 @@ const app = createApp({
       if(lo==null || hi==null) return null;
       return { lo, hi };
     }
+    // 无规则级偏差量来源时不再自动带出，保留各行手动维护的取值
     function syncDriftImpurityRange(row){
       if(!row) return;
       row._rangeManual = false;
       const tr = driftNum(row.典型保留时间);
-      if(tr==null){ row.有效范围下限 = ''; row.有效范围上限 = ''; return; }
       const d = driftDelta();
+      if(tr==null || !d) return;
       row.有效范围下限 = driftFmt4(tr + d.lo);
       row.有效范围上限 = driftFmt4(tr + d.hi);
     }
@@ -11358,16 +11827,8 @@ const app = createApp({
       row._rangeManual = true;
       const lo = driftNum(row.有效范围下限), hi = driftNum(row.有效范围上限);
       if(lo!=null && hi!=null && lo>hi){
-        const t = row.有效范围下限; row.有效范围下限 = row.有效范围上限; row.有效范围上限 = t;
+        const t = row.有效范围下限; row.有效范围上限 = row.有效范围上限; row.有效范围上限 = t;
       }
-    }
-    function onDriftDeltaChange(){
-      // 仅重算未手工调整过的行，避免覆盖逐行微调的取值范围
-      driftImpurityRows.value.forEach(r=> { if(!r._rangeManual) syncDriftImpurityRange(r); });
-    }
-    function driftRangeText(){
-      const d = driftDelta();
-      return driftFmt4(d.lo).replace(/0+$/,'').replace(/\.$/,'.0') + '~' + driftFmt4(d.hi).replace(/0+$/,'').replace(/\.$/,'.0');
     }
     function resetDriftForm(){
       driftFormTab.value = 'impurity';
@@ -11423,6 +11884,7 @@ const app = createApp({
       { prop: '谱图保留时间', label: '谱图保留时间', req: true, tag: '识别填充', tagType: 'primary', width: 130, editable: true },
       { prop: '谱图峰面积', label: '谱图峰面积', req: true, tag: '识别填充', tagType: 'primary', width: 120, editable: true },
       { prop: '是否主峰', label: '是否主峰', req: true, tag: '自动判断', tagType: 'warning', width: 96, type: 'select' },
+      { prop: '参考峰', label: '参考峰', req: true, tag: '手动选择', tagType: 'info', width: 132, type: 'select-ref' },
       { prop: '相对保留时间', label: '相对保留时间', req: true, tag: '自动计算', tagType: 'primary', width: 130, editable: true },
       { prop: '对应典型保留时间', label: '对应典型保留时间', req: false, tag: '自动匹配', tagType: 'success', width: 140, editable: true },
       { prop: '有效取值范围', label: '有效取值范围', req: false, tag: '自动带入', tagType: 'primary', width: 150, editable: false },
@@ -11432,6 +11894,26 @@ const app = createApp({
       { prop: '杂质指标', label: '杂质指标', req: false, tag: '自动代入', tagType: 'primary', width: 150, editable: false },
       { prop: '杂质偏差结论', label: '杂质偏差结论', req: false, tag: '自动判断', tagType: 'warning', width: 112, editable: false },
     ];
+    // 参考峰：相对保留时间的计算基准（默认主峰，可手动切换；整表共用同一参考峰）
+    const spectrumRefPeak = ref('');
+    const spectrumRefOptions = computed(()=> (spectrumPeaks.value || []).map(r=> ({
+      value: String(r.谱图峰号 || ''),
+      label: String(r.谱图峰号 || '') + (String(r.是否主峰 || '') === '是' ? '（主峰）' : '')
+    })).filter(o=> o.value));
+    function setSpectrumRefPeak(val){
+      const v = String(val || '').trim();
+      if(!v) return;
+      const row = (spectrumPeaks.value || []).find(r=> String(r.谱图峰号 || '') === v) || {};
+      const isMain = String(row.是否主峰 || '') === '是';
+      spectrumRefPeak.value = v;
+      spectrumPeaks.value = (spectrumPeaks.value || []).map(r=> Object.assign({}, r, { 参考峰: v }));
+      if(spectrumCalcDone.value) runSpectrumCalc();
+      if(isMain){
+        ElMessage.success('参考峰已切换为峰 ' + v + '（主峰），相对保留时间已按该峰重算');
+      } else {
+        ElMessage.warning('参考峰已切换为峰 ' + v + '（非主峰）：相对保留时间按该峰重算，匹配结果可能大面积「超出有效范围」；已手动修改的谱图数据会在重算时由源文件重新回填');
+      }
+    }
     const spectrumNoteGroups = [
       { title: '数据备注 · 数据列表', items: [
         { no: '1', name: '数据源', desc: '1、点击【识别+计算】后，自动生成行数据' },
@@ -11443,20 +11925,21 @@ const app = createApp({
         { no: '2', name: '谱图保留时间', desc: '1、根据文件，识别自动填充，可修改，输入，数字' },
         { no: '3', name: '谱图峰面积', desc: '1、根据文件，识别自动填充，可修改，输入，数字' },
         { no: '4', name: '是否主峰', desc: '1、自动判断：识别该数据内最大的「谱图峰面积」默认为「是」，其余默认均为「否」\n2、支持修改，下拉「是/否」，支持多主峰（支持选择多个主峰）' },
-        { no: '5', name: '相对保留时间', desc: '1、自动计算，= 各「谱图保留时间」× 参考峰的典型保留时间 ÷ 参考峰谱图保留时间\n   1）参考峰：主峰\n2、计算完成后，支持手动修改，数字\n3、计算完成后，逐一比对该值是否落在「对应典型保留时间」的有效取值范围内' },
-        { no: '6', name: '对应典型保留时间', desc: '1、范围判断（匹配前置条件）：先判断本峰的相对保留时间是否落在「漂移规则设置」内某一典型保留时间的有效取值范围（= 典型保留时间 − 偏差量 ~ 典型保留时间 + 偏差量）内\n   1）不在任何有效取值范围内：该峰不参与自动匹配，本字段为空，匹配异常说明＝「超出有效范围」，是否新杂默认「是」\n   2）落在有效取值范围内：仅在命中的范围内执行下述自动匹配\n2、是否主峰：\n   1）是（主峰）：自动匹配「漂移规则设置」内主峰典型保留时间；且「是否锁定」默认为「是」\n   2）否（非主峰）：\n      a. 已定性结构：若谱图内已存在定性结构名称，且「漂移规则设置」内也存在此定性结构名称，自动匹配对应的典型保留时间；且「是否锁定」默认为「是」\n      b. 非已定性结构：手动选择（仅可选取有效取值范围命中的典型保留时间）' },
-        { no: '7', name: '有效取值范围', desc: '1、根据匹配到的典型保留时间自动带入，= 典型保留时间 − 偏差量 ~ 典型保留时间 + 偏差量\n2、偏差量取自「漂移规则设置」的偏差范围（两个数字输入框）；未匹配到（含超出有效范围）时为空' },
-        { no: '8', name: '对应定性结构', desc: '1、谱图内已存在化学式名称\n   1）自动将谱图内的化学式名称进行填充' },
-        { no: '9', name: '是否锁定', desc: '1、主峰：默认为「是」，不可修改\n2、谱图内存在已定性结构，且台账内也存在此定性结构：默认为「是」，不可修改\n3、锁定后，点击重新计算，当前锁定峰的对应典型保留时间不需要重新匹配' },
-        { no: '10', name: '是否新杂', desc: '1、自动匹配，可修改\n2、超出有效取值范围而未参与匹配的峰，默认「是」' },
-        { no: '11', name: '杂质指标', desc: '1、匹配到典型保留时间：带入该杂质的 UCL/LCL\n2、未匹配到：带入「漂移规则设置」的新杂质项目通用指标' },
-        { no: '12', name: '新杂偏差结论', desc: '1、若为新杂，则根据「预警设置」的 UCL/LCL 进行判断，若超出则为「是」，否则为「否」\n2、若非新杂，则不判断，显示「/」' },
+        { no: '5', name: '参考峰', desc: '1、默认取主峰（本次识别结果内「谱图峰面积」最大的峰），下拉可切换为本次识别结果内任一峰\n2、整表共用同一参考峰：切换后全表「参考峰」同步，并自动重算「相对保留时间」\n3、参考峰的典型保留时间取「漂移规则设置」内的主峰典型保留时间；若参考峰非主峰，先按主峰折算一次，折算值落在某一典型保留时间范围内时改用该典型保留时间\n4、切换参考峰仅影响「相对保留时间」及其下游范围判断，不改变「是否主峰 / 是否锁定 / 是否新杂」等匹配结果' },
+        { no: '6', name: '相对保留时间', desc: '1、自动计算，= 各「谱图保留时间」× 参考峰典型保留时间 ÷ 参考峰谱图保留时间\n   1）参考峰：由「参考峰」字段指定，默认主峰；参考峰自身该值为 1.0000\n2、计算完成后，支持手动修改，数字\n3、计算完成后，逐一比对该值是否落在「对应典型保留时间」的有效取值范围内' },
+        { no: '7', name: '对应典型保留时间', desc: '1、范围判断（匹配前置条件）：先判断本峰的相对保留时间是否落在「漂移规则设置」内某一典型保留时间的有效取值范围（= 典型保留时间 − 偏差量 ~ 典型保留时间 + 偏差量）内\n   1）不在任何有效取值范围内：该峰不参与自动匹配，本字段为空，匹配异常说明＝「超出有效范围」，是否新杂默认「是」\n   2）落在有效取值范围内：仅在命中的范围内执行下述自动匹配\n2、是否主峰：\n   1）是（主峰）：自动匹配「漂移规则设置」内主峰典型保留时间；且「是否锁定」默认为「是」\n   2）否（非主峰）：\n      a. 已定性结构：若谱图内已存在定性结构名称，且「漂移规则设置」内也存在此定性结构名称，自动匹配对应的典型保留时间；且「是否锁定」默认为「是」\n      b. 非已定性结构：手动选择（仅可选取有效取值范围命中的典型保留时间）' },
+        { no: '8', name: '有效取值范围', desc: '1、根据匹配到的典型保留时间自动带入该行的「偏差范围（下限 ~ 上限）」\n2、取值范围由「漂移规则设置」已知杂质项目指标列表逐行维护；未匹配到（含超出有效范围）时为空' },
+        { no: '9', name: '对应定性结构', desc: '1、谱图内已存在化学式名称\n   1）自动将谱图内的化学式名称进行填充' },
+        { no: '10', name: '是否锁定', desc: '1、主峰：默认为「是」，不可修改\n2、谱图内存在已定性结构，且台账内也存在此定性结构：默认为「是」，不可修改\n3、锁定后，点击重新计算，当前锁定峰的对应典型保留时间不需要重新匹配' },
+        { no: '11', name: '是否新杂', desc: '1、自动匹配，可修改\n2、超出有效取值范围而未参与匹配的峰，默认「是」' },
+        { no: '12', name: '杂质指标', desc: '1、匹配到典型保留时间：带入该杂质的 UCL/LCL\n2、未匹配到：带入「漂移规则设置」的新杂质项目通用指标' },
+        { no: '13', name: '新杂偏差结论', desc: '1、若为新杂，则根据「预警设置」的 UCL/LCL 进行判断，若超出则为「是」，否则为「否」\n2、若非新杂，则不判断，显示「/」' },
       ]},
       { title: '状态备注 · 匹配异常说明', items: [
         { no: '1', name: '异常说明', desc: '1、超出有效范围：相对保留时间不在任何典型保留时间的有效取值范围内，该峰不参与自动匹配，对应典型保留时间/对应定性结构为空，是否新杂默认为「是」\n2、未匹配到：有效取值范围内已无可用候选（如候选均被锁定峰占用），对应典型保留时间为空\n3、重复匹配：两个或两个以上，对应典型保留时间重复，保留时间拼接展示\n4、顺序异常：当前峰的对应典型保留时间，小于上一峰的对应典型保留时间\n5、/：匹配到唯一一个，或手动更改后匹配到唯一一个对应典型保留时间' },
       ]},
       { title: '功能备注', items: [
-        { no: '1', name: '识别+计算', desc: '1、上述基本信息必须全部存在值，才可点击，否则不可点击\n2、点击完成后，自动填充下述的色谱识别信息的数据列表内\n3、计算顺序：先算相对保留时间 → 再逐峰判断是否落在对应典型保留时间的有效取值范围内 → 超出范围的峰不进入自动匹配，最终无匹配结果值' },
+        { no: '1', name: '识别+计算', desc: '1、上述基本信息必须全部存在值，才可点击，否则不可点击\n2、点击完成后，自动填充下述的色谱识别信息的数据列表内\n3、计算顺序：先确定参考峰 → 再算相对保留时间 → 再逐峰判断是否落在对应典型保留时间的有效取值范围内 → 超出范围的峰不进入自动匹配，最终无匹配结果值' },
         { no: '2', name: '重新计算', desc: '1、校验：锁定峰的对应典型保留时间，不可重复\n2、根据下方锁定的组分峰的对应典型保留时间，重新计算' },
         { no: '3', name: '保存校验', desc: '1、对应典型保留时间有值的组分峰，不可为新杂' },
         { no: '4', name: '保存', desc: '1、按固定值不叠加：生成数据台账，且不增加典型保留时间\n2、按批次新杂滚动叠加：生成数据台账同时，需将本次新杂项目自动添加至典型保留时间内展示\n3、首批次新杂滚动增加，其余批次不叠加：判断该批次是否为数据台账内的首批次数据，若是，将本次新杂项目自动添加至典型保留时间内；若否，则不添加' },
@@ -11528,6 +12011,11 @@ const app = createApp({
         return;
       }
       const mainPeak = peaks.reduce((a,b)=> b.谱图峰面积 > a.谱图峰面积 ? b : a, peaks[0]);
+      // 参考峰：沿用已选值（仍存在于本次识别结果内则保留），否则默认主峰
+      const prevRef = String(spectrumRefPeak.value || '').trim();
+      const refPeak = (prevRef && peaks.find(p=> p.谱图峰号 === prevRef)) || mainPeak;
+      const refPeakNo = String(refPeak.谱图峰号 || '');
+      spectrumRefPeak.value = refPeakNo;
       const wins = spectrumWindows();
       // 未匹配到规则方案：仅回填识别结果，不对匹配类字段做任何推断
       if(!wins.length){
@@ -11536,6 +12024,7 @@ const app = createApp({
           谱图保留时间: p.谱图保留时间.toFixed(3),
           谱图峰面积: p.谱图峰面积.toFixed(4),
           是否主峰: p === mainPeak ? '是' : '否',
+          参考峰: refPeakNo,
           相对保留时间: '—',
           对应典型保留时间: '—',
           对应定性结构: '—',
@@ -11553,7 +12042,19 @@ const app = createApp({
         return;
       }
       const mainWin = wins.find(w=> w.是否主峰) || wins[wins.length - 1];
-      const factor = mainPeak.谱图保留时间 ? (mainWin.典型保留时间 / mainPeak.谱图保留时间) : 1;
+      const mainTR = driftNum(mainWin && mainWin.典型保留时间);
+      // 参考峰典型保留时间：主峰取「漂移规则设置」的主峰典型保留时间；
+      // 非主峰先按主峰折算一次，折算值命中某一典型保留时间范围时改用命中的典型保留时间（参考峰自身 RRT≈1）
+      const refIsMain = refPeak === mainPeak
+        || String((((spectrumPeaks.value || []).find(r=> String(r.谱图峰号) === refPeakNo) || {}).是否主峰) || '') === '是';
+      let refTR = mainTR;
+      let factor = (refPeak.谱图保留时间 && refTR != null) ? (refTR / refPeak.谱图保留时间) : 1;
+      if(!refIsMain && refPeak.谱图保留时间){
+        const probe = Number((refPeak.谱图保留时间 * factor).toFixed(4));
+        const hit = wins.find(w=> probe >= w.下限 - 1e-9 && probe <= w.上限 + 1e-9);
+        const hitTR = hit ? driftNum(hit.典型保留时间) : null;
+        if(hitTR != null){ refTR = hitTR; factor = refTR / refPeak.谱图保留时间; }
+      }
       const newLim = spectrumDemoNewLimits();
       const rows = peaks.map(p=>{
         const rrt = Number((p.谱图保留时间 * factor).toFixed(4));
@@ -11564,6 +12065,7 @@ const app = createApp({
           谱图保留时间: p.谱图保留时间.toFixed(3),
           谱图峰面积: p.谱图峰面积.toFixed(4),
           是否主峰: p === mainPeak ? '是' : '否',
+          参考峰: refPeakNo,
           相对保留时间: rrt.toFixed(4),
           对应典型保留时间: '',
           对应定性结构: '',
@@ -11615,7 +12117,7 @@ const app = createApp({
       runSpectrumCalc();
       ElMessage.success('Demo：已按锁定峰重新计算，锁定峰对应典型保留时间未重新匹配');
     }
-    function resetSpectrumCalc(){ spectrumPeaks.value = []; spectrumCalcDone.value = false; spectrumNoRule.value = false; spectrumNoteVisible.value = true; }
+    function resetSpectrumCalc(){ spectrumPeaks.value = []; spectrumCalcDone.value = false; spectrumNoRule.value = false; spectrumNoteVisible.value = true; spectrumRefPeak.value = ''; }
 
     // ===== 图谱识别 · 源文件（MOCK['spectrum-file'] 图谱文件台账）=====
     // 图谱文件一次上传一条记录；被图谱识别任务引用后置「已使用」，不可被再次选择
@@ -11854,14 +12356,38 @@ const app = createApp({
 
     // ===== 色谱数据台账（chrom-ledger）=====
     const CHROM_LEDGER_RT_LIST = ['1.142','2.142','3.142','4.142','5.156','7.652','8.186'];
-    const chromLedgerDim = ref('峰面积');
-    const CHROM_LEDGER_DIMS = ['峰面积','保留时间','峰面积&保留时间'];
+    const chromLedgerDim = ref('峰面积%');
+    // 维度口径：峰面积% = _rt[TR].a（相对峰面积）；峰面积 = a × 10000（绝对峰面积，与「色谱识别取数」area 同口径）；
+    //          保留时间 = _rt[TR].t；组合项按「峰面积% / 峰面积 / 保留时间」三段展示
+    const CHROM_LEDGER_DIM_PAIRS = '峰面积%&峰面积&保留时间';
+    const CHROM_LEDGER_DIMS = ['峰面积%','峰面积','保留时间',CHROM_LEDGER_DIM_PAIRS];
+    function chromLedgerPctText(v){
+      // 列表只展示数值本身，不带 % 后缀（单位由维度名称体现）
+      const s = (v && v.a != null && v.a !== '') ? String(v.a).trim() : '';
+      return s || '—';
+    }
+    function chromLedgerAreaText(v){
+      const pct = parseFloat(v && v.a);
+      return Number.isFinite(pct) ? String(+(pct * 10000).toFixed(1)) : '—';
+    }
     function chromLedgerCell(row, rt){
       const v = (row._rt && row._rt[rt]) || {};
       const dim = chromLedgerDim.value;
+      if(dim==='峰面积') return chromLedgerAreaText(v);
       if(dim==='保留时间') return v.t || '—';
-      if(dim==='峰面积&保留时间') return (v.a!=null && v.t!=null) ? (v.a + '（' + v.t + '）') : '—';
-      return v.a != null ? v.a : '—';
+      if(dim===CHROM_LEDGER_DIM_PAIRS) return [chromLedgerPctText(v), chromLedgerAreaText(v), (v.t || '—')].join(' / ');
+      return chromLedgerPctText(v);
+    }
+    // 「色谱识别取数 → 台账记录信息」专用取值：固定按「峰面积% / 峰面积 / 保留时间」三段展示，
+    // 不跟随台账工具栏维度（取数场景需要同时看到三个量来判断取哪个峰，与台账列表的口径解耦）
+    function chromPickCellText(row, rt){
+      const v = (row._rt && row._rt[rt]) || {};
+      const pct = chromLedgerPctText(v);
+      const area = chromLedgerAreaText(v);
+      const tr = v.t || '—';
+      // 三段全空时只留一个占位，避免「— / — / —」刷屏（该峰在本台账未取到任何值）
+      if(pct === '—' && area === '—' && tr === '—') return '—';
+      return [pct, area, tr].join(' / ');
     }
 
     /* ===== 漂移规则 → GC/LC 台账 联动（分类 + 表头） ===== */
@@ -13671,6 +14197,9 @@ const app = createApp({
     const saDetailRow = ref(null);
     // 分配详情明细由 computed 派生（见 saDetailRows），此处只记当前样品编号作为数据锚点
     const saDetailSampleNo = ref('');
+    // 分配记录弹窗（该样品全部历史「分配 / 取消分配」操作）
+    const saLogVisible = ref(false);
+    const saLogRow = ref(null);
     const msaFrameSrc = ref('');
     const remarksOpen = ref(false);
     const remarksActiveTab = ref('');
@@ -13733,53 +14262,59 @@ const app = createApp({
       announceOpen.value = false;
       try{ localStorage.setItem(ANNOUNCE_DISMISS_KEY, announceLatest); }catch(e){}
     }
-    /* ===== 修改记录（顶栏入口）：按模块归并、时间取最新、序号连续递增 =====
+    /* ===== 修改记录（顶栏入口）：按「日期 + 模块」归并、倒序排列、序号连续递增 =====
        与「版本公告」分工：公告 = 里程碑/可开发口径；修改记录 = 每次改动的流水，只读、不做已读状态。
-       归并口径（2026-10-28 主人定）：相同 module 汇总为一行，行时间取该模块最新一次改动日期；
-       行内保留全部子项（按日期升序），默认只展开最新 1 项，可「展开全部 N 项」查看历史。
-       定位口径（2026-10-28 主人追加）：模块列必须落到**具体按钮或页面**（where，如「报检单-检验详情-原始记录」），
-       不在大类层面止步；折叠态显示最新子项的 where，展开态每条子项各带自己的 where 并隐藏列上的 where，避免重复。 */
+       归并口径（2026-11-02 主人定）：**同一日期 + 同一模块**汇总为一行（键 = date|module），行时间即该日期；
+       行内保留该组全部子项，默认只展开最新 1 项，可「展开全部 N 项」查看同日同模块的其余改动。
+       排序口径（2026-11-02）：按日期**倒序**，最新修改在最上方；同日内按追加先后倒序（越晚写越靠上）。
+       定位口径（2026-10-28 主人定）：模块列必须落到**具体按钮或页面**（where，如「报检单-检验详情-原始记录」）；
+       折叠态显示最新子项的 where，展开态每条子项各带自己的 where 并隐藏列上的 where，避免重复。 */
     const changeLogOpen = ref(false);
     const changeLogExpanded = ref([]);
     const changeLogRawCount = (typeof DEMO_CHANGE_LOG !== 'undefined' ? DEMO_CHANGE_LOG.length : 0);
     const changeLogRows = computed(()=>{
-      const raw = (typeof DEMO_CHANGE_LOG !== 'undefined' ? DEMO_CHANGE_LOG : []).slice()
-        .sort((a, b)=> String(a.date).localeCompare(String(b.date)));
+      const raw = (typeof DEMO_CHANGE_LOG !== 'undefined' ? DEMO_CHANGE_LOG : []).slice();
       const bag = new Map();
+      let ord = 0;
       raw.forEach(r=>{
         const mod = String(r.module || '').trim() || '其他';
-        if(!bag.has(mod)) bag.set(mod, { module: mod, date: String(r.date || ''), items: [] });
-        const g = bag.get(mod);
-        if(String(r.date || '') > g.date) g.date = String(r.date || '');   /* 行时间 = 最新一次 */
-        g.items.push({ date: String(r.date || ''), where: String(r.where || ''), text: String(r.text || '') });
+        const date = String(r.date || '');
+        const key = date + '|' + mod;
+        if(!bag.has(key)) bag.set(key, { key, module: mod, date, ord: ord++, items: [] });
+        bag.get(key).items.push({ where: String(r.where || ''), text: String(r.text || '') });
       });
-      /* 按最新时间升序；同日保持首次出现顺序（Map 插入序 + 稳定排序） */
-      const list = [...bag.values()].sort((a, b)=> a.date < b.date ? -1 : (a.date > b.date ? 1 : 0));
+      /* 日期倒序（最新在最上）；同日按追加顺序倒序，保证"越晚记录的越靠上" */
+      const list = [...bag.values()].sort((a, b)=>{
+        if(a.date === b.date) return b.ord - a.ord;
+        return a.date < b.date ? 1 : -1;
+      });
       return list.map((g, i)=>{
         const latest = g.items[g.items.length - 1] || {};
-        return { seq: i + 1, date: g.date, module: g.module, where: latest.where || g.module,
-                 items: g.items, count: g.items.length };
+        return { seq: i + 1, key: g.key, date: g.date, module: g.module,
+                 where: latest.where || g.module, items: g.items, count: g.items.length };
       });
     });
-    function isChangeLogExpanded(mod){ return changeLogExpanded.value.indexOf(mod) >= 0; }
-    function toggleChangeLogRow(mod){
-      const i = changeLogExpanded.value.indexOf(mod);
+    function isChangeLogExpanded(key){ return changeLogExpanded.value.indexOf(key) >= 0; }
+    function toggleChangeLogRow(key){
+      const i = changeLogExpanded.value.indexOf(key);
       if(i >= 0) changeLogExpanded.value.splice(i, 1);
-      else changeLogExpanded.value.push(mod);
+      else changeLogExpanded.value.push(key);
     }
     function visibleChangeLogItems(row){
       const items = (row && row.items) || [];
       if(!items.length) return [];
-      return isChangeLogExpanded(row.module) ? items : [items[items.length - 1]];
+      return isChangeLogExpanded(row.key) ? items : [items[items.length - 1]];
     }
     /* 折叠时 where 显示在模块列；展开后逐条显示，列上不再重复 */
     function changeLogShowWhereInColumn(row){
-      return !(row && row.count > 1 && isChangeLogExpanded(row.module));
+      return !(row && row.count > 1 && isChangeLogExpanded(row.key));
     }
     const changeLogRangeText = computed(()=>{
       const rows = changeLogRows.value;
       if(!rows.length) return '';
-      const first = rows[0].date, last = rows[rows.length - 1].date;
+      /* 行已按倒序排，范围要取最早 ~ 最晚，不能直接取首末行 */
+      const dates = rows.map(r=> r.date).sort();
+      const first = dates[0], last = dates[dates.length - 1];
       return first === last ? first : first + ' ~ ' + last;
     });
     const qcLedgerBatchAddVisible = ref(false);
@@ -14123,7 +14658,6 @@ const app = createApp({
     const inspMethodForm = reactive({
       inspectionMethodNum: '',
       inspectionMethodName: '',
-      methodType: '',
       enableStatus: '启用',
       remark: '',
       whetherUsePublic: '是',
@@ -16086,7 +16620,7 @@ const app = createApp({
       inspSampleActiveItemId.value = inspSampleCatItems.value.length ? inspSampleCatItems.value[0].id : '';
       inspSampleMethod.value = inspSampleMethodForCat(inspSampleActiveCat.value);
       inspSamplePublicTestTimes.value = '1次';
-      inspSampleTestCount.value = 2;
+      initInspEntryBarDefaults(row);
       inspSampleFullscreen.value = false;
       inspSampleDataEntryVisible.value = true;
     }
@@ -16147,6 +16681,570 @@ const app = createApp({
     const inspSampleMethod = ref('');
     const inspSamplePublicTestTimes = ref('1次');
     const inspSampleTestCount = ref(2);
+    /* ── 录入参数条：样本测试次数 / 分析仪器（2026-11-02）─────────────────────
+       样本测试次数默认按当前行绑定的检验方案带出（方案「样本测试次数」字段，缺失回退 2）；
+       分析仪器默认按样品任务分配结果（同样品编号、已分配行的「检验设备」）映射仪器台账带出。
+       两者均允许手动修改：用户改过后（touched）不再被自动刷新覆盖。 */
+    const inspSampleInstruments = ref([]);
+    const inspSampleTestCountTouched = ref(false);
+    const inspSampleInstrumentsTouched = ref(false);
+    const inspInstrumentOptions = computed(() => {
+      storeTick.value;
+      return (((MOCK['instrument-ledger'] || {}).main) || [])
+        .filter(r => String(r['使用状态'] || '在用') === '在用')
+        .map(r => ({ value: String(r['仪器编号'] || r['仪器名称'] || ''), label: String(r['仪器编号'] || '') + '/' + String(r['仪器名称'] || '') }))
+        .filter(o => o.value);
+    });
+    // 分配记录中的「检验设备」文本 → 仪器台账编码（未匹配保留原文，保证不丢数据）
+    function inspInstrumentCodeOf(devText){
+      const t = String(devText || '').trim();
+      if(!t) return '';
+      const list = (((MOCK['instrument-ledger'] || {}).main) || []);
+      const hit = list.find(r => t === String(r['仪器编号'] || '') || t === String(r['仪器名称'] || ''))
+        || list.find(r => (r['仪器编号'] && t.indexOf(String(r['仪器编号'])) === 0) || (r['仪器名称'] && t.indexOf(String(r['仪器名称'])) >= 0));
+      return hit ? String(hit['仪器编号'] || hit['仪器名称']) : t;
+    }
+    function inspAssignInstrumentsOf(row){
+      const sn = String((row && (row['样品编号'] || row.sampleNum)) || '').trim();
+      if(!sn) return [];
+      const bag = MOCK['sample-assign'] || {};
+      const out = [];
+      Object.keys(bag).forEach(tab => {
+        (bag[tab] || []).forEach(r => {
+          if(String(r['样品编号'] || '') !== sn) return;
+          if(String(r['分配状态'] || '') === '未分配') return;
+          String(r['检验设备'] || '').split(/[、,，;；]/).map(s => s.trim()).filter(Boolean).forEach(dev => {
+            const code = inspInstrumentCodeOf(dev);
+            if(code && out.indexOf(code) < 0) out.push(code);
+          });
+        });
+      });
+      return out;
+    }
+    function inspSchemeTestCountOf(row){
+      const code = String((row && (row.inspectionSchemeName || row['检验方案'])) || '').trim();
+      if(!code) return null;
+      const bag = MOCK['insp-scheme'] || {};
+      for(const tab of Object.keys(bag)){
+        const hit = (bag[tab] || []).find(r => String(r['方案编码'] || '') === code || String(r['方案名称'] || '') === code);
+        if(hit){
+          const n = parseInt(String(hit['样本测试次数'] || '').replace(/次/g, ''), 10);
+          return (Number.isFinite(n) && n >= 1 && n <= 9) ? n : null;
+        }
+      }
+      return null;
+    }
+    // 弹窗打开时初始化参数条默认值（touched 复位；该行已手动选过仪器则恢复其修改）
+    function initInspEntryBarDefaults(row){
+      inspSampleTestCountTouched.value = false;
+      inspSampleInstrumentsTouched.value = false;
+      inspSampleTestCount.value = inspSchemeTestCountOf(row) || 2;
+      if(row && Array.isArray(row._instruments) && row._instruments.length){
+        inspSampleInstruments.value = row._instruments.slice();
+        inspSampleInstrumentsTouched.value = true;
+      } else {
+        inspSampleInstruments.value = inspAssignInstrumentsOf(row);
+      }
+      if(row) row._instruments = inspSampleInstruments.value.slice();
+    }
+    function onInspSampleTestCountChange(){
+      inspSampleTestCountTouched.value = true;
+      const n = Number(inspSampleTestCount.value);
+      if(!Number.isInteger(n) || n < 1 || n > 9) ElMessage.warning('样本测试次数不能为空，且须为 1~9 的整数');
+    }
+    function onInspSampleInstrumentsChange(){
+      inspSampleInstrumentsTouched.value = true;
+      const row = activeSampleRow.value;
+      if(row) row._instruments = (inspSampleInstruments.value || []).slice();
+    }
+    // 检验方案 / 任务分配在其他页面变更（storeTick 递增）时自动刷新默认值，不覆盖手动修改
+    watch(storeTick, () => {
+      if(!inspSampleDataEntryVisible.value) return;
+      const row = activeSampleRow.value;
+      if(!row) return;
+      if(!inspSampleTestCountTouched.value){
+        const n = inspSchemeTestCountOf(row);
+        if(n) inspSampleTestCount.value = n;
+      }
+      if(!inspSampleInstrumentsTouched.value){
+        inspSampleInstruments.value = inspAssignInstrumentsOf(row);
+        row._instruments = inspSampleInstruments.value.slice();
+      }
+    });
+
+    /* ── 采集数据 · 选择样品文件弹窗（2026-11-02）─────────────────────────
+       数据源为图谱文件台账（spectrum-file）：筛选 → 单选文件 → 自动识别谱峰填充
+       「参数 × 次数」网格 → 提交后按列回填当前检验项目类的定量检验项参数。 */
+    const collectVisible = ref(false);
+    const collectFilters = reactive({ date: '当天', fileRange: '最新文件', fileName: '', sampleNum: '', batch: '' });
+    const collectFileId = ref('');
+    const collectGrid = ref([
+      { name: '保留时间', values: [] },
+      { name: '峰面积', values: [] },
+      { name: '峰面积%', values: [] },
+      { name: '峰高', values: [] }
+    ]);
+    const collectBatchOptions = computed(() => {
+      storeTick.value;
+      const set = [];
+      (((MOCK['spectrum-file'] || {}).main) || []).forEach(f => {
+        const b = String(f['批号'] || '').trim();
+        if(b && set.indexOf(b) < 0) set.push(b);
+      });
+      return set;
+    });
+    const collectFiles = computed(() => {
+      storeTick.value;
+      let list = (((MOCK['spectrum-file'] || {}).main) || []).slice();
+      // 上传日期
+      if(collectFilters.date !== '全部'){
+        const days = collectFilters.date === '当天' ? 0 : (collectFilters.date === '近3天' ? 2 : 6);
+        const start = new Date(); start.setHours(0, 0, 0, 0); start.setDate(start.getDate() - days);
+        list = list.filter(f => {
+          const t = new Date(String(f['上传时间'] || '').replace(/-/g, '/'));
+          return !isNaN(t) && t >= start;
+        });
+      }
+      if(collectFilters.fileName.trim()){
+        const kw = collectFilters.fileName.trim();
+        list = list.filter(f => String(f['文件名'] || '').indexOf(kw) >= 0);
+      }
+      if(collectFilters.sampleNum.trim()){
+        const kw = collectFilters.sampleNum.trim();
+        list = list.filter(f => String(f['样本编号'] || '').indexOf(kw) >= 0);
+      }
+      if(collectFilters.batch){
+        list = list.filter(f => String(f['批号'] || '') === collectFilters.batch);
+      }
+      // 最新文件：仅保留上传时间最新的一份
+      if(collectFilters.fileRange === '最新文件' && list.length){
+        const latest = list.slice().sort((a, b) => String(b['上传时间'] || '').localeCompare(String(a['上传时间'] || '')))[0];
+        list = [latest];
+      }
+      return list;
+    });
+    const collectSelectedFile = computed(() => collectFiles.value.find(f => f.id === collectFileId.value) || null);
+    function openCollectDialog(){
+      const row = activeSampleRow.value;
+      if(!row){ ElMessage.warning('请先选择样品'); return; }
+      collectFilters.date = '当天';
+      collectFilters.fileRange = '最新文件';
+      collectFilters.fileName = '';
+      collectFilters.sampleNum = String(row['样品编号'] || row.sampleNum || '');
+      collectFilters.batch = '';
+      collectFileId.value = '';
+      collectGrid.value.forEach(g => { g.values = Array(inspSampleTestCount.value).fill(''); });
+      collectVisible.value = true;
+    }
+    // 自动识别：按峰面积降序取前 N 峰，第 k 次 = 第 k 大峰；onlyName 时仅填充单个参数行
+    function collectAutoFill(onlyName){
+      const file = collectSelectedFile.value;
+      if(!file){ ElMessage.warning('请先选择样品文件'); return; }
+      const peaks = (file._peaks || []).slice().sort((a, b) => (Number(b['峰面积']) || 0) - (Number(a['峰面积']) || 0));
+      if(!peaks.length){ ElMessage.warning('所选文件无谱峰数据，无法识别'); return; }
+      const n = inspSampleTestCount.value;
+      collectGrid.value.forEach(g => {
+        if(onlyName && g.name !== onlyName) return;
+        g.values = Array.from({ length: n }, (_, i) => {
+          const pk = peaks[i] || peaks[0];
+          if(g.name === '保留时间') return String(pk['保留时间']);
+          if(g.name === '峰面积') return String(pk['峰面积']);
+          if(g.name === '峰高') return String(pk['峰高']);
+          // 图谱文件「相对峰面积」本身即百分数（各峰合计 100），直接保留两位小数
+          return Number(pk['相对峰面积']).toFixed(2);
+        });
+      });
+      ElMessage.success('已识别 ' + peaks.length + ' 个谱峰并填充参数值');
+    }
+    function collectClearGrid(){
+      collectGrid.value.forEach(g => { g.values = Array(inspSampleTestCount.value).fill(''); });
+      ElMessage.info('已清空全部参数值');
+    }
+    // 把网格值按「参数名称」逐列写入样本参数（与 fillItemParamsFromPeak 同口径，但保留逐列差异）
+    // gridRows：任意弹窗的「参数名称 × 次数」网格（采集数据 / 图谱识别取数共用）
+    function fillItemParamsFromGridRows(item, gridRows){
+      const rows = inspSampleParamRowsOf(item);
+      let filled = 0;
+      rows.forEach(p => {
+        const nm = String(p.name || '');
+        let g = null;
+        if(nm.indexOf('保留时间') >= 0) g = gridRows.find(x => x.name === '保留时间');
+        else if(nm.indexOf('峰面积%') >= 0) g = gridRows.find(x => x.name === '峰面积%');
+        else if(nm.indexOf('峰面积') >= 0) g = gridRows.find(x => x.name === '峰面积');
+        else if(nm.indexOf('峰高') >= 0) g = gridRows.find(x => x.name === '峰高');
+        else if(p.single) g = gridRows.find(x => x.name === '峰面积%');
+        if(!g) return;
+        for(let i = 1; i <= inspSampleTestCount.value; i++){
+          const v = g.values[i - 1];
+          if(v !== '' && v != null) item[p.field + i] = String(v);
+        }
+        filled++;
+      });
+      if(item.paramMode === 'hplc') onHplcParamCellChange(item);
+      else if(item.paramMode === 'result') onResultParamCellChange(item);
+      else onParamCellChange(item);
+      return filled;
+    }
+    function onCollectSubmit(){
+      const file = collectSelectedFile.value;
+      if(!file){ ElMessage.warning('请先选择样品文件'); return; }
+      const hasVal = collectGrid.value.some(g => (g.values || []).some(v => String(v || '').trim() !== ''));
+      if(!hasVal){ ElMessage.warning('请先「自动识别进行填充」或手动填写参数值后再提交'); return; }
+      const row = activeSampleRow.value;
+      if(!row){ ElMessage.warning('无样品数据，无法回填'); return; }
+      const activeCat = inspSampleActiveCat.value || DE_INSP_TREE[0].cat;
+      const items = (row._inspItems || [])
+        .filter(it => it.type !== '定性' && (it.cat || DE_INSP_TREE[0].cat) === activeCat);
+      if(!items.length){ ElMessage.info('当前样品无可回填的定量检验项'); return; }
+      let cnt = 0;
+      items.forEach(it => { if(fillItemParamsFromGridRows(it, collectGrid.value) > 0) cnt++; });
+      collectVisible.value = false;
+      if(cnt) ElMessage.success('已按「' + file['文件名'] + '」回填 ' + cnt + ' 项检验参数');
+      else ElMessage.info('已提交，但未匹配到可回填的参数名称');
+    }
+    function onCollectCancel(){
+      collectVisible.value = false;
+      ElMessage.info('已取消采集数据，未回填任何内容');
+    }
+
+    /* ── 仪器数采 · 选择采集仪器弹窗（2026-11-02）─────────────────────────
+       与「选择样品文件」对称：筛选仪器台账 → 单选采集仪器 → 自动生成/手工填写
+       「检验项 × 次数」实测值网格 → 提交回填当前检验项目类。 */
+    const iotVisible = ref(false);
+    const iotFilters = reactive({ instNum: '', instName: '', sampleNum: '', type: '' });
+    const iotInstId = ref('');
+    const iotRows = ref([]);
+    const iotInstruments = computed(() => {
+      storeTick.value;
+      let list = (((MOCK['instrument-ledger'] || {}).main) || [])
+        .filter(r => String(r['使用状态'] || '在用') === '在用');
+      if(iotFilters.instNum) list = list.filter(r => String(r['仪器编号'] || '') === iotFilters.instNum);
+      if(iotFilters.instName.trim()){
+        const kw = iotFilters.instName.trim();
+        list = list.filter(r => String(r['仪器名称'] || '').indexOf(kw) >= 0);
+      }
+      if(iotFilters.type) list = list.filter(r => String(r['仪器类型'] || '') === iotFilters.type);
+      return list;
+    });
+    const iotSelectedInst = computed(() => iotInstruments.value.find(r => r.id === iotInstId.value) || null);
+    const iotTypeOptions = computed(() => {
+      const set = [];
+      (((MOCK['instrument-ledger'] || {}).main) || []).forEach(r => {
+        const t = String(r['仪器类型'] || '').trim();
+        if(t && set.indexOf(t) < 0) set.push(t);
+      });
+      return set;
+    });
+    const iotItems = computed(() => {
+      storeTick.value;
+      const row = activeSampleRow.value;
+      if(!row) return [];
+      const activeCat = inspSampleActiveCat.value || DE_INSP_TREE[0].cat;
+      return (row._inspItems || [])
+        .filter(it => it.type !== '定性' && (it.cat || DE_INSP_TREE[0].cat) === activeCat);
+    });
+    function openIotGather(){
+      const row = activeSampleRow.value;
+      if(!row){ ElMessage.warning('请先选择样品'); return; }
+      if(!iotItems.value.length){ ElMessage.info('当前样品无可取数的定量检验项'); return; }
+      if(!inspSampleMethod.value){ ElMessage.warning('请先选择检验方法'); return; }
+      iotFilters.instNum = '';
+      iotFilters.instName = '';
+      iotFilters.type = '';
+      iotFilters.sampleNum = String(row['样品编号'] || row.sampleNum || '');
+      // 默认选中「分析仪器」的第一台（若已在参数条选过）
+      const inst = inspInstrumentCodeOf((inspSampleInstruments.value || [])[0] || '');
+      const hit = iotInstruments.value.find(r => String(r['仪器编号'] || '') === inst);
+      iotInstId.value = hit ? hit.id : '';
+      iotRows.value = iotItems.value.map(it => ({ name: it.name, itemId: it.id, values: Array(inspSampleTestCount.value).fill('') }));
+      iotVisible.value = true;
+    }
+    // 生成实测值：沿用原仪器数采口径（有规格上限 USL 时取其比例，否则用递增基准值）
+    function iotValueOf(item, idx, testIdx){
+      const usl = parseFloat(item.usl);
+      const ratio = 0.62 + (idx % 3) * 0.07 + (testIdx % 3) * 0.004;
+      const v = Number.isFinite(usl) ? usl * ratio : 0.5 + idx * 0.13 + testIdx * 0.01;
+      if(item.paramMode === 'result'){
+        const dec = Number(item.decimals || 0);
+        return dec ? v.toFixed(dec) : String(Math.round(v));
+      }
+      return v.toFixed(3);
+    }
+    function iotAutoFill(onlyName){
+      const inst = iotSelectedInst.value;
+      if(!inst){ ElMessage.warning('请先选择采集仪器'); return; }
+      let cnt = 0;
+      iotRows.value.forEach((g, idx) => {
+        if(onlyName && g.name !== onlyName) return;
+        g.values = Array.from({ length: inspSampleTestCount.value }, (_, t) => iotValueOf(iotItems.value[idx], idx, t));
+        cnt++;
+      });
+      ElMessage.success('已从 ' + inst['仪器编号'] + ' 读取 ' + cnt + ' 项实测值');
+    }
+    function iotClearGrid(){
+      iotRows.value.forEach(g => { g.values = Array(inspSampleTestCount.value).fill(''); });
+      ElMessage.info('已清空全部实测值');
+    }
+    function onIotSubmit(){
+      const inst = iotSelectedInst.value;
+      if(!inst){ ElMessage.warning('请先选择采集仪器'); return; }
+      const hasVal = iotRows.value.some(g => (g.values || []).some(v => String(v || '').trim() !== ''));
+      if(!hasVal){ ElMessage.warning('请先「自动读取」或手动填写实测值后再提交'); return; }
+      const row = activeSampleRow.value;
+      if(!row){ ElMessage.warning('无样品数据，无法回填'); return; }
+      let cnt = 0;
+      iotRows.value.forEach(g => {
+        const it = (row._inspItems || []).find(x => String(x.id) === String(g.itemId));
+        if(!it) return;
+        // 多次测定取最后一次作为实测值（Demo 口径：结果值取单次），并触发判定联动
+        const vals = (g.values || []).filter(v => String(v || '').trim() !== '');
+        if(!vals.length) return;
+        it.val = String(vals[vals.length - 1]);
+        if(it.paramMode === 'result') it._sres1 = it.val;
+        onItemValChange(it);
+        cnt++;
+      });
+      iotVisible.value = false;
+      if(cnt) ElMessage.success('已从「' + inst['仪器编号'] + '/' + inst['仪器名称'] + '」回填 ' + cnt + ' 项实测值');
+      else ElMessage.info('已提交，但未匹配到可回填的检验项');
+    }
+    function onIotCancel(){
+      iotVisible.value = false;
+      ElMessage.info('已取消仪器数采，未回填任何内容');
+    }
+
+    /* ── 图谱识别取数 · 选择台账记录弹窗（2026-11-02）─────────────────────
+       交互骨架与「仪器数采」完全一致：筛选 → 记录单选 → 自动读取 → 参数×次数网格
+       → 提交/取消。数据源为 GC / LC 台账记录（含 _rt 保留时间与峰面积%）。 */
+    const chromVisible = ref(false);
+    const chromFilters = reactive({ kind: '全部', batch: '', material: '', rule: '' });
+    const chromLedgerKey = ref('');
+    // 参数网格：按当前检验项目类的「定量检验项 × 各自参数行」动态生成（2026-11-02）
+    const chromRows = ref([]);
+    const chromLedgerList = computed(() => {
+      storeTick.value;
+      const out = [];
+      ['GC', 'LC'].forEach(kind => {
+        if(chromFilters.kind !== '全部' && chromFilters.kind !== kind) return;
+        const bag = MOCK[kind === 'LC' ? 'chrom-ledger-lc' : 'chrom-ledger-gc'] || {};
+        Object.keys(bag).forEach(tab => {
+          if(tab === 'types') return;
+          (bag[tab] || []).forEach(r => {
+            if(!r || !r._rt) return;
+            out.push({ key: kind + '::' + tab + '::' + r.id, kind, tab, row: r });
+          });
+        });
+      });
+      let list = out;
+      if(chromFilters.batch.trim()){
+        const kw = chromFilters.batch.trim();
+        list = list.filter(x => String(x.row['批号'] || '').indexOf(kw) >= 0);
+      }
+      if(chromFilters.material.trim()){
+        const kw = chromFilters.material.trim();
+        list = list.filter(x => String(x.row['物料名称'] || '').indexOf(kw) >= 0);
+      }
+      if(chromFilters.rule.trim()){
+        const kw = chromFilters.rule.trim();
+        list = list.filter(x => (String(x.row['规则名称'] || '') + String(x.row['规则编码'] || '')).indexOf(kw) >= 0);
+      }
+      return list;
+    });
+    const chromSelectedLedger = computed(() => chromLedgerList.value.find(x => x.key === chromLedgerKey.value) || null);
+    // 台账表头：与 GC / LC 台账列表保持一致 —— 批号 → 各典型保留时间（每个 TR 一列）→ 杂质统计
+    // TR 列取当前结果集内全部 _rt 键的并集（GC / LC 混排时各取并集），按数值升序
+    const chromLedgerRtCols = computed(() => {
+      const set = new Set();
+      chromLedgerList.value.forEach(x => {
+        Object.keys((x.row || {})._rt || {}).forEach(k => set.add(String(k)));
+      });
+      return Array.from(set).sort((a, b) => Number(a) - Number(b));
+    });
+    // 与台账列表一致的杂质统计列（列序同 GC / LC 台账 columns 配置）
+    const CHROM_LEDGER_PICK_STAT_FIELDS = ['杂质个数', '新杂个数', '是否存在新杂', '杂质偏差结论'];
+    // 表头第二行「已定性名称」：取漂移规则 _impurities 的「定性结构」，按当前色谱类型筛选，GC/LC 混排时先到非空
+    const chromLedgerRtStructMap = computed(() => {
+      storeTick.value;
+      const kinds = chromFilters.kind === '全部' ? ['GC', 'LC'] : [chromFilters.kind];
+      const map = {};
+      kinds.forEach(kind => {
+        const m = chromRtMetaMapOf(kind);
+        Object.keys(m).forEach(tr => {
+          const st = String(((m[tr] || {}).structure) || '').trim();
+          if(!map[tr]) map[tr] = st;
+          else if(!map[tr] && st) map[tr] = st;
+        });
+      });
+      return map;
+    });
+    // 台账单元格文本（数组/对象做可读化，空值显示 —）
+    function ledgerCellText(v){
+      if(v === null || v === undefined || v === '') return '—';
+      if(Array.isArray(v)) return v.length ? v.length + ' 项' : '—';
+      if(typeof v === 'object') return '—';
+      return String(v);
+    }
+    // 台账 _rt（保留时间→峰面积%）展开为可读文本，作为「保留时间 / 峰面积%」列带出
+    function chromRtText(row){
+      const rt = (row && row._rt) || {};
+      const keys = Object.keys(rt).sort((a, b) => Number(a) - Number(b));
+      const parts = keys.map(k => String((rt[k] || {}).t != null && (rt[k] || {}).t !== '' ? rt[k].t : k));
+      return parts.length ? parts.join('、') : '—';
+    }
+    function chromPctText(row){
+      const rt = (row && row._rt) || {};
+      const keys = Object.keys(rt).sort((a, b) => Number(a) - Number(b));
+      const parts = keys.map(k => String((rt[k] || {}).a));
+      return parts.length ? parts.join('、') : '—';
+    }
+    // 参数网格行：行名只显示参数名称（保留时间 / 峰面积 / 峰面积%）；
+    // 检验项全名（含检验项目名）退到 title 悬浮提示，绑定 itemId/field 便于精确回填
+    function chromBuildGridRows(){
+      const row = activeSampleRow.value;
+      const n = inspSampleTestCount.value;
+      const out = [];
+      if(!row) return out;
+      const activeCat = inspSampleActiveCat.value || DE_INSP_TREE[0].cat;
+      (row._inspItems || [])
+        .filter(it => it.type !== '定性' && (it.cat || DE_INSP_TREE[0].cat) === activeCat)
+        .forEach(it => {
+          inspSampleParamRowsOf(it).forEach(p => {
+            out.push({
+              key: String(it.id) + '::' + p.field,
+              name: (p.name || '结果值'),
+              tip: it.name + ' · ' + (p.name || '结果值'),
+              itemId: String(it.id),
+              field: p.field,
+              paramName: String(p.name || ''),
+              single: !!p.single,
+              filled: false,
+              values: Array(n).fill('')
+            });
+          });
+        });
+      return out;
+    }
+    // 峰参数 → 参数行取值
+    function chromParamValueOf(peak, paramName, single){
+      if(!peak) return '';
+      const nm = String(paramName || '');
+      if(nm.indexOf('保留时间') >= 0) return String(peak.tr);
+      if(nm.indexOf('峰面积%') >= 0) return dePeakPctText(peak);
+      if(nm.indexOf('峰面积') >= 0) return String(peak.area);
+      if(nm.indexOf('峰高') >= 0) return String(peak.height);
+      if(single) return dePeakPctText(peak);
+      return '';
+    }
+    // 重复测定微扰：第 1 次取基准值，其后按 ±0.2% 交替波动，小数位沿用基准
+    function chromDriftValue(baseVal, k){
+      const num = Number(baseVal);
+      if(!Number.isFinite(num)) return String(baseVal);
+      const factor = k <= 1 ? 1 : (1 + (k % 2 === 1 ? 1 : -1) * 0.002 * (k - 1));
+      const dec = String(baseVal).indexOf('.') >= 0 ? String(baseVal).split('.')[1].length : 0;
+      return (num * factor).toFixed(Math.min(dec, 6));
+    }
+    function openChromGather(){
+      const row = activeSampleRow.value;
+      if(!row){ ElMessage.warning('请先选择样品'); return; }
+      if(!inspSampleMethod.value){ ElMessage.warning('请先选择检验方法'); return; }
+      const activeCat = inspSampleActiveCat.value || DE_INSP_TREE[0].cat;
+      const items = (row._inspItems || []).filter(it => it.type !== '定性' && (it.cat || DE_INSP_TREE[0].cat) === activeCat);
+      if(!items.length){ ElMessage.info('当前样品无可取数的定量检验项'); return; }
+      // 色谱类型默认按方法名推断（液相/HPLC→LC，其余→GC），批号默认带当前样品报检批号
+      chromFilters.kind = /液相|HPLC|LC/i.test(String(inspSampleMethod.value || '')) ? 'LC' : 'GC';
+      chromFilters.batch = String((row['报检批号'] || row['批号']) || '').trim();
+      chromFilters.material = '';
+      chromFilters.rule = '';
+      chromLedgerKey.value = '';
+      chromRows.value = chromBuildGridRows();
+      // 默认批号与台账批号不同源时（demo 数据常见），自动放开为全部，避免打开即空列表
+      if(!chromLedgerList.value.length) chromFilters.batch = '';
+      chromVisible.value = true;
+    }
+    // 自动读取：逐行按「检验项匹配峰 → 参数取值」，匹配不到该检验项峰时回退主峰
+    // onlyRowKey：按行下发 —— 点击某行的「填充」时只带出该行的 3 次测定值（分次获取，不跨行批量）
+    function chromAutoFill(onlyRowKey){
+      const sel = chromSelectedLedger.value;
+      if(!sel){ ElMessage.warning('请先选择台账记录'); return; }
+      const peaks = buildChromPeaks(sel.kind, sel.row);
+      if(!peaks.length){ ElMessage.warning('所选台账记录无谱峰数据，无法识别'); return; }
+      const mains = peaks.filter(p => p.isMain).slice().sort((a, b) => b.pct - a.pct);
+      const fallback = mains[0] || peaks.slice().sort((a, b) => b.pct - a.pct)[0];
+      const row = activeSampleRow.value;
+      const activeCat = inspSampleActiveCat.value || DE_INSP_TREE[0].cat;
+      const items = ((row && row._inspItems) || []).filter(it => it.type !== '定性' && (it.cat || DE_INSP_TREE[0].cat) === activeCat);
+      const n = inspSampleTestCount.value;
+      let filledRows = 0, skippedRows = 0;
+      const matchedItems = {};
+      chromRows.value.forEach(g => {
+        if(onlyRowKey && g.key !== onlyRowKey) return;
+        const it = items.find(x => String(x.id) === g.itemId);
+        const peak = pickLedgerPeakForItem(it, peaks) || fallback;
+        const baseVal = chromParamValueOf(peak, g.paramName, g.single);
+        if(baseVal === ''){
+          skippedRows++;
+          return;
+        }
+        filledRows++;
+        matchedItems[g.itemId] = true;
+        g.values = Array.from({ length: n }, (_, i) => chromDriftValue(baseVal, i + 1));
+        g.filled = true;   // 下发带出的值不可修改
+      });
+      if(!filledRows && !skippedRows){ ElMessage.warning('未找到可填充的参数行'); return; }
+      const itemCnt = Object.keys(matchedItems).length;
+      const rowName = onlyRowKey ? String(((chromRows.value.find(g => g.key === onlyRowKey) || {}).name) || '') : '';
+      const scopeText = onlyRowKey ? '参数「' + rowName + '」' : '全部参数';
+      ElMessage.success('已按' + scopeText + '带出 ' + itemCnt + ' 个检验项 × ' + n + ' 次测定值（下发值不可修改）' + (skippedRows ? '，' + skippedRows + ' 个参数无对应峰数据已跳过' : ''));
+    }
+    function chromClearGrid(){
+      chromRows.value.forEach(g => { g.values = Array(inspSampleTestCount.value).fill(''); g.filled = false; });
+      ElMessage.info('已清空全部参数值');
+    }
+    function onChromSubmit(){
+      const sel = chromSelectedLedger.value;
+      if(!sel){ ElMessage.warning('请先选择台账记录'); return; }
+      const hasVal = chromRows.value.some(g => (g.values || []).some(v => String(v || '').trim() !== ''));
+      if(!hasVal){ ElMessage.warning('请先「自动读取实测值」或按参数点击「次数下发 · 填充」后再提交'); return; }
+      const row = activeSampleRow.value;
+      if(!row){ ElMessage.warning('无样品数据，无法回填'); return; }
+      const activeCat = inspSampleActiveCat.value || DE_INSP_TREE[0].cat;
+      const items = (row._inspItems || []).filter(it => it.type !== '定性' && (it.cat || DE_INSP_TREE[0].cat) === activeCat);
+      if(!items.length){ ElMessage.info('当前样品无可回填的定量检验项'); return; }
+      // 按行精确回填到「检验项 + 参数列」，再逐项触发判定联动
+      const touched = {};
+      let rowCnt = 0;
+      chromRows.value.forEach(g => {
+        const vals = (g.values || []);
+        if(!vals.some(v => String(v || '').trim() !== '')) return;
+        const it = items.find(x => String(x.id) === g.itemId);
+        if(!it) return;
+        for(let i = 1; i <= inspSampleTestCount.value; i++){
+          const v = vals[i - 1];
+          if(v !== '' && v !== null && v !== undefined) it[g.field + i] = String(v);
+        }
+        touched[g.itemId] = it;
+        rowCnt++;
+      });
+      Object.keys(touched).forEach(id => {
+        const it = touched[id];
+        if(it.paramMode === 'hplc') onHplcParamCellChange(it);
+        else if(it.paramMode === 'result') onResultParamCellChange(it);
+        else onParamCellChange(it);
+      });
+      // 回写「未匹配峰」列表（录入页底部），带出保留时间等峰数据
+      const allPeaks = buildChromPeaks(sel.kind, sel.row);
+      inspUnmatchedPeaks.value = allPeaks.filter(p => !p.structure);
+      inspUnmatchedPeakSource.value = sel.kind + ' 台账 · 批号 ' + String(sel.row['批号'] || '—');
+      const itemCnt = Object.keys(touched).length;
+      chromVisible.value = false;
+      const label = sel.kind + ' 台账 · 批号 ' + String(sel.row['批号'] || '—');
+      if(itemCnt) ElMessage.success('已从 ' + label + ' 回填 ' + itemCnt + ' 个检验项、' + rowCnt + ' 个参数');
+      else ElMessage.info('已提交，但未匹配到可回填的检验项（' + label + '）');
+    }
+    function onChromCancel(){
+      chromVisible.value = false;
+      ElMessage.info('已取消图谱识别取数，未回填任何内容');
+    }
     const inspSampleActiveItemId = ref('');
     /* 色谱识别取数结果：未匹配峰（台账「定性结构」为空的峰），弹窗底部单独列出 */
     const inspUnmatchedPeaks = ref([]);
@@ -16183,28 +17281,25 @@ const app = createApp({
       const first = inspSampleCatItems.value[0];
       inspSampleActiveItemId.value = first ? first.id : '';
     }
-    // 检验方法下拉：主数据取数（方法类型决定「获取采集数据」的通道）
+    // 检验方法下拉：主数据取数（2026-11-02 起「方法类型」字段已删除，
+    // 「图谱识别取数 / 仪器数采取数」两按钮常驻，取数通道由录入人手动选择）
     const inspSampleMethodOptions = computed(() => {
       storeTick.value;
       return (((MOCK['insp-method'] || {}).method) || [])
         .filter(r => (r['启用状态'] || '启用') === '启用')
-        .map(r => ({ label: r['方法名称'], value: r['方法名称'], type: r['方法类型'] || '通用方法' }));
+        .map(r => ({ label: r['方法名称'], value: r['方法名称'] }));
     });
-    const inspSampleMethodType = computed(() => {
-      const hit = inspSampleMethodOptions.value.find(m => m.value === inspSampleMethod.value);
-      return hit ? hit.type : '';
+    // 取数通道（2026-11-02 起）：「图谱识别取数」「仪器数采取数」两个按钮在参数条常驻，
+    // 由录入人手动选择通道，不再依赖「方法类型」字段；名称推断仅用于公共测试次数显隐与默认方法选取
+    function inspGatherChannelOf(methodName){
+      return /色谱|GC|HPLC|GPC/i.test(String(methodName || '')) ? '色谱识别' : '通用方法';
+    }
+    const inspSampleHasParams = computed(() => {
+      if (!inspSampleMethod.value) return false;
+      return inspGatherChannelOf(inspSampleMethod.value) === '色谱识别';
     });
-    const inspSampleGatherBtnText = computed(() => inspSampleMethodType.value === '色谱识别'
-      ? '图谱识别取数'
-      : (inspSampleMethodType.value ? '仪器数采取数' : '获取采集数据'));
-    const inspSampleGatherTip = computed(() => {
-      if (!inspSampleMethodType.value) return '请先选择检验方法（方法类型决定取数通道）';
-      if (inspSampleMethodType.value === '色谱识别') return '该方法为「色谱识别」：从图谱识别结果读取峰面积/载气压力等色谱参数，并按方法公式计算';
-      return '该方法为「通用方法」：通过 IOT 仪器数采读取检验项实测值';
-    });
-    const inspSampleHasParams = computed(() => inspSampleMethodType.value === '色谱识别');
     function defaultInspSampleMethod() {
-      const hit = inspSampleMethodOptions.value.find(m => m.type === '色谱识别') || inspSampleMethodOptions.value[0];
+      const hit = inspSampleMethodOptions.value.find(m => inspGatherChannelOf(m.value) === '色谱识别') || inspSampleMethodOptions.value[0];
       return hit ? hit.value : '';
     }
     /* 检验项目类 ↔ 检验方法 绑定（2026-10-27）：类别配置里的 method 即方法主数据中的「方法名称」，
@@ -16218,7 +17313,7 @@ const app = createApp({
       }
       return opts.length ? opts[0].value : '';
     }
-    // 获取采集数据：按检验方法类型分流取数通道（通用方法→仪器数采；色谱识别→GC/LC 台账取数）
+    // 获取采集数据：两个取数按钮常驻，channel 由按钮决定（chrom→GC/LC 台账取数；iot→仪器数采）
     /* ── 色谱识别取数：从 GC / LC 台账按「已定性名称」匹配（2026-10-27）────────────────
        台账行只存「批号 + 各典型保留时间的数值」（_rt: {TR: {t: 保留时间, a: 峰面积%}}），
        定性名称来自漂移规则的「定性结构」（是否主峰同源）。台账未建模绝对峰面积与峰高，
@@ -16245,23 +17340,12 @@ const app = createApp({
       return map;
     }
     // 按检验方法判定台账（液相/HPLC → LC 台账；其余色谱 → GC 台账），并用 批号 → 物料名称 → 首行 依次找行
-    function fetchChromLedgerPeaks(row, methodName){
-      const isLC = /液相|HPLC|LC/i.test(String(methodName || ''));
-      const kind = isLC ? 'LC' : 'GC';
-      const bag = MOCK[kind === 'LC' ? 'chrom-ledger-lc' : 'chrom-ledger-gc'] || {};
-      const tab = String(activeTab.value || '');
-      const list = (bag[tab] || []).filter(r => r && r._rt);
-      if(!list.length) return null;
-      const batch = String((row && (row['报检批号'] || row['批号'])) || '').trim();
-      const matName = String((row && row['物料名称']) || '').trim();
-      let hit = batch ? list.find(r => String(r['批号'] || '').trim() === batch) : null;
-      if(!hit && matName) hit = list.find(r => String(r['物料名称'] || '').trim() === matName);
-      if(!hit) hit = list[0];
+    function buildChromPeaks(kind, ledgerRow){
       const meta = chromRtMetaMapOf(kind);
-      const peaks = Object.keys(hit._rt || {})
+      return Object.keys((ledgerRow && ledgerRow._rt) || {})
         .sort((a, b) => Number(a) - Number(b))
         .map((trKey, idx) => {
-          const cell = hit._rt[trKey] || {};
+          const cell = (ledgerRow._rt || {})[trKey] || {};
           const pct = parseFloat(cell.a);
           const trNum = parseFloat(cell.t != null && cell.t !== '' ? cell.t : trKey);
           const k = (Math.round(Number(trKey) * 1000) / 1000).toFixed(3);
@@ -16277,7 +17361,20 @@ const app = createApp({
             isMain: !!m.isMain
           };
         });
-      return { kind, ledgerRow: hit, peaks };
+    }
+    function fetchChromLedgerPeaks(row, methodName){
+      const isLC = /液相|HPLC|LC/i.test(String(methodName || ''));
+      const kind = isLC ? 'LC' : 'GC';
+      const bag = MOCK[kind === 'LC' ? 'chrom-ledger-lc' : 'chrom-ledger-gc'] || {};
+      const tab = String(activeTab.value || '');
+      const list = (bag[tab] || []).filter(r => r && r._rt);
+      if(!list.length) return null;
+      const batch = String((row && (row['报检批号'] || row['批号'])) || '').trim();
+      const matName = String((row && row['物料名称']) || '').trim();
+      let hit = batch ? list.find(r => String(r['批号'] || '').trim() === batch) : null;
+      if(!hit && matName) hit = list.find(r => String(r['物料名称'] || '').trim() === matName);
+      if(!hit) hit = list[0];
+      return { kind, ledgerRow: hit, peaks: buildChromPeaks(kind, hit) };
     }
     // 峰面积% 文本：微量峰（<0.01）保留 4 位小数，避免显示成 0.00
     function dePeakPctText(p){
@@ -16318,54 +17415,10 @@ const app = createApp({
       else onParamCellChange(item);
       return filled;
     }
-    function onFetchGatherData() {
-      const row = activeSampleRow.value;
-      if (!row) return;
-      const type = inspSampleMethodType.value;
-      if (!type) { ElMessage.warning('请先选择检验方法'); return; }
-      // 按当前检验项目类取数：每类绑定各自的检验方法，避免「在某类点取数却改写其他类结果」
-      const activeCat = inspSampleActiveCat.value || DE_INSP_TREE[0].cat;
-      const items = (row._inspItems || [])
-        .filter(it => it.type !== '定性' && (it.cat || DE_INSP_TREE[0].cat) === activeCat);
-      if (!items.length) { ElMessage.info('当前样品无可取数的定量检验项'); return; }
-      if (type === '色谱识别') {
-        // 2026-10-27：色谱识别 → 从 GC / LC 台账取数（不再用模拟色谱参数）
-        const ledger = fetchChromLedgerPeaks(row, inspSampleMethod.value);
-        if (!ledger || !ledger.peaks.length) {
-          inspUnmatchedPeaks.value = [];
-          inspUnmatchedPeakSource.value = '';
-          ElMessage.warning('未找到可用的 ' + (ledger && ledger.kind === 'LC' ? 'LC' : 'GC') + ' 台账数据（请确认批号或物料与台账一致）');
-          return;
-        }
-        let cnt = 0;
-        items.forEach(it => {
-          const peak = pickLedgerPeakForItem(it, ledger.peaks);
-          if (!peak) return;
-          fillItemParamsFromPeak(it, peak);
-          cnt++;
-        });
-        // 未匹配 = 台账中「定性结构」为空的峰，统一列在弹窗最下方
-        inspUnmatchedPeaks.value = ledger.peaks.filter(p => !p.structure);
-        inspUnmatchedPeakSource.value = (ledger.kind === 'LC' ? 'LC 台账' : 'GC 台账')
-          + ' · 批号 ' + String(ledger.ledgerRow['批号'] || '—');
-        const unm = inspUnmatchedPeaks.value.length;
-        if (cnt) {
-          ElMessage.success('已从 ' + (ledger.kind === 'LC' ? 'LC' : 'GC') + ' 台账取数：匹配 ' + cnt + ' 项检验参数，未匹配峰 ' + unm + ' 条已列在下方');
-        } else {
-          ElMessage.info('台账中未匹配到当前检验项目（' + inspUnmatchedPeakSource.value + '），未定性峰 ' + unm + ' 条已列在下方');
-        }
-      } else {
-        items.forEach((it, idx) => {
-          const usl = parseFloat(it.usl);
-          const ratio = 0.62 + (idx % 3) * 0.07;
-          const v = Number.isFinite(usl) ? usl * ratio : 0.5 + idx * 0.13;
-          it.val = v.toFixed((it.paramMode === 'result') ? (Number(it.decimals) || 0) : 3);
-          if (it.paramMode === 'result' && !Number(it.decimals)) it.val = String(Math.round(v));
-          if (it.paramMode === 'result') it._sres1 = it.val;
-          onItemValChange(it);
-        });
-        ElMessage.success('已从「仪器数采（IOT）」取数（' + inspSampleMethod.value + '）：回填 ' + items.length + ' 项实测值');
-      }
+    function onFetchGatherData(channel) {
+      // 两个取数按钮统一走「选择弹窗」流程（2026-11-02）：chrom→选择台账记录；iot→选择采集仪器
+      if (channel === 'chrom') { openChromGather(); return; }
+      openIotGather();
     }
     const inspSampleParamRows = [
       { code: 'A1', name: '峰面积', formula: '', field: '_paramA1_' },
@@ -18663,7 +19716,6 @@ const app = createApp({
       if (mode === 'add') {
         inspMethodForm.inspectionMethodNum = 'MET-NEW-' + String(Date.now()).slice(-4);
         inspMethodForm.inspectionMethodName = '';
-        inspMethodForm.methodType = '';
         inspMethodForm.enableStatus = '启用';
         inspMethodForm.remark = '';
         inspMethodForm.whetherUsePublic = '是';
@@ -18681,7 +19733,6 @@ const app = createApp({
       } else if (row) {
         inspMethodForm.inspectionMethodNum = (mode === 'copy') ? '' : (row['方法编码'] || row['检验方法编码'] || '');
         inspMethodForm.inspectionMethodName = (mode === 'copy') ? '' : (row['方法名称'] || row['检验方法名称'] || '');
-        inspMethodForm.methodType = row['方法类型'] || '';
         inspMethodForm.enableStatus = row['启用状态'] || '启用';
         inspMethodForm.remark = row['备注'] || '';
         const usePub = row._whetherUsePublic || (row['公用参数'] === '否' ? '否' : (row['公用参数'] === '是' ? '是' : ((row._publicParams||[]).length ? '是' : '否')));
@@ -18712,11 +19763,6 @@ const app = createApp({
         ElMessage.error('请输入检验方法名称');
         return;
       }
-      if (!inspMethodForm.methodType) {
-        ElMessage.error('请选择方法类型（通用方法 / 色谱识别）');
-        return;
-      }
-
       if (
         inspMethodForm.whetherUsePublic === '是' &&
         inspMethodForm.publicTestTimesType === '同样本次数' &&
@@ -18750,7 +19796,6 @@ const app = createApp({
         id: inspMethodEditId.value || String(Date.now()),
         '方法编码': code,
         '方法名称': name,
-        '方法类型': inspMethodForm.methodType,
         '公用参数': formatInspMethodParamJoin(pubList),
         '样本参数': formatInspMethodParamJoin(smpList),
         '启用状态': inspMethodForm.enableStatus,
@@ -19696,43 +20741,65 @@ const app = createApp({
       if(!dev) return '';
       return (saOwnerText(sampleAssignDeviceOwner(dev)).split(/[、,，]/)[0] || '').trim();
     }
-    // 检验人候选：人员池 + 台账现有责任人 + 当前值（保证历史手工值不被丢弃）
+    // 检验人为多选：统一成「姓名数组」口径（兼容历史字符串「张伟、李芳」与单值）
+    function saInspectorList(v){
+      if(Array.isArray(v)) return v.map(x=> String(x===null||x===undefined ? '' : x).trim()).filter(Boolean);
+      return String(v===null||v===undefined ? '' : v).split(/[、,，;；\/]/).map(s=> s.trim()).filter(Boolean);
+    }
+    function saInspectorFilled(b){ return saInspectorList(b && b['检验人']).length > 0; }
+    // 检验班组同为多选：复用报检单的 teamListOf / teamTextOf 口径（「，」分隔），与上游保持一致
+    function sampleAssignTeamOptions(curArg){
+      const out = [];
+      const push = v=>{ const s = String(v||'').trim(); if(s && s!=='—' && !out.includes(s)) out.push(s); };
+      SAMPLE_ASSIGN_TEAMS.forEach(push);
+      // 台账班组（与报检单同源）+ 历史分配值兜底，保证已保存的班组能回显
+      (inspOrderTeamOptions.value || []).forEach(push);
+      const page = MOCK['sample-assign'] || {};
+      Object.keys(page).forEach(tab=>{
+        (Array.isArray(page[tab]) ? page[tab] : []).forEach(r=> teamListOf(r['检验班组']).forEach(push));
+      });
+      teamListOf(curArg).forEach(push);
+      return out;
+    }
+    // 检验人候选：人员池 + 台账现有责任人 + 当前已选值（保证历史手工值不被丢弃）
     function sampleAssignInspectorOptions(curArg){
-      const cur = String(curArg===undefined ? '' : (curArg||'')).trim();
       const out = [];
       const push = v=>{ const s = String(v||'').trim(); if(s && s!=='—' && !out.includes(s)) out.push(s); };
       LAB_INSPECTOR_USERS.forEach(push);
-      sampleAssignLedgerDevices().forEach(d=> push(d.owner));
-      push(cur);
+      // 设备台账「责任人」可能是「张伟、李芳」多责任人串：多选下拆分逐人入池，避免出现合并伪选项
+      sampleAssignLedgerDevices().forEach(d=> saInspectorList(d.owner).forEach(push));
+      saInspectorList(curArg).forEach(push);
       return out;
     }
     // 检验人为空、或仍等于「上一台设备的责任人」→ 视为未手工调整，自动带出新设备责任人；
-    // 已手工改选 → 保留用户选择，不覆盖。
+    // 已手工改选（含增选多人）→ 保留用户选择，不覆盖。
     function onSaAssignDeviceChange(b){
       if(!b) return;
       const dev = String(b['检验设备']||'').trim();
       const prevOwner = String(b._deviceOwnerRef||'');
       const nextOwner = saDeviceOwner(dev);
-      const cur = String(b['检验人']||'').trim();
-      const untouched = !cur || (!!prevOwner && cur===prevOwner);
-      if(untouched) b['检验人'] = nextOwner;
+      const cur = saInspectorList(b['检验人']);
+      const untouched = !cur.length || (!!prevOwner && cur.length===1 && cur[0]===prevOwner);
+      if(untouched) b['检验人'] = nextOwner ? [nextOwner] : [];
       b._deviceOwnerRef = nextOwner;
       b._deviceNoOwner = !!dev && !nextOwner;
-      if(b._deviceNoOwner && !String(b['检验人']||'').trim()){
+      if(b._deviceNoOwner && !saInspectorList(b['检验人']).length){
         ElMessage.warning('「' + (b['检验类名称']||'该检验类') + '」所选检验设备在仪器台账中未维护责任人，请手动选择检验人');
       }
     }
-    // 检验人是否仍等于当前设备责任人（用于「已自动带出」提示，手工改选后不再显示）
+    // 检验人是否仍只有「当前设备责任人」一人（用于「已自动带出」提示，手工改选/增选后不再显示）
     function saInspectorIsAuto(b){
       if(!b) return false;
-      const v = String(b['检验人']||'').trim();
-      return !!v && v === saDeviceOwner(b['检验设备']);
+      const v = saInspectorList(b['检验人']);
+      return v.length===1 && v[0] === saDeviceOwner(b['检验设备']);
     }
-    // 打开分配弹窗：记录设备责任人基线；检验人为空时按设备责任人补默认值（不回写设备台账）
+    // 打开分配弹窗：检验班组 / 检验人 归一为数组；检验人为空时按设备责任人补默认值（不回写设备台账）
     function initSaAssignBlock(b){
       const dev = String(b['检验设备']||'').trim();
       const owner = saDeviceOwner(dev);
-      if(!String(b['检验人']||'').trim()) b['检验人'] = owner;
+      b['检验班组'] = teamListOf(b['检验班组']);
+      const list = saInspectorList(b['检验人']);
+      b['检验人'] = list.length ? list : (owner ? [owner] : []);
       b._deviceOwnerRef = owner;
       b._deviceNoOwner = !!dev && !owner;
       return b;
@@ -19875,7 +20942,7 @@ const app = createApp({
       if(no && String(row['样品编号']||'').indexOf(no) < 0) return false;
       if(mat && String(row['物料名称']||'').indexOf(mat) < 0) return false;
       if(cls && !(row._groups||[]).some(g=> g['检验类名称']===cls)) return false;
-      if(team && !(row._groups||[]).some(g=> g['检验班组']===team)) return false;
+      if(team && !(row._groups||[]).some(g=> teamListOf(g['检验班组']).indexOf(team) >= 0)) return false;
       if(st && st!=='全部' && String(row['分配状态']||'')!==st) return false;
       return true;
     }
@@ -19904,9 +20971,9 @@ const app = createApp({
       for(let i=0;i<blocks.length;i++){
         const b = blocks[i];
         const nm = b['检验类名称'] || ('第 ' + (i+1) + ' 项');
-        if(!b['检验班组']){ ElMessage.warning('「'+nm+'」请选择检验班组'); return; }
+        if(!teamListOf(b['检验班组']).length){ ElMessage.warning('「'+nm+'」请选择检验班组'); return; }
         if(!b['检验设备']){ ElMessage.warning('「'+nm+'」请选择检验设备'); return; }
-        if(!String(b['检验人']||'').trim()){
+        if(!saInspectorFilled(b)){
           const dev = String(b['检验设备']||'').trim();
           const noOwner = !!dev && !saDeviceOwner(dev);
           ElMessage.warning(noOwner
@@ -19917,10 +20984,19 @@ const app = createApp({
       }
       const stamp = sampleAssignNowStamp();
       blocks.forEach(b=>{
-        // 检验人：默认取设备台账「责任人」，允许在弹窗内调整；同步写入「分析人」保持下游口径一致
-        const inspector = String(b['检验人']||'').trim();
+        // 检验人支持多选：弹窗内为姓名数组，落库拼成「张伟、李芳」文本口径（下游按字符串读取，不改）
+        const inspector = saInspectorList(b['检验人']).join('、');
+        // 检验班组支持多选：沿用报检单 teamTextOf 口径（「，」分隔、去重）
+        const teamText = teamTextOf(b['检验班组']);
+        // 落库前快照：值未变化的检验类不写分配记录（避免重复保存刷出无意义日志）
+        const prev = (b.rows||[])[0] || {};
+        const prevInspector = String(prev['检验人'] || prev['分析人'] || '').trim();
+        const changed = String(prev['分配状态']||'')!=='已分配'
+          || String(prev['检验班组']||'')!==teamText
+          || String(prev['检验设备']||'')!==String(b['检验设备']||'').trim()
+          || prevInspector!==inspector;
         (b.rows||[]).forEach(r=>{
-          r['检验班组'] = b['检验班组'];
+          r['检验班组'] = teamText;
           r['检验设备'] = b['检验设备'];
           r['检验人'] = inspector;
           r['分析人'] = inspector;
@@ -19928,6 +21004,18 @@ const app = createApp({
           r['分配人'] = SAMPLE_ASSIGN_OPERATOR;
           r['分配时间'] = stamp;
         });
+        if(changed){
+          saLogPush({
+            '样品编号': String(prev['样品编号'] || saAssignRow.value?.['样品编号'] || '').trim(),
+            '检验类名称': b['检验类名称'] || '',
+            '操作类型': '分配',
+            '分配对象': saLogTargetText(teamText, b['检验设备'], inspector),
+            '取消原因': '',
+            '操作人': SAMPLE_ASSIGN_OPERATOR,
+            '操作时间': stamp,
+            '来源': '检验任务分配'
+          });
+        }
       });
       saAssignVisible.value = false;
       bumpStore();
@@ -19971,6 +21059,7 @@ const app = createApp({
         '检验方案': saPick(rows,'检验方案') || '—',
         '检验班组': saPick(rows,'检验班组') || '',
         '检验设备': saPick(rows,'检验设备') || '',
+        '检验人': saPick(rows,'检验人') || saPick(rows,'分析人') || '',
         '分配状态': saPick(rows,'分配状态') || '未分配',
         '分配人': saPick(rows,'分配人') || '',
         '分配时间': saPick(rows,'分配时间') || '',
@@ -20001,9 +21090,16 @@ const app = createApp({
       if(row['状态']==='已完成'){ ElMessage.warning('该检验类已提交录入，不可取消分配'); return; }
       if(row['分配状态']==='未分配'){ ElMessage.warning('该检验类尚未分配，无需取消'); return; }
       const nm = row['检验类名称'] || '该检验类';
-      ElementPlus.ElMessageBox.confirm('确认取消「' + nm + '」的分配？（班组 / 设备将清空，状态回到「未分配」）', '取消分配', {
-        confirmButtonText:'确定', cancelButtonText:'取消', type:'warning'
-      }).then(()=>{
+      // 取消原因：分配记录需留痕，改为带输入框的二次确认（必填）
+      ElementPlus.ElMessageBox.prompt('确认取消「' + nm + '」的分配？（班组 / 设备 / 检验人将清空，状态回到「未分配」）', '取消分配', {
+        confirmButtonText:'确定', cancelButtonText:'返回', type:'warning',
+        inputType:'textarea', inputPlaceholder:'请填写取消原因（必填），如：设备临时故障，改由次日复检',
+        inputValidator: v => (String(v==null ? '' : v).trim() ? true : '请填写取消原因')
+      }).then(({ value })=>{
+        // 落库前先取被取消的分配对象，取消后字段即被清空
+        const nowRow = (row.__rows||[])[0] || {};
+        const canceledTarget = saLogTargetText(nowRow['检验班组'], nowRow['检验设备'], nowRow['检验人'] || nowRow['分析人']);
+        const sampleNo = String(nowRow['样品编号'] || saDetailSampleNo.value || '').trim();
         (row.__rows||[]).forEach(r=>{
           r['检验班组'] = '';
           r['检验设备'] = '';
@@ -20013,9 +21109,110 @@ const app = createApp({
           r['录入状态'] = '待录入';
           sampleAssignClearOperator(r);
         });
+        saLogPush({
+          '样品编号': sampleNo,
+          '检验类名称': nm,
+          '操作类型': '取消分配',
+          '分配对象': canceledTarget,
+          '取消原因': String(value||'').trim(),
+          '操作人': SAMPLE_ASSIGN_OPERATOR,
+          '操作时间': sampleAssignNowStamp(),
+          '来源': '分配详情·行内取消'
+        });
         bumpStore();
         ElMessage.success('已取消「' + nm + '」的分配');
       }).catch(()=>{});
+    }
+
+    // ── 样品任务分配 · 分配记录（全部历史「分配 / 取消分配」审计，按时间倒序）──────
+    // 存储口径：独立 localStorage 键（不写入 MOCK —— mock 体量已接近浏览器配额，写入会连带失败）；
+    // 写入异常时退回内存数组，本次会话内记录依然可见。
+    const SA_LOG_KEY = 'oled-sample-assign-log-v1';
+    let saLogMem = [];
+    // 分配对象文本：检验班组 ｜ 检验设备 ｜ 检验人（顺序与「分配详情」列序一致，前缀不重复占宽）
+    function saLogTargetText(team, device, inspector){
+      const t = Array.isArray(team) ? teamTextOf(team) : String(team||'').trim();
+      const d = String(device||'').trim();
+      const i = Array.isArray(inspector) ? saInspectorList(inspector).join('、') : String(inspector||'').trim();
+      return [t, d, i].filter(Boolean).join(' ｜ ');
+    }
+    function saLogNormalize(list){
+      return (Array.isArray(list) ? list : []).filter(r=> r && typeof r==='object' && String(r['样品编号']||'').trim()).map(r=> ({
+        id: r.id || ('sal-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6)),
+        '样品编号': String(r['样品编号']||'').trim(),
+        '检验类名称': r['检验类名称'] || '',
+        '操作类型': r['操作类型']==='取消分配' ? '取消分配' : '分配',
+        '分配对象': r['分配对象'] || '',
+        '取消原因': r['取消原因'] || '',
+        '操作人': r['操作人'] || '',
+        '操作时间': r['操作时间'] || '',
+        '来源': r['来源'] || ''
+      }));
+    }
+    function saLogLoad(){
+      try{
+        const raw = localStorage.getItem(SA_LOG_KEY);
+        if(raw){ const arr = JSON.parse(raw); if(Array.isArray(arr) && arr.length) return saLogNormalize(arr); }
+      }catch(e){}
+      return saLogNormalize(saLogMem);
+    }
+    function saLogSave(list){ saLogMem = list; try{ localStorage.setItem(SA_LOG_KEY, JSON.stringify(list)); }catch(e){} }
+    const saLogStore = ref(saLogLoad());
+    function saLogPush(rec){
+      if(!rec || !String(rec['样品编号']||'').trim()) return;
+      const list = saLogStore.value.slice();
+      list.push(saLogNormalize([rec])[0]);
+      saLogStore.value = list;
+      saLogSave(list);
+    }
+    // 首次加载：为 mock 中「已分配」的检验类补一条基线分配记录（历史演示数据无真实操作留痕），
+    // 已存在记录时不重复补写，后续以真实操作记录为准。
+    function saLogSeed(){
+      if(saLogStore.value.length) return;
+      const bag = MOCK['sample-assign'] || {};
+      const seen = new Set();
+      const seeds = [];
+      Object.keys(bag).forEach(tab=>{
+        (bag[tab]||[]).forEach(r=>{
+          if(String(r['分配状态']||'')!=='已分配') return;
+          const no = String(r['样品编号']||'').trim();
+          const cls = String(r['检验类名称']||'').trim();
+          const time = String(r['分配时间']||'').trim();
+          if(!no || !time) return;
+          const key = no + '||' + cls + '||' + time;
+          if(seen.has(key)) return;
+          seen.add(key);
+          seeds.push({
+            id: 'sal-seed-' + no + '-' + cls,
+            '样品编号': no,
+            '检验类名称': cls,
+            '操作类型': '分配',
+            '分配对象': saLogTargetText(r['检验班组'], r['检验设备'], r['检验人'] || r['分析人']),
+            '取消原因': '',
+            '操作人': String(r['分配人']||'').trim() || SAMPLE_ASSIGN_OPERATOR,
+            '操作时间': time,
+            '来源': '历史数据'
+          });
+        });
+      });
+      if(seeds.length){ saLogStore.value = seeds; saLogSave(seeds); }
+    }
+    // 当前样品的全部记录：按操作时间倒序，同一秒内按写入顺序倒序，保证最新操作在最上
+    const saLogRows = computed(()=>{
+      const no = String(saLogRow.value?.['样品编号'] || '').trim();
+      if(!no) return [];
+      return saLogStore.value
+        .map((r, idx)=> ({ r, idx }))
+        .filter(x=> String(x.r['样品编号']||'').trim()===no)
+        .sort((a,b)=> String(b.r['操作时间']||'').localeCompare(String(a.r['操作时间']||'')) || (b.idx - a.idx))
+        .map(x=> x.r);
+    });
+    function saLogTagClass(t){ return t==='取消分配' ? 'tag-o' : 'tag-b'; }
+    function openSaLog(row){
+      if(!row) return;
+      saLogSeed();   // 首次打开补写历史基线记录（幂等）
+      saLogRow.value = row;
+      saLogVisible.value = true;
     }
 
     function formFieldOptions(f){
@@ -25436,7 +26633,19 @@ const app = createApp({
         if((tabView.value||{}).name==='expired') list = list.filter(r => r['状态']==='过期');
       }
       if(pageId.value==='lab-receive'){
-        list = (((MOCK['lab-receive']||{}).main)||[]).filter(r => r['状态']==='待接收');
+        const _lrTab = (tabView.value||{}).name;
+        const _lrSrc = (((MOCK['lab-receive']||{}).main)||[]);
+        if(_lrTab==='processed'){
+          // 已处理：汇总已接收 / 已驳回，处理人、处理时间按状态取对应字段（运行时映射，不改数据）
+          list = _lrSrc
+            .filter(r => r['状态']==='已接收' || r['状态']==='已驳回')
+            .map(r => Object.assign({}, r, {
+              处理人: r['状态']==='已驳回' ? (r['驳回人']||'') : (r['接收人']||''),
+              处理时间: r['状态']==='已驳回' ? (r['驳回时间']||'') : (r['接收时间']||''),
+            }));
+        } else {
+          list = _lrSrc.filter(r => r['状态']==='待接收');
+        }
       }
       if(pageId.value==='sampling-scheme'){
         list = (((MOCK['sampling-scheme']||{}).main)||[]).slice();
@@ -25581,8 +26790,15 @@ const app = createApp({
         });
       }
       if(pageId.value==='lab-receive'){
-        list = applyContainsExactQuery(list, query, ['条码号','样品编码','样品名称','批号'], ['使用状态']);
+        const _lrQTab = (tabView.value||{}).name;
+        // 「状态」精确筛选只对「已处理」生效；待接收页签没有该查询项，避免残留条件误过滤
+        const _lrExact = _lrQTab==='processed' ? ['状态'] : [];
+        list = applyContainsExactQuery(list, query, ['条码号','样品编码','样品名称','批号','驳回原因'], _lrExact);
         list.sort((a,b)=>{
+          if(_lrQTab==='processed'){
+            const tp = String(b['处理时间']||'').localeCompare(String(a['处理时间']||''));
+            if(tp) return tp;
+          }
           const t = String(b['创建时间']||'').localeCompare(String(a['创建时间']||''));
           if(t) return t;
           return String(b['条码号']||'').localeCompare(String(a['条码号']||''));
@@ -26267,7 +27483,8 @@ const app = createApp({
         const vals = [];
         row._groups.forEach(g=>{
           const v = g ? g[field] : '';
-          (Array.isArray(v) ? v : [v]).forEach(x=>{
+          const parts = (field === '检验班组') ? teamListOf(v) : (Array.isArray(v) ? v : [v]);
+          parts.forEach(x=>{
             const s = String(x==null ? '' : x).trim();
             if(s && s!=='—' && vals.indexOf(s) < 0) vals.push(s);
           });
@@ -26411,8 +27628,9 @@ const app = createApp({
           cols.push(col);
           if(isChromLedgerPage() && c.field==='批号'){
             // 每个典型保留时间一列；表头单元格两行：上行＝典型保留时间，下行＝对应定性结构
+            const rtColW = chromLedgerDim.value === CHROM_LEDGER_DIM_PAIRS ? 210 : 132;
             (chromLedgerRtList()||[]).forEach(rt=>{
-              cols.push({ field:'_rt_'+rt, title: rt, width:132, minWidth:120,
+              cols.push({ field:'_rt_'+rt, title: rt, width:rtColW, minWidth:rtColW - 12,
                 slots:{ header:'rt_head', default:'rt_cell' } });
             });
           }
@@ -27174,12 +28392,6 @@ const app = createApp({
         resetDriftForm();
         if(formMode.value==='add' || formMode.value==='copy'){
           formModel['使用检验类型'] = [];
-          formModel['偏差范围下限'] = driftFmt4(DRIFT_DELTA_DEFAULT.lo).replace(/0+$/,'').replace(/\.$/,'.0');
-          formModel['偏差范围上限'] = driftFmt4(DRIFT_DELTA_DEFAULT.hi).replace(/0+$/,'').replace(/\.$/,'.0');
-        } else if(!String(formModel['偏差范围下限']||'').trim()){
-          const parts = String(formModel['偏差范围']||'').split('~');
-          formModel['偏差范围下限'] = (parts[0]||'').trim() || DRIFT_DELTA_DEFAULT.lo + '';
-          formModel['偏差范围上限'] = (parts[1]||'').trim() || DRIFT_DELTA_DEFAULT.hi + '';
         }
       }
       if(pageId.value==='spectrum'){
@@ -27209,8 +28421,148 @@ const app = createApp({
       }
       formVisible.value=true;
     }
+    // ── 仪器台账 · 变更日志（自新增起逐次留痕）──────────────────────────────
+    // 口径：一行 = 一次保存动作（新增 / 修改）。「修改」按字段级 diff 记录变更前→变更后，
+    // 值未变化的保存不落日志。每条记录另存一份「变更后字段快照」（取数据列表的全部字段），
+    // 因此历史行展示的是当时值而不是当前值 —— 拿当前行回填会伪造历史。
+    // 存储用独立 localStorage 键（不写 MOCK，避免连带触发配额失败），写入异常时退回内存数组。
+    const IL_LOG_KEY = 'oled-instrument-change-log-v2';
+    const IL_LOG_OPERATOR = '超级管理员';
+    let ilLogMem = [];
+    // 参与留痕的业务字段；系统字段（id/typeId/创建人/创建时间/修改人/修改时间）不参与比对，避免噪声
+    const IL_LOG_FIELDS = ['仪器编号','仪器名称','仪器条码','仪器类型','使用状态','仪器状态','规格型号','测量范围','精度等级','存放位置','责任部门','责任人','购置日期','仪器厂家','出厂编号','出厂日期','厂家联系人','附件','备注',
+      '是否定检','上次定检日期','上次定检结果','上次定检单位','定检周期','定检周期单位','定检预警周期','定检预警周期单位','下次定检日期','定检附件',
+      '是否内校','上次内校日期','上次内校结果','内校周期','内校周期单位','内校预警周期','内校预警周期单位','下次内校日期','内校附件',
+      '是否外校','上次外校日期','上次外校结果','上次外校单位','外校周期','外校周期单位','外校预警周期','外校预警周期单位','下次外校日期','外校附件'];
+    // 新增记录的摘要字段：只取建档关键信息，避免一次写出 40+ 字段
+    const IL_LOG_SUMMARY_FIELDS = ['仪器编号','仪器名称','仪器类型','使用状态','责任人','存放位置'];
+    // 字段快照的兜底列（正常情况下从「仪器台账」列表列配置派生，保证字段名与顺序和数据列表一致）
+    const IL_LOG_SNAPSHOT_FALLBACK = ['仪器状态','仪器编号','仪器名称','仪器条码','仪器类型','使用状态','规格型号','测量范围','精度等级','存放位置','责任部门','责任人','购置日期','创建时间'];
+    function ilLogVal(v){
+      const s = Array.isArray(v) ? v.filter(Boolean).join('、') : String(v===undefined || v===null ? '' : v);
+      const t = s.trim();
+      return (t==='' || t==='—') ? '' : t;
+    }
+    // 快照列 = 数据列表的展示字段（剔除 勾选 / 序号 / 操作），字段名、顺序、宽度、标签样式全部沿用列表配置
+    const ilLogSnapshotCols = computed(()=>{
+      const cols = (((page.value||{}).tabViews||[])[0]||{}).columns || [];
+      const out = cols
+        .filter(c=> c && c.field && c.type!=='checkbox' && c.type!=='seq' && c.field!=='_actions' && c.slot!=='row_actions')
+        .map(c=> ({
+          field: c.field,
+          label: c.title || c.field,
+          // 沿用列表列宽；时间类列给 172px 下限，避免「2026-08-24 00:00:00」被省略号截断
+          width: Math.min(200, Math.max((/时间$/.test(c.title || c.field) ? 172 : 96), c.width || 120)),
+          tag: c.slot === 'tag'
+        }));
+      if(out.length) return out;
+      return IL_LOG_SNAPSHOT_FALLBACK.map(f=> ({ field: f, label: f, width: 120, tag: f==='使用状态' }));
+    });
+    // 字段快照：只存列表展示字段（控制日志体积），值统一转文本，空值存空串由展示层占位
+    function ilLogSnapshotOf(row){
+      const snap = {};
+      ilLogSnapshotCols.value.forEach(c=>{ snap[c.field] = ilLogVal(row ? row[c.field] : ''); });
+      return snap;
+    }
+    // 快照单元格取值 + 占位规则：
+    // ①记录无快照（历史记录 / 手工数据）→「—」 ②快照无该字段（列表后加的列）→「—」
+    // ③值为空 →「—」 ④非标量（异常数据）→ 字符串化并截断，保证不抛错、不撑破表格
+    function ilLogCellText(row, field){
+      const snap = row && row['快照'];
+      if(!snap || typeof snap !== 'object' || Array.isArray(snap)) return '—';
+      if(!Object.prototype.hasOwnProperty.call(snap, field)) return '—';
+      const raw = snap[field];
+      if(raw === null || raw === undefined) return '—';
+      if(typeof raw === 'object'){ try{ const s = JSON.stringify(raw); return s ? s.slice(0,120) : '—'; }catch(e){ return '—'; } }
+      const s = String(raw).trim();
+      return s ? s : '—';
+    }
+    function ilLogNormalize(list){
+      return (Array.isArray(list) ? list : [])
+        .filter(r=> r && typeof r==='object' && String(r['仪器ID']||'').trim())
+        .map(r=> ({
+          id: r.id || ('ill-' + Date.now() + '-' + Math.random().toString(36).slice(2,6)),
+          '仪器ID': String(r['仪器ID']||'').trim(),
+          '仪器编号': r['仪器编号'] || '',
+          '变更类型': r['变更类型']==='新增' ? '新增' : '修改',
+          '操作人': r['操作人'] || IL_LOG_OPERATOR,
+          '操作时间': r['操作时间'] || '',
+          '变更项': r['变更项'] || '',
+          '变更明细': r['变更明细'] || '',
+          '快照': (r['快照'] && typeof r['快照']==='object' && !Array.isArray(r['快照'])) ? r['快照'] : null
+        }));
+    }
+    function ilLogLoad(){
+      try{
+        const raw = localStorage.getItem(IL_LOG_KEY);
+        if(raw){ const arr = JSON.parse(raw); if(Array.isArray(arr) && arr.length) return ilLogNormalize(arr); }
+      }catch(e){}
+      return ilLogNormalize(ilLogMem);
+    }
+    function ilLogSave(list){ ilLogMem = list; try{ localStorage.setItem(IL_LOG_KEY, JSON.stringify(list)); }catch(e){} }
+    const ilLogStore = ref(ilLogLoad());
+    function ilLogPush(rec){
+      if(!rec || !String(rec['仪器ID']||'').trim()) return;
+      const list = ilLogStore.value.slice();
+      list.push(ilLogNormalize([rec])[0]);
+      ilLogStore.value = list;
+      ilLogSave(list);
+    }
+    // 建档摘要：「仪器名称：马弗炉（箱式）；使用状态：在用；…」
+    function ilLogSummaryText(row){
+      return IL_LOG_SUMMARY_FIELDS
+        .map(f=>{ const v = ilLogVal(row ? row[f] : ''); return v ? (f + '：' + v) : ''; })
+        .filter(Boolean).join('；');
+    }
+    // 字段级 diff，仅保留实际发生变化的字段
+    function ilLogDiff(before, after){
+      const out = [];
+      IL_LOG_FIELDS.forEach(f=>{
+        if(!Object.prototype.hasOwnProperty.call(after||{}, f)) return;
+        const a = ilLogVal(before ? before[f] : ''), b = ilLogVal(after[f]);
+        if(a === b) return;
+        out.push({ field:f, from:a, to:b });
+      });
+      return out;
+    }
+    function ilLogDetailText(diffs){
+      return diffs.map(d=> d.field + '：' + (d.from || '空') + ' → ' + (d.to || '空')).join('；');
+    }
+    // 为单台仪器补「新增」建档基线（历史数据无真实操作留痕）；已存在「新增」记录时跳过。
+    // 保存前调用时传入的仍是旧行，因此摘要取到的是建档时的值而不是修改后的值。
+    function ilLogSeedRowBaseline(row){
+      const id = String((row && row.id) || '').trim();
+      if(!id) return;
+      if(ilLogStore.value.some(x=> x['仪器ID']===id && x['变更类型']==='新增')) return;
+      ilLogPush({
+        '仪器ID': id,
+        '仪器编号': row['仪器编号'] || '',
+        '变更类型': '新增',
+        '操作人': ilLogVal(row['创建人']) || IL_LOG_OPERATOR,
+        '操作时间': ilLogVal(row['创建时间']) || nowStamp(),
+        '变更项': '初始建档',
+        '变更明细': ilLogSummaryText(row) || '—',
+        '快照': ilLogSnapshotOf(row)
+      });
+    }
+    // 打开详情时整表补齐，按仪器ID 幂等
+    function ilInstrumentLogSeed(){
+      ((MOCK['instrument-ledger']||{}).main||[]).forEach(r=> ilLogSeedRowBaseline(r));
+    }
+    // 当前仪器（详情行）的变更日志：时间倒序，同一时间按写入顺序倒序，最新在最上
+    const ilLogRows = computed(()=>{
+      storeTick.value; // 保存后随 store 刷新
+      const id = String((detailRow.value && detailRow.value.id) || '').trim();
+      if(!id) return [];
+      return ilLogStore.value
+        .map((r,i)=>({ r, i }))
+        .filter(o=> o.r['仪器ID'] === id)
+        .sort((x,y)=> String(y.r['操作时间']||'').localeCompare(String(x.r['操作时间']||'')) || (y.i - x.i))
+        .map(o=> o.r);
+    });
     function openDetail(row){
       detailRow.value = STORE ? STORE.overlayPcRow(pageId.value, { ...row }) : { ...row };
+      if(pageId.value==='instrument-ledger') ilInstrumentLogSeed();
       if(pageId.value==='lg-dispatch'){
         detailRow.value['关联仓储业务'] = resolveWhBizType(row);
         const pre = normalizeDispatchSoShipPreDocs(row);
@@ -27987,7 +29339,6 @@ const app = createApp({
           批号: order['报检批号'] || '',
           来源单号: line.sampleNum || '',
           报检单单号: order['报检单号'] || '',
-          使用状态: '在用',
           状态: '待接收',
           存放仓库: '',
           存放库位: '',
@@ -28055,7 +29406,7 @@ const app = createApp({
        命中样品主数据 lab-sample 时覆盖 样品编码/名称/规格/种类/计量单位/有效期，
        未命中则按上游物料信息兜底（与待取样弹窗「留样」口径一致）。 */
     const labRetainAddVisible = ref(false);
-    const labRetainForm = reactive({ orderKey: '', count: 1, takeDate: '', remark: '', printAfter: false });
+    const labRetainForm = reactive({ orderKey: '', count: 1, takeDate: '', remark: '' });
     const labLabelVisible = ref(false);
     const labLabelRows = ref([]);
 
@@ -28113,68 +29464,219 @@ const app = createApp({
       const p = x => String(x).padStart(2, '0');
       return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
     }
-    function openLabRetainAdd(){
-      labRetainForm.orderKey = '';
-      labRetainForm.count = 1;
-      labRetainForm.remark = '';
-      labRetainForm.printAfter = false;
-      labRetainForm.takeDate = todayStamp();
-      labRetainAddVisible.value = true;
+    /* ── 留样信息明细（2026-11-02）：一行 = 一个留样样品 ───────────────────────────
+       样品编号 YP+yyMMdd+3 位流水，起始流水与参考原型一致（679），同一天接着已用最大号往后排；
+       检验班组 / 留样单位 / 取样备注 由上游单据与样品主数据自动代入，样品来源与留样数量手工填。 */
+    const labRetainLines = ref([]);
+    const labRetainSel = ref([]);
+    const LAB_RETAIN_NO_SEED = 679;
+    function labRetainNoPrefix(){
+      const d = new Date();
+      const p = x => String(x).padStart(2, '0');
+      return 'YP' + String(d.getFullYear()).slice(2) + p(d.getMonth() + 1) + p(d.getDate());
     }
-    function onLabRetainOrderChange(){
-      // 换单据后件数回到 1，上限由可留样件数约束
-      labRetainForm.count = 1;
+    function labRetainNoText(n){ return labRetainNoPrefix() + String(n).padStart(3, '0'); }
+    function labRetainNoUsedMax(){
+      const prefix = labRetainNoPrefix();
+      let max = 0;
+      ['lab-receive', 'lab-archive'].forEach(pid => {
+        (((MOCK[pid] || {}).main) || []).forEach(r => {
+          const v = String((r && r['样品编号']) || '');
+          if (!v.startsWith(prefix)) return;
+          const n = parseInt(v.slice(prefix.length), 10);
+          if (Number.isFinite(n) && n > max) max = n;
+        });
+      });
+      return max;
     }
-    function confirmLabRetainAdd(){
+    function labRetainNoStart(){
+      const used = labRetainNoUsedMax();
+      return used >= LAB_RETAIN_NO_SEED ? used + 1 : LAB_RETAIN_NO_SEED;
+    }
+    function labRetainTeamOf(order){
+      if (!order) return '';
+      const direct = order['检验班组'] || order['所属检验班组'] || '';
+      if (direct) return String(direct);
+      const tab = String(order._tab || '');
+      if (tab === 'purchase-incoming' || tab === 'in-wh-recheck') return '来料检验班组';
+      if (tab === 'finished-product' || tab === 'finished-mix' || tab === 'made-product') return '成品检验班组';
+      return '理化分析班组';
+    }
+    function newRetainLine(no){
+      const order = labRetainOrder.value || {};
+      const master = matchLabSampleMaster(order);
+      return {
+        _key: 'rl-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8),
+        样品编号: no,
+        样品来源: '',
+        检验班组: labRetainTeamOf(order),
+        取样备注: String(order['备注'] || ''),
+        留样数量: '',
+        留样单位: String((master && master['计量单位']) || order['计量单位'] || ''),
+      };
+    }
+    function resetRetainLines(){
+      labRetainLines.value = [];
+      labRetainSel.value = [];
+    }
+    function buildRetainLines(n){
+      const order = labRetainOrder.value;
+      if (!order) return;
+      const total = Math.max(1, Math.min(Number(n) || 1, 200));
+      const start = labRetainNoStart();
+      labRetainLines.value = Array.from({ length: total }, (_, i) => newRetainLine(labRetainNoText(start + i)));
+      labRetainSel.value = [];
+    }
+    function syncRetainLinesToCount(){
+      const order = labRetainOrder.value;
+      if (!order) return;
+      const total = Math.max(1, Math.min(Number(labRetainForm.count) || 1, 200));
+      const lines = labRetainLines.value.slice();
+      if (lines.length === total) return;
+      if (lines.length > total) lines.length = total;
+      else {
+        const prefix = labRetainNoPrefix();
+        let next = labRetainNoStart();
+        const last = lines.length ? String(lines[lines.length - 1]['样品编号'] || '') : '';
+        if (last.startsWith(prefix)) {
+          const v = parseInt(last.slice(prefix.length), 10);
+          if (Number.isFinite(v) && v >= next) next = v + 1;
+        }
+        while (lines.length < total) { lines.push(newRetainLine(labRetainNoText(next))); next += 1; }
+      }
+      labRetainLines.value = lines;
+      labRetainSel.value = [];
+    }
+    function onLabRetainCountChange(){
+      if (!labRetainOrder.value) return;
+      syncRetainLinesToCount();
+    }
+    function generateRetainLines(){
+      if (!labRetainOrder.value) { ElMessage.warning('请选择上游单据'); return; }
+      const build = () => {
+        buildRetainLines(labRetainForm.count);
+        ElMessage.success('已按留样件数生成 ' + labRetainLines.value.length + ' 行样品');
+      };
+      const filled = labRetainLines.value.filter(r => String(r.样品来源 || '').trim() || String(r.留样数量 || '').trim()).length;
+      if (!filled) { build(); return; }
+      ElMessageBox.confirm('重新生成会覆盖已填写的「样品来源 / 留样数量」，是否继续？', '重新生成样品', {
+        type: 'warning', confirmButtonText: '重新生成', cancelButtonText: '取消'
+      }).then(build).catch(() => {});
+    }
+    function refreshRetainNo(){
+      if (!labRetainLines.value.length) { ElMessage.warning('请先生成样品'); return; }
+      const start = labRetainNoStart();
+      labRetainLines.value.forEach((r, i) => { r.样品编号 = labRetainNoText(start + i); });
+      ElMessage.success('样品编号已刷新（' + labRetainLines.value.length + ' 行）');
+    }
+    function removeRetainLines(){
+      const picked = labRetainSel.value.slice();
+      if (!picked.length) { ElMessage.warning('请先勾选需要删除的样品行'); return; }
+      const keys = new Set(picked.map(r => r._key));
+      labRetainLines.value = labRetainLines.value.filter(r => !keys.has(r._key));
+      labRetainSel.value = [];
+      labRetainForm.count = Math.max(1, labRetainLines.value.length);
+      ElMessage.success('已删除 ' + picked.length + ' 行样品');
+    }
+    function printRetainLines(){
+      const picked = (labRetainSel.value.length ? labRetainSel.value : labRetainLines.value).slice();
+      if (!picked.length) { ElMessage.warning('请先生成样品'); return; }
+      const order = labRetainOrder.value || {};
+      openLabLabelPrint(picked.map(r => ({
+        条码号: r.样品编号,
+        样品名称: order['物料名称'] || '',
+        样品规格: order['物料规格'] || '',
+        批号: order['报检批号'] || '',
+        取样日期: labRetainForm.takeDate || '',
+        报检单单号: order['报检单号'] || '',
+        份数: 1
+      })));
+    }
+    function submitRetainLines(lines){
       const order = labRetainOrder.value;
       if (!order) { ElMessage.warning('请选择上游单据'); return; }
-      const count = Number(labRetainForm.count || 0);
-      if (!Number.isInteger(count) || count <= 0) { ElMessage.warning('留样件数需为正整数'); return; }
+      const rows = (lines || []).slice();
+      if (!rows.length) { ElMessage.warning('请先生成留样样品行'); return; }
       const avail = labRetainAvailable.value;
       if (avail <= 0) { ElMessage.warning('该单据已取样件数均已留样，无法继续新增'); return; }
-      if (count > avail) { ElMessage.warning('留样件数不得超过可留样件数（' + avail + '）'); return; }
+      if (rows.length > avail) { ElMessage.warning('留样行数不得超过可留样件数（' + avail + '）'); return; }
+      const takeDate = String(labRetainForm.takeDate || '').trim();
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(takeDate)) { ElMessage.warning('请选择取样日期'); return; }
+      if (takeDate > todayStamp()) { ElMessage.warning('取样日期不能晚于今天'); return; }
+      const noMiss = rows.find(r => !String(r.样品编号 || '').trim());
+      if (noMiss) { ElMessage.warning('存在未生成样品编号的样例行，请点「刷新编号」'); return; }
+      const qtyMiss = rows.find(r => {
+        const v = String(r.留样数量 == null ? '' : r.留样数量).trim();
+        return !v || !(Number(v) > 0);
+      });
+      if (qtyMiss) { ElMessage.warning('「留样数量」需为大于 0 的数字（样品编号 ' + qtyMiss.样品编号 + '）'); return; }
       const master = matchLabSampleMaster(order);
       const bag = MOCK['lab-receive'] = MOCK['lab-receive'] || {};
       const list = bag.main = bag.main || [];
       const now = (typeof nowStamp === 'function') ? nowStamp() : new Date().toISOString().replace('T', ' ').slice(0, 19);
-      const day = labRetainForm.takeDate || todayStamp();
+      const day = takeDate;
       const validityNum = master ? String(master['有效期'] || '') : '';
       const validityUnit = master ? (master['有效期单位'] || '天') : '天';
+      const formRemark = String(labRetainForm.remark || '').trim();
       const barcodes = [];
-      for (let i = 0; i < count; i += 1) barcodes.push(nextRetainBarcode(barcodes.map(c => ({ 条码号: c }))));
-      const created = barcodes.map(barcode => ({
-        id: 'lr-add-' + Date.now() + '-' + barcode,
-        条码号: barcode,
-        样品编码: (master && master['样品编码']) || order['物料编码'] || '',
-        样品名称: (master && master['样品名称']) || order['物料名称'] || '',
-        样品规格: (master && master['样品规格']) || order['物料规格'] || '',
-        样品种类: (master && master['样品种类']) || order['物料种类'] || '',
-        建档数量: '1',
-        库存数量: '',
-        条码来源: '留样',
-        有效期: validityNum,
-        有效期单位: validityUnit,
-        有效期展示: labValidityText(validityNum, validityUnit),
-        失效日期: labExpireDate(day, validityNum, validityUnit),
-        取样日期: day,
-        计量单位: (master && master['计量单位']) || '',
-        批号: order['报检批号'] || '',
-        来源单号: '',
-        报检单单号: order['报检单号'] || '',
-        使用状态: '在用',
-        状态: '待接收',
-        存放仓库: '',
-        存放库位: '',
-        备注: String(labRetainForm.remark || '').trim() || '样品接收-留样新增',
-        创建人: '超级管理员',
-        创建时间: now
-      }));
+      const created = rows.map(line => {
+        const barcode = nextRetainBarcode(barcodes.map(c => ({ 条码号: c })));
+        barcodes.push(barcode);
+        return {
+          id: 'lr-add-' + Date.now() + '-' + barcode,
+          条码号: barcode,
+          样品编号: String(line.样品编号 || ''),
+          样品编码: (master && master['样品编码']) || order['物料编码'] || '',
+          样品名称: (master && master['样品名称']) || order['物料名称'] || '',
+          样品规格: (master && master['样品规格']) || order['物料规格'] || '',
+          样品种类: (master && master['样品种类']) || order['物料种类'] || '',
+          建档数量: '1',
+          库存数量: '',
+          条码来源: '留样',
+          有效期: validityNum,
+          有效期单位: validityUnit,
+          有效期展示: labValidityText(validityNum, validityUnit),
+          失效日期: labExpireDate(day, validityNum, validityUnit),
+          取样日期: day,
+          计量单位: String((master && master['计量单位']) || ''),
+          批号: order['报检批号'] || '',
+          来源单号: '',
+          报检单单号: order['报检单号'] || '',
+          样品来源: String(line.样品来源 || '').trim(),
+          检验班组: String(line.检验班组 || ''),
+          留样数量: String(line.留样数量 || '').trim(),
+          留样单位: String(line.留样单位 || ''),
+          状态: '待接收',
+          存放仓库: '',
+          存放库位: '',
+          备注: String(line.取样备注 || '').trim() || formRemark || '样品接收-留样新增',
+          创建人: '超级管理员',
+          创建时间: now
+        };
+      });
       created.forEach(row => list.unshift(row));
-      const printAfter = !!labRetainForm.printAfter;
       labRetainAddVisible.value = false;
+      labRetainForm.count = 1;
+      resetRetainLines();
       bumpStore();
-      ElMessage.success('已新增 ' + count + ' 条留样（待接收），可在列表中继续接收或打印标签');
-      if (printAfter) openLabLabelPrint(created.slice());
+      ElMessage.success('已新增 ' + created.length + ' 条留样（待接收），可在列表中继续接收或打印标签');
+    }
+    function confirmLabRetainAdd(){
+      submitRetainLines(labRetainLines.value);
+    }
+    function openLabRetainAdd(){
+      labRetainForm.orderKey = '';
+      labRetainForm.count = 1;
+      labRetainForm.remark = '';
+      labRetainForm.takeDate = todayStamp();
+      resetRetainLines();
+      labRetainAddVisible.value = true;
+    }
+    function onLabRetainOrderChange(){
+      // 换单据后件数回到 1，上限由可留样件数约束；明细行按件数重建
+      labRetainForm.count = 1;
+      if (labRetainOrder.value) buildRetainLines(1);
+      else resetRetainLines();
     }
     function openLabLabelPrint(rows){
       const list = (rows || []).filter(Boolean);
@@ -28505,14 +30007,31 @@ const app = createApp({
           '定性': ['质检三组', 'INS-0045 分光光度计'],
           '水分': ['质检二组', 'INS-0034 卡尔费休水分仪']
         };
-        if(btn.name==='自动匹配'){
+        if(btn.name==='自动分配'){
           let n = 0;
+          const seen = new Set();
           sampleAssignTabRows().forEach(r=>{
             const m = ASSIGN_MAP[r['检验类名称']];
-            if(m){ r['检验班组']=m[0]; r['检验设备']=m[1]; r['检验人']=sampleAssignDeviceOwner(m[1])||''; r['分析人']=r['检验人']; r['分配状态']='已分配'; sampleAssignMarkOperator(r); n++; }
+            if(m){
+              r['检验班组']=m[0]; r['检验设备']=m[1]; r['检验人']=sampleAssignDeviceOwner(m[1])||''; r['分析人']=r['检验人']; r['分配状态']='已分配'; sampleAssignMarkOperator(r); n++;
+              // 同一操作批内按「样品编号 + 检验类」合并为一条分配记录
+              const lk = String(r['样品编号']||'').trim() + '||' + String(r['检验类名称']||'').trim();
+              if(!seen.has(lk)){
+                seen.add(lk);
+                saLogPush({
+                  '样品编号': String(r['样品编号']||'').trim(),
+                  '检验类名称': r['检验类名称'] || '',
+                  '操作类型': '分配',
+                  '分配对象': saLogTargetText(r['检验班组'], r['检验设备'], r['检验人']),
+                  '取消原因': '', '操作人': SAMPLE_ASSIGN_OPERATOR,
+                  '操作时间': r['分配时间'] || sampleAssignNowStamp(),
+                  '来源': '工具栏·自动分配'
+                });
+              }
+            }
           });
           bumpStore();
-          ElMessage.success(n ? ('已按检验类自动匹配 ' + n + ' 条检验任务') : '当前列表的检验类暂无自动匹配规则');
+          ElMessage.success(n ? ('已按检验类自动分配 ' + n + ' 条检验任务') : '当前列表的检验类暂无自动分配规则');
           return;
         }
         if(btn.name==='批量分配'){
@@ -28523,9 +30042,22 @@ const app = createApp({
             (row._groups||[]).forEach(g=>{
               const m = ASSIGN_MAP[g['检验类名称']];
               if(!m){ skipped += g.rows.length; return; }
+              const teamText = m[0], device = m[1];
+              const owner = sampleAssignDeviceOwner(device) || '';
               (g.rows||[]).forEach(r=>{
-                r['检验班组']=m[0]; r['检验设备']=m[1]; r['检验人']=sampleAssignDeviceOwner(m[1])||''; r['分析人']=r['检验人'];
+                r['检验班组']=teamText; r['检验设备']=device; r['检验人']=owner; r['分析人']=r['检验人'];
                 r['分配状态']='已分配'; sampleAssignMarkOperator(r); n++;
+              });
+              // 每个「样品编号 + 检验类」写一条分配记录（同组多行只记一次）
+              const head = (g.rows||[])[0] || {};
+              saLogPush({
+                '样品编号': String(head['样品编号'] || row['样品编号'] || '').trim(),
+                '检验类名称': g['检验类名称'] || '',
+                '操作类型': '分配',
+                '分配对象': saLogTargetText(teamText, device, owner),
+                '取消原因': '', '操作人': SAMPLE_ASSIGN_OPERATOR,
+                '操作时间': head['分配时间'] || sampleAssignNowStamp(),
+                '来源': '工具栏·批量分配'
               });
             });
           });
@@ -29896,6 +31428,9 @@ const app = createApp({
     function closeInspEntryDialogs(){
       inspSampleDataEntryVisible.value = false;
       inspSampleQuickEntryVisible.value = false;
+      collectVisible.value = false;
+      iotVisible.value = false;
+      chromVisible.value = false;
     }
 
     function onInspSampleSave(){
@@ -29908,6 +31443,11 @@ const app = createApp({
         ElMessage.warning('台账复测模式不提供暂存，请直接提交复测数据');
         return;
       }
+      const tc = Number(inspSampleTestCount.value);
+      if(!Number.isInteger(tc) || tc < 1 || tc > 9){
+        ElMessage.error('样本测试次数不能为空，且须为 1~9 的整数');
+        return;
+      }
       inspEntryPersist(row, false);
       closeInspEntryDialogs();
       bumpStore();
@@ -29918,6 +31458,13 @@ const app = createApp({
       if(!activeSampleRow.value || !activeSampleRow.value._inspItems){
         ElMessage.warning('无检验项目数据');
         return;
+      }
+      if(!isDataLedgerMode.value){
+        const tc = Number(inspSampleTestCount.value);
+        if(!Number.isInteger(tc) || tc < 1 || tc > 9){
+          ElMessage.error('样本测试次数不能为空，且须为 1~9 的整数');
+          return;
+        }
       }
       if(isDataLedgerMode.value){
         const r = activeSampleRow.value;
@@ -31465,6 +33012,7 @@ const app = createApp({
       if(pageId.value==='sample-assign'){
         if(op.name==='分配'){ openSaAssign(row); return; }
         if(op.name==='分配详情'){ openSaDetail(row); return; }
+        if(op.name==='分配记录'){ openSaLog(row); return; }
       }
       if(pageId.value==='spc-report-ledger'){
         if(op.name==='预览'){ openSpcReportPreview(row); return; }
@@ -31507,7 +33055,7 @@ const app = createApp({
           inspSampleActiveItemId.value = inspSampleCatItems.value.length ? inspSampleCatItems.value[0].id : '';
           inspSampleMethod.value = inspSampleMethodForCat(inspSampleActiveCat.value);
           inspSamplePublicTestTimes.value = '1次';
-          inspSampleTestCount.value = 2;
+          initInspEntryBarDefaults(row);
           inspSampleFullscreen.value = false;
           inspSampleDataEntryVisible.value = true;
           return;
@@ -31543,7 +33091,7 @@ const app = createApp({
           inspSampleActiveItemId.value = inspSampleCatItems.value.length ? inspSampleCatItems.value[0].id : '';
           inspSampleMethod.value = inspSampleMethodForCat(inspSampleActiveCat.value);
           inspSamplePublicTestTimes.value = '1次';
-          inspSampleTestCount.value = 2;
+          initInspEntryBarDefaults(src);
           inspSampleFullscreen.value = false;
           inspSampleDataEntryVisible.value = true;
           return;
@@ -38748,13 +40296,45 @@ const app = createApp({
         if(isAdd){
           payload.id = 'il-' + Date.now();
           payload.typeId = dictTypeId.value;
-          payload.创建人 = '超级管理员';
+          payload.创建人 = IL_LOG_OPERATOR;
           payload.创建时间 = nowStamp();
+          payload.修改人 = payload.创建人;
+          payload.修改时间 = payload.创建时间;
           list.unshift(payload);
+          ilLogPush({
+            '仪器ID': payload.id,
+            '仪器编号': payload['仪器编号'] || '',
+            '变更类型': '新增',
+            '操作人': IL_LOG_OPERATOR,
+            '操作时间': payload.创建时间,
+            '变更项': '初始建档',
+            '变更明细': ilLogSummaryText(payload) || '—',
+            '快照': ilLogSnapshotOf(payload)
+          });
         } else {
           const cur = list.find(r=> r.id===formModel._editId);
           if(!cur){ ElMessage.warning('未找到待编辑仪器'); return; }
-          Object.assign(cur, payload, { id: cur.id, typeId: cur.typeId, 创建人: cur['创建人'], 创建时间: cur['创建时间'] });
+          // 先按字段级 diff 留痕（值无变化不生成记录），再落库，保证「变更前」取到的是旧值
+          const diffs = ilLogDiff(cur, payload);
+          const stamp = nowStamp();
+          ilLogSeedRowBaseline(cur);
+          Object.assign(cur, payload, {
+            id: cur.id, typeId: cur.typeId, 创建人: cur['创建人'], 创建时间: cur['创建时间'],
+            修改人: IL_LOG_OPERATOR, 修改时间: stamp
+          });
+          if(diffs.length){
+            ilLogPush({
+              '仪器ID': cur.id,
+              '仪器编号': cur['仪器编号'] || '',
+              '变更类型': '修改',
+              '操作人': IL_LOG_OPERATOR,
+              '操作时间': stamp,
+              '变更项': diffs.map(d=> d.field).join('、'),
+              '变更明细': ilLogDetailText(diffs),
+              // 快照取 assign 之后的整行：反映该次保存完成时的当时值
+              '快照': ilLogSnapshotOf(cur)
+            });
+          }
         }
         formVisible.value=false;
         bumpStore();
@@ -38766,10 +40346,6 @@ const app = createApp({
         const name = String(formModel['规则名称']||'').trim();
         if(!code){ ElMessage.warning('请填写规则编码'); return; }
         if(!name){ ElMessage.warning('请填写规则名称'); return; }
-        const lo = driftNum(formModel['偏差范围下限']), hi = driftNum(formModel['偏差范围上限']);
-        if(lo==null || hi==null){ ElMessage.warning('偏差范围须填写下限与上限两个数字（下限无需输入“-”）'); return; }
-        if(lo > 0 || hi < 0){ ElMessage.warning('偏差范围下限自动为负、上限自动为正，请只填写偏差量数字'); return; }
-        if(hi < Math.abs(lo)){ ElMessage.warning('偏差范围上限不得小于下限的绝对值'); return; }
         const inspTypes = Array.isArray(formModel['使用检验类型']) ? formModel['使用检验类型'].filter(Boolean) : String(formModel['使用检验类型']||'').split(/[、,，]/).filter(Boolean);
         if(!inspTypes.length){ ElMessage.warning('请选择使用检验类型（可多选）'); return; }
         const mats = driftMatRows.value.filter(r=> String(r.物料编码||'').trim() !== '');
@@ -38789,8 +40365,8 @@ const app = createApp({
             return {
               是否主峰: r.是否主峰==='是' ? '是' : '否',
               典型保留时间: tr==null ? '' : tr.toFixed(3),
-              有效范围下限: rl==null ? (tr==null ? '' : driftFmt4(tr + lo)) : driftFmt4(rl),
-              有效范围上限: rh==null ? (tr==null ? '' : driftFmt4(tr + hi)) : driftFmt4(rh),
+              有效范围下限: rl==null ? '' : driftFmt4(rl),
+              有效范围上限: rh==null ? '' : driftFmt4(rh),
               定性结构: r.定性结构 || '',
               标准结果值: String(r.标准结果值 == null ? '' : r.标准结果值).trim(),
               UCL: r.UCL || '',
@@ -38813,9 +40389,6 @@ const app = createApp({
           规则名称: name,
           规则分类: formModel['规则分类'] || '',
           TR规则: formModel['TR规则'] || '按固定值不叠加',
-          偏差范围: driftRangeText(),
-          偏差范围下限: String(lo),
-          偏差范围上限: String(hi),
           使用检验类型: inspTypes.join('、'),
           适用物料: mats.map(r=> r.物料编码).join('、'),
           杂质个数: imps.length,
@@ -41678,6 +43251,7 @@ const app = createApp({
         '审核通过':'tag-g','审核驳回':'tag-gr','已发起':'tag-b','加签通过':'tag-g','待签':'tag-y','同意':'tag-g',
         '单次':'tag-b','多次':'tag-p',
         '待处理':'tag-gr','处理中':'tag-b','已处理':'tag-g',
+        '新增':'tag-b','修改':'tag-o',
         '轻微':'tag-b','一般':'tag-y','严重':'tag-p','重大':'tag-r',
         '承运商':'tag-r','我方/发货方':'tag-p','收货方':'tag-b',
       }[s] || 'tag-gr';
@@ -42051,9 +43625,9 @@ const app = createApp({
       query, queryExpanded, hasMoreQuery, visibleQueryFields, queryErrors, clearQueryError, selectedIds, pageNum, pageSize, tableData, pagedData, vxeColumns, isSpcPage, isComparePage, spcCompareRows, addCompareRow, copyCompareRow, removeCompareRow, onCompareFieldChange, spcChartKey, spcTimeRange, spcQueried, spcLoading, spcChartOptions, spcDescBlocks, spcSampleVisible, spcSampleRows, spcChartTabs, spcMultiSingleCol, spcMultiTableRows, spcMultiTableCols, setSpcChartRef, spcReportPreviewVisible, spcReportPreviewRow, spcReportPreviewFile, spcReportPreviewCharts, spcReportPreviewAnalysis, setSpcReportPreviewChartRef, disposeSpcReportPreviewCharts, downloadSpcReport, openSpcReportPreview, onSpcChartChange, onSpcSetting, openSpcSampleData, onSpcExport, runSpcQuery, spcQueryGroups, spcResultRows, spcResultCols, spcResultPage, spcResultPageSize, spcResultTotal, spcResultPageCount, spcResultPaged, spcResultIndex, spcResultEmptyText, onSpcResultPageChange, onSpcResultSizeChange, spcSettingVisible, spcSettingTab, spcRuleMode, spcRuleCols, spcRuleRows, onSpcRuleModeChange, onSpcRuleSelectAll, onSpcRuleSelectSingle, resetSpcAnomalyRules, spcFilterRows, clearSpcFilterSetting, spcSampleGroup, onSpcIChartValueChange, resetSpcSampleGroup, spcLimitCharts, onSpcLimitChange, resetSpcLimitRules, spcHistoryTrendType, spcChartViewAll, spcChartViewSelected, spcLineSettings, spcPointSettings, spcTipSettings, resetSpcChartSetting, spcCompareChartViewAll, spcCompareChartViewSelected, spcCompareTipSettings, resetSpcCompareChartSetting, onSpcSettingClosed, onSpcSettingSave, onSpcSampleExport, onSpcFillTestData, onSpcFillHardnessData, spcSampleTitle, spcSampleBtnLabel, spcSampleIdVisible, canMergeShip, canCloseShip, canCloseDispatch, canCloseWaybill, canCloseInspPlan, canSettleWaybill, canDeleteKpiPlan,
       formVisible, msaFrameSrc, formMode, formDialogTitle, formDialogWidth, formSwitch, formModel, poMatPool, formLineSelected, dispatchAuditVisible, dispatchAuditRow, dispatchAuditForm, splitVisible, splitRow, splitForm, splitLines, splitLineSelected, splitNeedsOrder, splitShowPreDoc, splitShowSoShipPreDocs, splitShowSoPreoutPrepDoc, splitPreDocRequired, splitShowPo, onSplitOrderTypeChange, openSplitPicker, settleVisible, settleRows, settleForm, totalSettleQty, totalSettleFee, openSettleModal, onSettleOk, secondaryAssignVisible, secondaryAssignRow, secondaryAssignForm, resetSecondaryAssignForm, onSecondaryAssignOk, assignVisible, assignRow, assignForm, assignCarriers, assignVehicles, assignTrailers, activeFormFields, activeFormLineFields, formLineEmptyText, formLineRows, authSchemeRows, authItemRows, onAuthSchemeRow,
       sampFormTab, sampRuleRows, sampRuleSelected, sampMix, sampFormTrialN, sampFormTrial, sampFormTrialErr, sampFamilyLabel, sampRuleAlert, addSampRuleRow, removeSampRuleRow, removeSampRuleSelected, onSampRuleSelChange, onSampRuleRightChange, toggleSampRuleMode, onSampRuleRowsChange, runSampFormTrial, onSampMatClear,
-      driftFormTab, driftImpurityRows, driftNewUCL, driftNewLCL, driftFilterMin, driftFilterMax, driftMatRows, driftColRows, addDriftImpurity, removeDriftImpurity, addDriftMat, removeDriftMat, addDriftCol, removeDriftCol, driftMatOptions, onDriftMatPick, driftColTypeOptions, driftInspTypeOptions, resetDriftForm, onDriftImpurityTrInput, onDriftImpurityRangeInput, onDriftDeltaChange, onDriftDeltaLowerInput, onDriftDeltaUpperInput, syncDriftImpurityRange, driftRowRange, spectrumPeaks, spectrumCalcDone, spectrumNoRule, spectrumNoteVisible, spectrumCols, spectrumNoteGroups, specTagStyle, runSpectrumCalc, recalcSpectrum, resetSpectrumCalc, specFilePickVisible, specFilePickId, specFileKw, specFileStatus, specFilePreviewVisible, specFilePreviewRow, spectrumFileRows, spectrumFileById, spectrumFileStatusOf, spectrumFilePickRows, openSpectrumFilePick, onSpectrumFileRowPick, previewSpectrumFile, confirmSpectrumFilePick, applySpectrumSourceFile, spectrumColumnCodeOptions, spectrumDriftRuleRows, spectrumDriftNameOptions, syncSpectrumDriftName, onSpectrumInspTypeChange, onSpectrumMaterialChange, onSpectrumColumnModelChange, spectrumRuleByName, spectrumRuleCategoryPlaceholder, syncSpectrumRuleCategory, spectrumSourcePeaks, specPreviewPeaks, specPreviewPolyline,
+      driftFormTab, driftImpurityRows, driftNewUCL, driftNewLCL, driftFilterMin, driftFilterMax, driftMatRows, driftColRows, addDriftImpurity, removeDriftImpurity, addDriftMat, removeDriftMat, addDriftCol, removeDriftCol, driftMatOptions, onDriftMatPick, driftColTypeOptions, driftInspTypeOptions, resetDriftForm, onDriftImpurityTrInput, onDriftImpurityRangeInput, syncDriftImpurityRange, driftRowRange, spectrumPeaks, spectrumCalcDone, spectrumNoRule, spectrumNoteVisible, spectrumCols, spectrumRefPeak, spectrumRefOptions, setSpectrumRefPeak, spectrumNoteGroups, specTagStyle, runSpectrumCalc, recalcSpectrum, resetSpectrumCalc, specFilePickVisible, specFilePickId, specFileKw, specFileStatus, specFilePreviewVisible, specFilePreviewRow, spectrumFileRows, spectrumFileById, spectrumFileStatusOf, spectrumFilePickRows, openSpectrumFilePick, onSpectrumFileRowPick, previewSpectrumFile, confirmSpectrumFilePick, applySpectrumSourceFile, spectrumColumnCodeOptions, spectrumDriftRuleRows, spectrumDriftNameOptions, syncSpectrumDriftName, onSpectrumInspTypeChange, onSpectrumMaterialChange, onSpectrumColumnModelChange, spectrumRuleByName, spectrumRuleCategoryPlaceholder, syncSpectrumRuleCategory, spectrumSourcePeaks, specPreviewPeaks, specPreviewPolyline,
       subRules, formatSubRuleText, judgeTargetLabel, subRuleEditVisible, subRuleEditId, subRuleEditForm, openSubRuleEdit, saveSubRuleEdit, moveSubRule, removeSubRule, resetSubRules, judgeDemoVisible, judgeDemoRule, judgeDemoPeaks, JUDGE_DEMO_STD, judgeDemoResult, openJudgeDemo, loadJudgeDemoBad,
-      CHROM_LEDGER_RT_LIST, chromLedgerDim, CHROM_LEDGER_DIMS, chromLedgerCell, chromLedgerRowRtPairs, chromLedgerRtStructureMap, chromLedgerPairsCellHeight, chromLedgerEditVisible, chromLedgerEditForm, openChromLedgerEdit, saveChromLedgerEdit, chromCategoryVisible, chromCategoryForm, chromCategoryMatOptions, openChromCategoryForm, onChromCategoryMaterial, saveChromCategory,
+      CHROM_LEDGER_RT_LIST, chromLedgerDim, CHROM_LEDGER_DIMS, CHROM_LEDGER_DIM_PAIRS, chromLedgerPctText, chromLedgerAreaText, chromLedgerCell, chromPickCellText, chromLedgerRowRtPairs, chromLedgerRtStructureMap, chromLedgerPairsCellHeight, chromLedgerEditVisible, chromLedgerEditForm, openChromLedgerEdit, saveChromLedgerEdit, chromCategoryVisible, chromCategoryForm, chromCategoryMatOptions, openChromCategoryForm, onChromCategoryMaterial, saveChromCategory,
       qsNodes, qsNodeSelected, qsDragFrom, qsNodeVisible, qsNodeForm, qsNodeTitle, openQsNode, removeQsNodes, moveQsNode, saveQsNode, onQsLineChange, onQsGatherChange, onQsInspSchemeChange, onQsProcessTypeChange, onQsMaterialChange, qsPreviewVisible, qsPreviewTitle, qsPreviewRows, qsLineOptions, qsWorkshopOptions, qsMaterialOptions, qsSamplingOptions, qsInspItems, qsInspSchemeOptions, qsGatherItems, qsGatherItemOptions,
       sovKw, sovCollapsed, sovSelectedId, sovFilteredGroups, sovSelected, sovTitle, sovRows, selectSovScheme, onSovSearch, sovItemNames, navigateSovProcess,
       SGR_ZERO_OPTS, SGR_ROUND_OPTS, SGR_FETCH_OPTS, sgrTab, sgrSchemes, sgrSchemeSelected, sgrPickVisible, sgrPickQuery, sgrPickRows, sgrPickSelected, openSgrSchemePicker, confirmSgrSchemePicker, removeSgrScheme, removeSgrSchemes, onSgrXbarMode,
@@ -42072,20 +43646,21 @@ const app = createApp({
       pickerVisible, pickerTitle, pickerDialogTitle, pickerKw, pickerPrepQ, pickerPrepFilterTick, pickerPrepSelQty, pickerPrepNeedQty, resetPickerPrepQ, pickerRows, pickerColumns, pickerDialogWidth, pickerMultiSelect, pickerCurrent, pickerSelected, pickerMode,
       mergeVisible, mergeForm, onMergeShipOk, onFormSelectChange,
       isSampleAssignAnalystDisabled, formSelectPlaceholder,
-      SAMPLE_ASSIGN_TEAMS, sampleAssignDeviceOptions, sampleAssignAnalystOptions,
-      sampleAssignInspectorOptions, onSaAssignDeviceChange, saInspectorIsAuto,
+      SAMPLE_ASSIGN_TEAMS, sampleAssignDeviceOptions, sampleAssignAnalystOptions, sampleAssignTeamOptions,
+      sampleAssignInspectorOptions, onSaAssignDeviceChange, saInspectorIsAuto, saInspectorList, saInspectorFilled,
       saAssignVisible, saAssignRow, saAssignBlocks, openSaAssign, saveSaAssign,
       saDetailVisible, saDetailRow, saDetailRows, openSaDetail, cancelSaDetailTask,
       saDetailHeadStatus, saDetailDoneCount, saCancelTaskEnabled, saCancelTaskTip,
+      saLogVisible, saLogRow, saLogRows, openSaLog, saLogTagClass,
       soPrepPushVisible, soPrepPushForm, soPrepDocTypeOptions, onSoPrepPushOk,
       jobVisible, jobTitle, jobHead, jobProcs, jobProcIdx,
       jobLogiMode, jobStockMode, jobInvTip, jobInvCols, jobBarcodeCols, jobInvRows, jobBarcodeRows, formBarcodeRows, formBarcodeSelected,
       prodPickLotVisible, prodPickLotTitle, prodPickLotHead, prodPickLotRows, hasProdPickLotDetails, formatProdPickLotsText, openProdPickLotDetail,
       dictTypeKw, dictTypeId, dictTypeTitle, filteredDictTypeTree, dictTypeCollapsed, dictTypeFormVisible, dictTypeFormMode, dictTypeForm, dictSplitTypeLabel, dictTypes, chromModelStatMap, chromModelMetaText,
       visibleTypeFormFields, dictTypeOptions,
-      onSelectMenu, onTabChange, onQuery, onResetQuery, onToolbar, onRowOp,
+      onSelectMenu, onTabChange, onQuery, onResetQuery, onToolbar, onRowOp, ilLogRows, ilLogSnapshotCols, ilLogCellText,
       sampleTakeVisible, sampleTakeTab, sampleTakeForm, sampleTakeMasterCells, sampleTakeTeamOptions, sampleTakeSchemeOptions, sampleTakeRows, sampleTakeSheet, sampleTakeSelected, sampleTakeItemSelected, sampleTakePlanCount, sampleTakeTempCount, sampleTakePickerVisible, sampleTakePickerTitle, sampleTakePickerKw, sampleTakePickerRows, itemPickerRows, openSampleTakePicker, onSampleTakePickerSelect, confirmSampleTakePicker, confirmItemPicker, onSampleTakeItemSelection, deleteSampleTakeItems,
-      onSampleTakeSchemeChange, generateSampleTakeRows, printSampleTakeLabels, refreshSampleTakeCodes, deleteSampleTakeRows, onSampleTakeSelection, retainSampleTake, formatSampleTakeTeam, sampleRetainRows, sampleRetainSelected, generateSampleRetainRows, printSampleRetainLabels, refreshSampleRetainCodes, deleteSampleRetainRows, onSampleRetainSelection, cancelSampleTake, saveSampleTake, confirmSampleTake, labReceiveVisible, labReceiveIds, labReceiveForm, labReceiveWhOptions, labReceiveLocOptions, onLabReceiveWhChange, confirmLabReceive, labRetainAddVisible, labRetainForm, labRetainUpstreamOptions, labRetainOrder, labRetainAvailable, labRetainNoMaster, openLabRetainAdd, onLabRetainOrderChange, confirmLabRetainAdd, labLabelVisible, labLabelRows, openLabLabelPrint, confirmLabLabelPrint, labArchiveLabelVisible, labArchiveLabelTemplate, labArchiveLabelTemplates, labArchiveLabelRows, openLabArchiveLabelPrint, confirmLabArchiveLabelPrint, handleLabArchiveExpireDispose, onLabReceiveReject, onFormLineAction, onFormBarcodeAction, onFormOk, onFormFooter, onQcInspectSave, onSplitOk, onDispatchAuditOk, onAssignOk, onAssignVehicleChange, tagClass, displayTagValue, isExpireOverdue, formatMatUomRatioDisplay, isDateTimeField, colMinWidth, formLineColMinWidth, fitColWidth, colMaxWidth, isFormFieldVisible, isFormFieldRequired, ratioFieldKey, isBatchFieldRequired, dispatchNeedsOrderNo, isFormFieldLocked, isFormLineFieldLocked, isFormPickerDisabled, formPickerPlaceholder, onFormPickerClear, isDetailLineRowActionVisible, visibleRowOps, rowOpsInline, rowOpsMore, onRowOpMore, rowOpsColWidth, canEditTankArch, onTankArchDetailEdit, onBizLink, isBizLinkField, isDetailTagField, detailFieldLabel, detailDisplayValue, maskIdCard, removeFormLine, clonePoInFormLineForNewLot, refreshPoInFormLineNos, removeMatMediumPick, matInfoText, formFieldOptions, formLineSelectOptions, prodRetBatchOptions, countWhLotOptions, isProdFormLotField, isCountManageRow, resolveWhBizType, isWaybillPage, isChromLedgerPage, usesErpLineNoCol, isPoNoticePage, isProdIssuePage, isDirectXferPage, isProdWhPage, prodAppMeta, isLoadPage, loadPageMeta, loadWhBizMeta, isWhLineClosePage, isOsPoPage, isWhNoticePage, isCsRecvPage, isBcSerialPage, isBcLineFormPage, onBcFormLineBarcodeEnter, syncSerialSplitRemain, syncSerialMergeRemain, isCsRetPage, isCsWhPage, demoCarrierName, demoCarrierDispatcher,
+      onSampleTakeSchemeChange, generateSampleTakeRows, printSampleTakeLabels, refreshSampleTakeCodes, deleteSampleTakeRows, onSampleTakeSelection, retainSampleTake, formatSampleTakeTeam, sampleRetainRows, sampleRetainSelected, generateSampleRetainRows, printSampleRetainLabels, refreshSampleRetainCodes, deleteSampleRetainRows, onSampleRetainSelection, cancelSampleTake, saveSampleTake, confirmSampleTake, labReceiveVisible, labReceiveIds, labReceiveForm, labReceiveWhOptions, labReceiveLocOptions, onLabReceiveWhChange, confirmLabReceive, labRetainAddVisible, labRetainForm, labRetainUpstreamOptions, labRetainOrder, labRetainAvailable, labRetainNoMaster, openLabRetainAdd, onLabRetainOrderChange, confirmLabRetainAdd, labRetainLines, labRetainSel, generateRetainLines, printRetainLines, refreshRetainNo, removeRetainLines, onLabRetainCountChange, labLabelVisible, labLabelRows, openLabLabelPrint, confirmLabLabelPrint, labArchiveLabelVisible, labArchiveLabelTemplate, labArchiveLabelTemplates, labArchiveLabelRows, openLabArchiveLabelPrint, confirmLabArchiveLabelPrint, handleLabArchiveExpireDispose, onLabReceiveReject, onFormLineAction, onFormBarcodeAction, onFormOk, onFormFooter, onQcInspectSave, onSplitOk, onDispatchAuditOk, onAssignOk, onAssignVehicleChange, tagClass, displayTagValue, isExpireOverdue, formatMatUomRatioDisplay, isDateTimeField, colMinWidth, formLineColMinWidth, fitColWidth, colMaxWidth, isFormFieldVisible, isFormFieldRequired, ratioFieldKey, isBatchFieldRequired, dispatchNeedsOrderNo, isFormFieldLocked, isFormLineFieldLocked, isFormPickerDisabled, formPickerPlaceholder, onFormPickerClear, isDetailLineRowActionVisible, visibleRowOps, rowOpsInline, rowOpsMore, onRowOpMore, rowOpsColWidth, canEditTankArch, onTankArchDetailEdit, onBizLink, isBizLinkField, isDetailTagField, detailFieldLabel, detailDisplayValue, maskIdCard, removeFormLine, clonePoInFormLineForNewLot, refreshPoInFormLineNos, removeMatMediumPick, matInfoText, formFieldOptions, formLineSelectOptions, prodRetBatchOptions, countWhLotOptions, isProdFormLotField, isCountManageRow, resolveWhBizType, isWaybillPage, isChromLedgerPage, usesErpLineNoCol, isPoNoticePage, isProdIssuePage, isDirectXferPage, isProdWhPage, prodAppMeta, isLoadPage, loadPageMeta, loadWhBizMeta, isWhLineClosePage, isOsPoPage, isWhNoticePage, isCsRecvPage, isBcSerialPage, isBcLineFormPage, onBcFormLineBarcodeEnter, syncSerialSplitRemain, syncSerialMergeRemain, isCsRetPage, isCsWhPage, demoCarrierName, demoCarrierDispatcher,
       selectDictType, toggleDictTypeNode, openDictTypeForm, onDictTypeFormOk, removeDictType, onRemoveUnusedDictTypes, addrPopoverField,
       rcAuditVisible, rcAuditRow, rcAuditForm, saveReportAudit,
       riIssueVisible, riIssueForm, riIssueLines, riSourceNos, riTemplateOptions, isRiBatchAllValues, riBatchAllValuesLines, onRiSourceChange, onRiTemplateChange, saveIssueCOA,
@@ -42111,7 +43686,10 @@ const app = createApp({
       workshopSelectOptions, prodLineSelectNames, onInspLinePicked, onInspWorkshopChange, fillGatherSchemeLine,
       COMMON_MATERIAL_OPTIONS, inspOrderModalVisible, inspOrderMode, inspOrderEditId, inspOrderCloseModalVisible, inspOrderCloseRows, inspOrderCloseExplain, inspSampleDataEntryVisible, inspSampleQuickEntryVisible, inspSampleEndEntryVisible,
       inspSampleAbnormalReportVisible, activeSampleRow, inspSampleShowAll, inspSampleFullscreen, toggleInspSampleFullscreen, scrollToInspItem, inspSampleMethod,
-      inspSamplePublicTestTimes, inspSampleTestCount, inspSampleActiveItemId, inspSampleActiveCat, inspSampleCategories, inspSampleCatItems, selectInspSampleCat, inspSampleHasParams, inspSampleMethodOptions, inspSampleMethodType, inspSampleGatherBtnText, inspSampleGatherTip, onFetchGatherData, inspSampleParamRows, inspSampleParamRowsOf, onResultParamCellChange, onHplcParamCellChange, onInspSampleParamCellChange, inspUnmatchedPeaks, inspUnmatchedPeakSource, dePeakPctText, inspSampleResultText, inspSampleItemCheckClass, inspSampleCatCheckClass, inspSampleItemTip, inspSampleSpecText, onQualValChange, onParamCellChange, onItemValChange, fillSampleDemoValues, clearSampleValues, onInspSampleSave,
+      inspSamplePublicTestTimes, inspSampleTestCount, inspSampleInstruments, inspInstrumentOptions, onInspSampleTestCountChange, onInspSampleInstrumentsChange, inspSampleActiveItemId, inspSampleActiveCat, inspSampleCategories, inspSampleCatItems, selectInspSampleCat, inspSampleHasParams, inspSampleMethodOptions, onFetchGatherData, inspSampleParamRows, inspSampleParamRowsOf, onResultParamCellChange, onHplcParamCellChange, onInspSampleParamCellChange, inspUnmatchedPeaks, inspUnmatchedPeakSource, dePeakPctText, inspSampleResultText, inspSampleItemCheckClass, inspSampleCatCheckClass, inspSampleItemTip, inspSampleSpecText, onQualValChange, onParamCellChange, onItemValChange, fillSampleDemoValues, clearSampleValues, onInspSampleSave,
+      collectVisible, collectFilters, collectBatchOptions, collectFiles, collectFileId, collectGrid, openCollectDialog, collectAutoFill, collectClearGrid, onCollectSubmit, onCollectCancel,
+      iotVisible, iotFilters, iotInstruments, iotTypeOptions, iotInstId, iotRows, openIotGather, iotAutoFill, iotClearGrid, onIotSubmit, onIotCancel,
+      chromVisible, chromFilters, chromLedgerList, chromLedgerRtCols, CHROM_LEDGER_PICK_STAT_FIELDS, chromLedgerRtStructMap, ledgerCellText, chromRtText, chromPctText, chromLedgerKey, chromRows, openChromGather, chromAutoFill, chromClearGrid, onChromSubmit, onChromCancel,
       qeFullscreen, qeMethod, qeInstrument, qeActiveCat, qeCollapsed, qePubVals, qePublicParams, qeSampleParams, qeMethodOptions, qeUnitOptions, qeInstrumentOptions,
       qeItems, qeDoneCount, qeCategories, qeAllCollapsed, qeSubTestColWidth, qeSubBlankWidth, qeInfoFields, qeSpecLines, qeInit, qeSyncMeta, qeSelectCat, qeToggleItem, qeToggleAll, qeToggleFullscreen, qeFetchSpectrum,
       onInspSampleDataEntrySubmit, onInspSampleEndEntryConfirm,
